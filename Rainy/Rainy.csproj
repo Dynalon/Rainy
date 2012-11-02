@@ -34,27 +34,31 @@
   <ItemGroup>
     <Reference Include="System" />
     <Reference Include="System.Runtime.Serialization" />
-    <Reference Include="ServiceStack">
-      <HintPath>..\..\ServiceStack-v.3.917\ServiceStack.dll</HintPath>
-    </Reference>
-    <Reference Include="ServiceStack.ServiceInterface">
-      <HintPath>..\..\ServiceStack-v.3.917\ServiceStack.ServiceInterface.dll</HintPath>
-    </Reference>
-    <Reference Include="ServiceStack.Interfaces">
-      <HintPath>..\..\ServiceStack-v.3.917\ServiceStack.Interfaces.dll</HintPath>
-    </Reference>
-    <Reference Include="ServiceStack.Common">
-      <HintPath>..\..\ServiceStack-v.3.917\ServiceStack.Common.dll</HintPath>
-    </Reference>
-    <Reference Include="ServiceStack.Text">
-      <HintPath>..\..\ServiceStack.Text\src\ServiceStack.Text\bin\Debug\ServiceStack.Text.dll</HintPath>
-    </Reference>
     <Reference Include="System.Core" />
     <Reference Include="System.Web" />
     <Reference Include="System.Web.Abstractions" />
     <Reference Include="log4net">
       <HintPath>..\lib\log4net.dll</HintPath>
     </Reference>
+    <Reference Include="ServiceStack.Common">
+      <HintPath>..\lib\ServiceStack.Common.dll</HintPath>
+    </Reference>
+    <Reference Include="ServiceStack.Interfaces">
+      <HintPath>..\lib\ServiceStack.Interfaces.dll</HintPath>
+    </Reference>
+    <Reference Include="ServiceStack.OrmLite">
+      <HintPath>..\lib\ServiceStack.OrmLite.dll</HintPath>
+    </Reference>
+    <Reference Include="ServiceStack.ServiceInterface">
+      <HintPath>..\lib\ServiceStack.ServiceInterface.dll</HintPath>
+    </Reference>
+    <Reference Include="ServiceStack.Text">
+      <HintPath>..\lib\ServiceStack.Text.dll</HintPath>
+    </Reference>
+    <Reference Include="ServiceStack">
+      <HintPath>..\lib\ServiceStack.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.CSharp" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <ItemGroup>
@@ -65,6 +69,10 @@
     <ProjectReference Include="..\DevDefined.OAuth\src\DevDefined.OAuth\DevDefined.OAuth.csproj">
       <Project>{61B700B6-3911-4CEF-8751-7F42CA765068}</Project>
       <Name>DevDefined.OAuth</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\JsonConfig\JsonConfig\JsonConfig.csproj">
+      <Project>{10095092-E1E5-441F-9380-B6329F3CFEB4}</Project>
+      <Name>JsonConfig</Name>
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
@@ -80,5 +88,8 @@
   <ItemGroup>
     <Folder Include="WebService\" />
     <Folder Include="WebService\OAuth\" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="settings.conf" />
   </ItemGroup>
 </Project>
