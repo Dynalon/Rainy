@@ -3,3 +3,4 @@
 *.userprefs
 *.pidb
 *.mdb
+.DS_Store

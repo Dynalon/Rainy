@@ -1,0 +1,6 @@
+[submodule "tomboy-library"]
+	path = tomboy-library
+	url = https://github.com/trepidity/tomboy-library
+[submodule "DevDefined.OAuth"]
+	path = DevDefined.OAuth
+	url = https://github.com/Dynalon/DevDefined.OAuth.git
