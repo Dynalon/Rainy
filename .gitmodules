@@ -4,3 +4,6 @@
 [submodule "DevDefined.OAuth"]
 	path = DevDefined.OAuth
 	url = https://github.com/Dynalon/DevDefined.OAuth.git
+[submodule "JsonConfig"]
+	path = JsonConfig
+	url = git@github.com:Dynalon/JsonConfig.git
