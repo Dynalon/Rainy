@@ -6,4 +6,4 @@
 	url = https://github.com/Dynalon/DevDefined.OAuth.git
 [submodule "JsonConfig"]
 	path = JsonConfig
-	url = git@github.com:Dynalon/JsonConfig.git
+	url = https://github.com/Dynalon/JsonConfig.git
