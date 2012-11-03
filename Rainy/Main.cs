@@ -130,8 +130,8 @@ namespace Rainy
 
 	public class MainClass
 	{
-		public static string NotesPath = "/tmp/rainy/notes";
-		public static string OAuthDataPath = "/tmp/rainy/oauth/";
+		public static string NotesPath;
+		public static string OAuthDataPath;
 
 		// HACK a dictionary holding usernames and their repos
 		// can be used for locking
@@ -207,8 +207,8 @@ namespace Rainy
 			if (string.IsNullOrEmpty (data_path)) {
 				data_path = Directory.GetCurrentDirectory ();
 			}
-			//NotesPath = Path.Combine (data_path, "notes");
-			//OAuthDataPath = Path.Combine (data_path, "oauth");
+			NotesPath = Path.Combine (data_path, "notes");
+			OAuthDataPath = Path.Combine (data_path, "oauth");
 
 			string listen_hostname = Config.Global.ListenAddress;
 			int listen_port = Config.Global.ListenPort;
