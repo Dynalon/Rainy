@@ -1,18 +1,10 @@
 using System;
 using ServiceStack.ServiceHost;
-using ServiceStack.ServiceInterface;
 using ServiceStack.Text;
-using DevDefined.OAuth.Provider;
-using DevDefined.OAuth.Testing;
-using DevDefined.OAuth.Provider.Inspectors;
 using DevDefined.OAuth.Framework;
-using System.Web;
 using System.IO;
 using System.Net;
-using ServiceStack.ServiceModel.Serialization;
-using Rainy.OAuth.SimpleStore;
 using DevDefined.OAuth.Storage.Basic;
-using DevDefined.OAuth.Storage;
 using Rainy.WebService;
 using log4net;
 
@@ -21,10 +13,10 @@ namespace Rainy.WebService.OAuth
 	
 	public class OAuthRequiredAttribute : Attribute, IHasRequestFilter
 	{
-		protected ILog logger;
+		protected ILog Logger;
 		public OAuthRequiredAttribute ()
 		{
-			logger = LogManager.GetLogger (GetType ());
+			Logger = LogManager.GetLogger (GetType ());
 		}
 		public IHasRequestFilter Copy ()
 		{
@@ -48,10 +40,10 @@ namespace Rainy.WebService.OAuth
 			IOAuthContext context = new OAuthContextBuilder ().FromWebRequest (web_request, new MemoryStream ());
 		
 			try {
-				logger.Debug ("trying to acquire authorization");
+				Logger.Debug ("trying to acquire authorization");
 				AppHost.OAuth.Provider.AccessProtectedResourceRequest (context);
 			} catch {
-				logger.DebugFormat ("failed to obtain authorization, oauth context is: {0}", context.Dump ());
+				Logger.DebugFormat ("failed to obtain authorization, oauth context is: {0}", context.Dump ());
 				response.ReturnAuthRequired ();
 			}
 			

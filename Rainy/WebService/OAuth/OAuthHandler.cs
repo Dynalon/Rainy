@@ -53,24 +53,24 @@ namespace Rainy.OAuth
 		public OAuthProvider Provider;
 
 		// the paths where we store our data
-		protected DirectoryInfo oauthDataPath;
-		protected string accessRepoFile;
+		protected DirectoryInfo OauthDataPath;
+		protected string AccessRepoFile;
 
 		// the interval in which we will write the repositories to disk in seconds
-		protected uint diskWriteInterval;
-		protected Thread writeThread;
+		protected uint DiskWriteInterval;
+		protected Thread WriteThread;
 
 		public OAuthHandler (string oauth_data_path, uint disk_write_interval = 300)
 		{
-			this.diskWriteInterval = disk_write_interval;
+			this.DiskWriteInterval = disk_write_interval;
 
 			// initialize the pathes for on-disk storage
-			oauthDataPath = new DirectoryInfo (oauth_data_path);
+			OauthDataPath = new DirectoryInfo (oauth_data_path);
 			if (!Directory.Exists (oauth_data_path)) {
 				// create the path where we store the oauth data
 				Directory.CreateDirectory (oauth_data_path);
 			}
-			accessRepoFile = Path.Combine (oauthDataPath.FullName, "access_tokens.json");
+			AccessRepoFile = Path.Combine (OauthDataPath.FullName, "access_tokens.json");
 
 			// read in persistent data
 			ReadDataFromDisk ();
@@ -102,8 +102,8 @@ namespace Rainy.OAuth
 		protected void ReadDataFromDisk ()
 		{
 			lock (this) {
-				if (File.Exists (accessRepoFile)) {
-					string access_repo_serialized = File.ReadAllText (accessRepoFile);
+				if (File.Exists (AccessRepoFile)) {
+					string access_repo_serialized = File.ReadAllText (AccessRepoFile);
 					this.AccessTokens = access_repo_serialized.FromJson<ITokenRepository<AccessToken>> ();
 				} else {
 					this.AccessTokens = new SimpleTokenRepository<AccessToken> ();
@@ -116,29 +116,29 @@ namespace Rainy.OAuth
 			lock (this) {
 				string access_repo_serialized = this.AccessTokens.ToJson ();
 				// TODO create backup of existing file before overwriting
-				File.WriteAllText (accessRepoFile, access_repo_serialized);
+				File.WriteAllText (AccessRepoFile, access_repo_serialized);
 			}
 		}
 
 		public void StartIntervallWriteThread ()
 		{
-			writeThread = new Thread (() => {
+			WriteThread = new Thread (() => {
 				while (true) {
-					Thread.Sleep ((int) diskWriteInterval * 1000);
+					Thread.Sleep ((int) DiskWriteInterval * 1000);
 
 					lock (this) {
 						WriteDataToDisk ();
 					}
 				}
 			});
-			writeThread.Start ();
+			WriteThread.Start ();
 		}
 		public void StopIntervallWriteThread ()
 		{
 			lock (this) {
 				// due to the lock its save to abort the thread at this place
-				if (writeThread.IsAlive) {
-					writeThread.Abort ();
+				if (WriteThread.IsAlive) {
+					WriteThread.Abort ();
 				}
 
 				WriteDataToDisk ();

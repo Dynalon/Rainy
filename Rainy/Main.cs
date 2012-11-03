@@ -94,7 +94,7 @@ namespace Rainy
 			// if another instance for this user exists, wait until it is freed
 			userLocks [username].WaitOne ();
 
-			StoragePath = "/tmp/rainy/notes/" + Username;
+			StoragePath = MainClass.NotesPath + "/" + Username;
 			if (!Directory.Exists (StoragePath)) {
 				Directory.CreateDirectory (StoragePath);
 			}
@@ -130,7 +130,7 @@ namespace Rainy
 
 	public class MainClass
 	{
-		public static string NotesPath = "/tmp/rainy/notes/";
+		public static string NotesPath = "/tmp/rainy/notes";
 		public static string OAuthDataPath = "/tmp/rainy/oauth/";
 
 		// HACK a dictionary holding usernames and their repos
@@ -199,8 +199,16 @@ namespace Rainy
 				Console.WriteLine ("Could not find a configuration file (try the -c flag)!");
 				return;
 			}
+
 			// set the configuration from the specified file
 			Config.Global = Config.ApplyJsonFromPath (config_file);
+
+			string data_path = Config.Global.DataPath;
+			if (string.IsNullOrEmpty (data_path)) {
+				data_path = Directory.GetCurrentDirectory ();
+			}
+			//NotesPath = Path.Combine (data_path, "notes");
+			//OAuthDataPath = Path.Combine (data_path, "oauth");
 
 			string listen_hostname = Config.Global.ListenAddress;
 			int listen_port = Config.Global.ListenPort;

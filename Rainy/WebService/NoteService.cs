@@ -11,50 +11,6 @@ using Rainy.WebService.OAuth;
 
 namespace Rainy.WebService
 {
-	public class RequestLogFilter : Attribute, IHasRequestFilter
-	{
-		protected ILog logger;
-		public RequestLogFilter ()
-		{
-			logger = LogManager.GetLogger (GetType ());
-		}
-		public void RequestFilter (IHttpRequest req, IHttpResponse res, object requestDto)
-		{
-			// bug: .Dump () on a NullStream will throw an exception
-			if (requestDto is OAuthRequestTokenRequest)
-				return;
-
-			logger.DebugFormat ("Received request at: {0}\nJSON Data received:\n{1}", req.RawUrl, requestDto.Dump ());
-		}
-		public IHasRequestFilter Copy ()
-		{
-			return this;
-		}
-		public int Priority {
-			get { return 1; }
-		}
-	}
-	public class ResponseLogFilter : Attribute, IHasResponseFilter
-	{
-		protected ILog logger;
-		public ResponseLogFilter ()
-		{
-			logger = LogManager.GetLogger (GetType ());
-		}
-		public void ResponseFilter (IHttpRequest req, IHttpResponse res, object responseDto)
-		{
-			logger.Debug ("Sending response JSON:\n" + responseDto.Dump ());
-		}
-		public IHasResponseFilter Copy ()
-		{
-			return this;
-		}
-		public int Priority {
-			get { return 1; }
-		}
-	}
-
-
 	[Route("/{Username}/{Password}/api/1.0/")]
 	public class ApiRequest : IReturn<ApiResponse>
 	{
@@ -69,7 +25,7 @@ namespace Rainy.WebService
 		}
 		public object Get (ApiRequest request)
 		{
-			logger.Debug ("ApiRequest received");
+			Logger.Debug ("ApiRequest received");
 			var response = new ApiResponse ();
 			var baseUri = ((HttpListenerRequest)this.Request.OriginalRequest).Url;
 			string baseUrl = baseUri.Scheme + "://" + baseUri.Authority + "/";
@@ -90,7 +46,6 @@ namespace Rainy.WebService
 	}
 
 	[Route("/api/1.0/{Username}/")]
-	[OAuthRequiredAttribute]
 	public class UserRequest : IReturn<UserResponse>
 	{
 		public string Username { get; set; }

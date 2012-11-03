@@ -41,12 +41,12 @@ namespace Rainy.WebService.OAuth
 			try {
 				IOAuthContext context = new OAuthContextBuilder ().FromWebRequest (original_request, request.RequestStream);
 				IToken token = AppHost.OAuth.Provider.GrantRequestToken (context);
-				logger.DebugFormat ("granting request token {0} to consumer", token);
+				Logger.DebugFormat ("granting request token {0} to consumer", token);
 
 				Response.StatusCode = 200;
 				Response.Write (token.ToString ());
 			} catch (Exception e) {
-				logger.ErrorFormat ("Caught exception: {0}", e.Message);
+				Logger.ErrorFormat ("Caught exception: {0}", e.Message);
 				Response.StatusCode = 500;
 				Response.StatusDescription = e.Message;
 			} finally {
@@ -81,14 +81,14 @@ namespace Rainy.WebService.OAuth
 			// TODO this is just a basic hack to enable authorization
 			if (!userIsAllowed (request.Username, request.Password)) {
 				// unauthorized
-				logger.WarnFormat ("Failed to authorize user {0}", request.Username);
+				Logger.WarnFormat ("Failed to authorize user {0}", request.Username);
 				Response.StatusCode = 403;
 				Response.StatusDescription ="Authorization failed";
 				Response.Close ();
 				return null;
 			}
 			// authorization succeeded, continue
-			logger.InfoFormat ("Successfully authorized user: {0}", request.Username);
+			Logger.InfoFormat ("Successfully authorized user: {0}", request.Username);
 
 			// TODO this is ugly as it bypasses the OAuth DevDefined API
 			// however, I can't find to this date any documentation or API code that would
@@ -101,11 +101,11 @@ namespace Rainy.WebService.OAuth
 			token.AccessToken.UserName = request.Username;
 		
 			AppHost.OAuth.RequestTokens.SaveToken (token);
-			logger.DebugFormat ("created an access token for user {0}: {1}", request.Username, token);
+			Logger.DebugFormat ("created an access token for user {0}: {1}", request.Username, token);
 
 			// redirect to the provded callback
 			var redirect_url = token.CallbackUrl + "?oauth_verifier=" + token.Verifier + "&oauth_token=" + token.Token;
-			logger.DebugFormat ("redirecting user to consumer at: {1}", request.Username, redirect_url);
+			Logger.DebugFormat ("redirecting user to consumer at: {1}", request.Username, redirect_url);
 			Response.Redirect (redirect_url);
 			return null;
 		}
@@ -143,10 +143,10 @@ namespace Rainy.WebService.OAuth
 			try {
 				var context = new OAuthContextBuilder ().FromWebRequest (original_request, new MemoryStream ());
 				var token = AppHost.OAuth.Provider.ExchangeRequestTokenForAccessToken (context);
-				logger.DebugFormat ("exchanging request token for access token {0}", token); 
+				Logger.DebugFormat ("exchanging request token for access token {0}", token);
 				Response.Write (token.ToString ());
 			} catch (Exception e) {
-				logger.ErrorFormat ("failed to exchange request token for access token, exception was: {0}", e.Message);
+				Logger.ErrorFormat ("failed to exchange request token for access token, exception was: {0}", e.Message);
 				Response.StatusCode = 500;
 				Response.StatusDescription = e.Message;
 			} finally {
