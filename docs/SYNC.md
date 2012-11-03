@@ -1,6 +1,7 @@
 Syncing documentation for Tomboy with remote webservers
 =================
 
+Note: This document is only intended for developers.
 
 About
 -----
