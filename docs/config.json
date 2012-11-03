@@ -1,0 +1,6 @@
+# This config file is only used for markdown.io 
+# and not an essential part of Rainy.
+{
+    "Theme" : "spacelab",
+    "Title": "Rainy Wiki"
+}
