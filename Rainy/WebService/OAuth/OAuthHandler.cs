@@ -137,7 +137,9 @@ namespace Rainy.OAuth
 		{
 			lock (this) {
 				// due to the lock its save to abort the thread at this place
-				writeThread.Abort ();
+				if (writeThread.IsAlive) {
+					writeThread.Abort ();
+				}
 
 				WriteDataToDisk ();
 			}

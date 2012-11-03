@@ -11,9 +11,6 @@ using Rainy.WebService.OAuth;
 
 namespace Rainy.WebService
 {
-
-
-
 	public class RequestLogFilter : Attribute, IHasRequestFilter
 	{
 		protected ILog logger;
@@ -24,10 +21,10 @@ namespace Rainy.WebService
 		public void RequestFilter (IHttpRequest req, IHttpResponse res, object requestDto)
 		{
 			// bug: .Dump () on a NullStream will throw an exception
-			if (requestDto is Rainy.WebService.OAuth.OAuthRequestTokenRequest)
+			if (requestDto is OAuthRequestTokenRequest)
 				return;
 
-			logger.Debug ("Received request JSON:\n" + requestDto.Dump ());
+			logger.DebugFormat ("Received request at: {0}\nJSON Data received:\n{1}", req.RawUrl, requestDto.Dump ());
 		}
 		public IHasRequestFilter Copy ()
 		{

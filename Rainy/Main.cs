@@ -14,6 +14,7 @@ using log4net;
 
 using Rainy.OAuth;
 using Rainy.WebService;
+using JsonConfig;
 
 namespace Rainy
 {
@@ -170,17 +171,27 @@ namespace Rainy
 		public static void Main (string[] args)
 		{
 			SetupLogging ();
+			var logger = LogManager.GetLogger ("Main");
+			
 			var appHost = new AppHost ();
 
+			logger.Debug ("starting oauth data store write thread"); 
 			AppHost.OAuth = new OAuthHandler (OAuthDataPath);
 			AppHost.OAuth.StartIntervallWriteThread ();
 
 			appHost.Init ();
-			appHost.Start ("http://*:48080/");
+
+			string listen_hostname = Config.Global.ListenAddress;
+			int listen_port = Config.Global.ListenPort;
+
+			string listen_url = "http://" + listen_hostname + ":" + listen_port + "/";
+			logger.DebugFormat ("starting http listener at: {0}", listen_url);
+			appHost.Start (listen_url);
 
 			Console.WriteLine ("Press RETURN to stop Rainy");
 			Console.ReadLine ();
 
+			logger.DebugFormat ("stopping oauth data store write thread");
 			AppHost.OAuth.StopIntervallWriteThread ();
 		}
 	}
