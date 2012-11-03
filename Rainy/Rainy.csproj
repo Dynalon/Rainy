@@ -84,6 +84,7 @@
     <Compile Include="WebService\OAuth\OAuthStores.cs" />
     <Compile Include="WebService\Common.cs" />
     <Compile Include="WebService\OAuth\OAuthAccessFilter.cs" />
+    <Compile Include="Options.cs" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="WebService\" />

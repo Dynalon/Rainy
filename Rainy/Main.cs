@@ -15,6 +15,7 @@ using log4net;
 using Rainy.OAuth;
 using Rainy.WebService;
 using JsonConfig;
+using Mono.Options;
 
 namespace Rainy
 {
@@ -136,7 +137,7 @@ namespace Rainy
 		// can be used for locking
 		public static Dictionary<string, Semaphore> UserLocks;
 
-		protected static void SetupLogging ()
+		protected static void SetupLogging (int loglevel)
 		{
 			// console appender
 			log4net.Appender.ConsoleAppender appender;
@@ -144,11 +145,15 @@ namespace Rainy
 			appender.Layout = new log4net.Layout.PatternLayout
 				//("%-4timestamp %-5level %logger %M %ndc - %message%newline");
 				("%-4timestamp [%-5level] %logger->%M - %message%newline");
-#if DEBUG
-			appender.Threshold = log4net.Core.Level.Debug;
-#else
-			appender.Threshold = log4net.Core.Level.Warn;
-#endif
+
+			switch (loglevel) {
+			case 0: appender.Threshold = log4net.Core.Level.Error; break;
+			case 1: appender.Threshold = log4net.Core.Level.Warn; break;
+			case 2: appender.Threshold = log4net.Core.Level.Info; break;
+			case 3: appender.Threshold = log4net.Core.Level.Debug; break;
+			case 4: appender.Threshold = log4net.Core.Level.All; break;
+			}
+
 			log4net.Config.BasicConfigurator.Configure (appender);
 			
 			LogManager.GetLogger("Logsystem").Debug ("logsystem initialized");
@@ -170,9 +175,40 @@ namespace Rainy
 		}
 		public static void Main (string[] args)
 		{
-			SetupLogging ();
+			// parse command line arguments
+			string config_file = "settings.conf";
+			int loglevel = 0;
+			bool show_help = false;
+
+			var p = new OptionSet () {
+				{ "c|config=", "use config file",
+					(string file) => config_file = file },
+				{ "v", "increase log level, where -vvvv is highest",
+					v => { if (v != null) ++loglevel; } },
+				{ "h|help",  "show this message and exit", 
+					v => show_help = v != null },
+			};
+			p.Parse (args);
+
+			if (show_help) {
+				p.WriteOptionDescriptions (Console.Out);
+				return;
+			}
+
+			if (!File.Exists (config_file)) {
+				Console.WriteLine ("Could not find a configuration file (try the -c flag)!");
+				return;
+			}
+			// set the configuration from the specified file
+			Config.Global = Config.ApplyJsonFromPath (config_file);
+
+			string listen_hostname = Config.Global.ListenAddress;
+			int listen_port = Config.Global.ListenPort;
+
 			var logger = LogManager.GetLogger ("Main");
-			
+			SetupLogging (loglevel);
+
+			// start the WebServices
 			var appHost = new AppHost ();
 
 			logger.Debug ("starting oauth data store write thread"); 
@@ -180,9 +216,6 @@ namespace Rainy
 			AppHost.OAuth.StartIntervallWriteThread ();
 
 			appHost.Init ();
-
-			string listen_hostname = Config.Global.ListenAddress;
-			int listen_port = Config.Global.ListenPort;
 
 			string listen_url = "http://" + listen_hostname + ":" + listen_port + "/";
 			logger.DebugFormat ("starting http listener at: {0}", listen_url);

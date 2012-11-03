@@ -14,12 +14,18 @@ using Rainy.OAuth.SimpleStore;
 using DevDefined.OAuth.Storage.Basic;
 using DevDefined.OAuth.Storage;
 using Rainy.WebService;
+using log4net;
 
 namespace Rainy.WebService.OAuth
 {
 	
 	public class OAuthRequiredAttribute : Attribute, IHasRequestFilter
 	{
+		protected ILog logger;
+		public OAuthRequiredAttribute ()
+		{
+			logger = LogManager.GetLogger (GetType ());
+		}
 		public IHasRequestFilter Copy ()
 		{
 			return this;
@@ -40,8 +46,14 @@ namespace Rainy.WebService.OAuth
 			
 			var web_request = ((HttpListenerRequest)request.OriginalRequest).ToWebRequest ();
 			IOAuthContext context = new OAuthContextBuilder ().FromWebRequest (web_request, new MemoryStream ());
-			
-			AppHost.OAuth.Provider.AccessProtectedResourceRequest (context);
+		
+			try {
+				logger.Debug ("trying to acquire authorization");
+				AppHost.OAuth.Provider.AccessProtectedResourceRequest (context);
+			} catch {
+				logger.DebugFormat ("failed to obtain authorization, oauth context is: {0}", context.Dump ());
+				response.ReturnAuthRequired ();
+			}
 			
 			// check if the access token matches the username
 			var access_token = AppHost.OAuth.AccessTokens.GetToken (context.Token);
