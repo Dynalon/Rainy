@@ -54,7 +54,7 @@ Click "Connect to server"; a browser instance should fire up and telling you imm
 There are currently some issues in Tomboy and Tomdroid that you should know of before using Rainy.
 
 * Tomboy
-  * There is a [bug in Tomboy][tomboy-bug-1] regarding note templates, especially the "New Note Template" note that will always reappear and cause conflicts. If you happen to get a window in Tomboy telling you that a note with the title "New Note Template" already exists, choose to *rename the local note version*. **Do not chose overwrite the local note!**. The renamed note must be kept and note deleted.
+  * There is a [bug in Tomboy][tomboy-bug-1] regarding note templates, especially the "New Note Template" note that will always reappear and cause conflicts. If you happen to get a window in Tomboy telling you that a note with the title "New Note Template" already exists, choose to *rename the local note version*. **Do not chose overwrite the local note!**. The renamed note must be kept and not deleted.
 
 * Tomdroid
   * Due to a [bug in the stable version][tomdroid-bug-1], it is only capable of pulling notes *from* the server. Do not *modify* any notes and push them back, this will result in Tomboy to fail on the next syncing attempt.
