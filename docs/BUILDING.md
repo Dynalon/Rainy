@@ -3,7 +3,7 @@ Build and run Rainy
 
 ### 0. Install build requirements:
   * git
-  * mono (its best to install mono-complete or similiar meta-package on your linux distro to get everything and avoid missing libraries)
+  * mono (it is best to install mono-complete or similiar meta-package on your linux distro to get everything and avoid missing libraries)
 
 ### 1. Fetch and prepare latest source code from github:
 

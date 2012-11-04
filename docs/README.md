@@ -17,7 +17,7 @@ Rainy is a synchronization/cloud server intended for use with [Tomboy][tomboy] a
 
   [this]: http://markdown.io/https://raw.github.com/Dynalon/Rainy/master/docs/README.md
   [tomboy]: http://projects.gnome.org/tomboy/
-  [tomboy-lib]: https://github.com/trepidity/tomboy-library
+  [tomboylib]: https://github.com/trepidity/tomboy-library
   [tomdroid]: https://launchpad.net/tomdroid
   [tomboyrest]: https://live.gnome.org/Tomboy/Synchronization/REST/1.0
   [snowy]: http://git.gnome.org/browse/snowy
