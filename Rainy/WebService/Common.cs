@@ -20,7 +20,7 @@ namespace Rainy.WebService
 			if (requestDto is OAuthRequestTokenRequest)
 				return;
 
-			Logger.DebugFormat ("Received request at: {0}\nJSON Data received:\n{1}", req.RawUrl, requestDto.Dump ());
+			Logger.DebugFormat ("Received request at: {0}\nJSON Data received:\n{1}", req.RawUrl, requestDto.ToJson ());
 		}
 		public IHasRequestFilter Copy ()
 		{
@@ -39,7 +39,7 @@ namespace Rainy.WebService
 		}
 		public void ResponseFilter (IHttpRequest req, IHttpResponse res, object responseDto)
 		{
-			Logger.Debug ("Sending response JSON:\n" + responseDto.Dump ());
+			Logger.Debug ("Sending response JSON:\n" + responseDto.ToJson ());
 		}
 		public IHasResponseFilter Copy ()
 		{
@@ -53,6 +53,10 @@ namespace Rainy.WebService
 	[ResponseLogFilterAttribute]
 	public abstract class RainyServiceBase : Service
 	{
+		protected INoteRepository GetNotes (string username)
+		{
+			return RainyStandaloneServer.DataBackend.GetNoteRepository (username);
+		}
 		protected ILog Logger;
 		public RainyServiceBase ()
 		{

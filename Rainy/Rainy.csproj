@@ -86,6 +86,8 @@
     <Compile Include="WebService\Common.cs" />
     <Compile Include="WebService\OAuth\OAuthAccessFilter.cs" />
     <Compile Include="Options.cs" />
+    <Compile Include="RainyStandaloneServer.cs" />
+    <Compile Include="NoteRepository.cs" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="WebService\" />

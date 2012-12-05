@@ -19,115 +19,6 @@ using Mono.Options;
 
 namespace Rainy
 {
-	public class AppHost : AppHostHttpListenerBase
-	{
-		public static OAuthHandler OAuth;
-		public static string Passkey;	
-
-		public AppHost () : base("Test", typeof(DTONote).Assembly)
-		{
-		}
-		public override void Configure (Funq.Container container)
-		{
-			// not all tomboy clients send the correct content-type
-			// so we force application/json
-			SetConfig (new EndpointHostConfig {
-				DefaultContentType = ContentType.Json 
-			});
-		}
-	}
-
-
-
-
-	/// <summary>
-	/// Note repository. There may only exists one repository of a username at any given time in memory. 
-	/// When trying to create another one of the same username, the thread will block until the previous
-	/// repository of that user was disposed. Best is to always use using (new NoteRepository (username)) {  ... }
-	/// to make sure the repository is freed afterwards.
-	/// </summary>
-	public class NoteRepository : IDisposable
-	{
-		// used internally to mimic the manifest.xml data storage
-		[DataContract]
-		class NoteManifest
-		{
-			[DataMember (Name = "note-revisions")]
-			public Dictionary<string, int> NoteRevisions { get; set; }
-			
-			[DataMember (Name = "latest-sync-revision")]
-			public long LatestSyncRevision { get; set; }
-			
-			[DataMember (Name = "current-sync-guid")]
-			public string CurrentSyncGuid { get; set; }
-			
-			public NoteManifest ()
-			{
-				LatestSyncRevision = -1;
-				NoteRevisions = new Dictionary<string, int> ();
-				CurrentSyncGuid = Guid.NewGuid ().ToString ();
-			}
-		}
-
-		protected IStorage Storage;
-		protected string StoragePath;
-		protected string ManifestPath;
-		public string Username { get; protected set; }
-
-		public Engine NoteEngine;
-
-		public Dictionary<string, int> NoteRevisions { get; set; }
-		public long LatestSyncRevision { get; set; }
-		public string CurrentSyncGuid { get; set; }
-
-		// holds semaphores for each user to avoid multiple instances
-		protected static Dictionary<string, Semaphore> userLocks = new Dictionary<string, Semaphore> ();
-
-		public NoteRepository (string username)
-		{
-			this.Username = username;
-
-			lock (userLocks) {
-				if (!userLocks.ContainsKey (Username))
-					userLocks [Username] = new Semaphore (1, 1);
-			}
-			// if another instance for this user exists, wait until it is freed
-			userLocks [username].WaitOne ();
-
-			StoragePath = MainClass.NotesPath + "/" + Username;
-			if (!Directory.Exists (StoragePath)) {
-				Directory.CreateDirectory (StoragePath);
-			}
-
-			Storage = new DiskStorage ();
-			Storage.SetPath (StoragePath);
-			NoteEngine = new Engine (Storage);
-
-			// read in data from "manifest" file
-			ManifestPath = Path.Combine (StoragePath, "manifest.json");
-			NoteManifest manifest;
-			if (File.Exists (ManifestPath)) {	
-				string manifest_json = File.ReadAllText (ManifestPath);
-				manifest = manifest_json.FromJson <NoteManifest> ();
-			} else {
-				manifest = new NoteManifest ();
-			}	
-			((NoteRepository)this).PopulateWith (manifest);
-
-		}
-		public void Dispose ()
-		{
-			// write back the manifest
-			var manifest = new NoteManifest ();
-			manifest.PopulateWith (this);
-			string manifest_json = manifest.ToJson ();
-			File.WriteAllText (this.ManifestPath, manifest_json);
-
-			userLocks [Username].Release ();
-		}
-
-	}
-
 	public class MainClass
 	{
 		public static string NotesPath;
@@ -216,24 +107,29 @@ namespace Rainy
 			var logger = LogManager.GetLogger ("Main");
 			SetupLogging (loglevel);
 
-			// start the WebServices
-			var appHost = new AppHost ();
+			var oauth_handler = new OAuthHandler ("/tmp/rainy/oauth/");
+			oauth_handler.StartIntervallWriteThread ();
 
-			logger.Debug ("starting oauth data store write thread"); 
-			AppHost.OAuth = new OAuthHandler (OAuthDataPath);
-			AppHost.OAuth.StartIntervallWriteThread ();
+			var data_backend = new RainyFileSystemDataBackend ();
 
-			appHost.Init ();
+			using (var listener = new RainyStandaloneServer (oauth_handler, data_backend)) {
 
-			string listen_url = "http://" + listen_hostname + ":" + listen_port + "/";
-			logger.DebugFormat ("starting http listener at: {0}", listen_url);
-			appHost.Start (listen_url);
+				listener.Port = Config.Global.ListenPort;
+				listener.Hostname = Config.Global.ListenAddress;
 
-			Console.WriteLine ("Press RETURN to stop Rainy");
-			Console.ReadLine ();
+				listener.Start ();
 
-			logger.DebugFormat ("stopping oauth data store write thread");
-			AppHost.OAuth.StopIntervallWriteThread ();
+				Console.WriteLine ("Press RETURN to stop Rainy");
+				Console.ReadLine ();
+			}
+			oauth_handler.StopIntervallWriteThread ();
 		}
 	}
+
+	public interface IDataBackend 
+	{
+		INoteRepository GetNoteRepository (string username);
+	}
+
+
 }

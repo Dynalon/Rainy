@@ -41,14 +41,14 @@ namespace Rainy.WebService.OAuth
 		
 			try {
 				Logger.Debug ("trying to acquire authorization");
-				AppHost.OAuth.Provider.AccessProtectedResourceRequest (context);
+				Rainy.RainyStandaloneServer.OAuth.Provider.AccessProtectedResourceRequest (context);
 			} catch {
 				Logger.DebugFormat ("failed to obtain authorization, oauth context is: {0}", context.Dump ());
 				response.ReturnAuthRequired ();
 			}
 			
 			// check if the access token matches the username
-			var access_token = AppHost.OAuth.AccessTokens.GetToken (context.Token);
+			var access_token = Rainy.RainyStandaloneServer.OAuth.AccessTokens.GetToken (context.Token);
 			if (access_token.UserName != Username) {
 				// forbidden
 				response.ReturnAuthRequired ();

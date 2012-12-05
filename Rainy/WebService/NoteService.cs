@@ -67,9 +67,9 @@ namespace Rainy.WebService
 				ApiRef = baseUrl + "/api/1.0/" + request.Username + "/notes",
 				Href = baseUrl + "/api/1.0/" + request.Username + "/notes"
 			};
-			using (var note_repo = new NoteRepository (request.Username)) {
-				u.LatestSyncRevision = note_repo.LatestSyncRevision;
-				u.CurrentSyncGuid = note_repo.CurrentSyncGuid;
+			using (var note_repo = GetNotes (request.Username)) {
+				u.LatestSyncRevision = note_repo.Manifest.LatestSyncRevision;
+				u.CurrentSyncGuid = note_repo.Manifest.CurrentSyncGuid;
 			}
 
 			return u;
@@ -85,10 +85,11 @@ namespace Rainy.WebService
 
 	public class NotesService : RainyServiceBase
 	{
-		protected static GetNotesResponse GetStoredNotes (NoteRepository note_repo)
+		protected static IDataBackend DataBackend;
+		protected static GetNotesResponse GetStoredNotes (INoteRepository note_repo)
 		{
 			var notes = new List<DTONote> ();
-			var stored_notes = note_repo.NoteEngine.GetNotes ();
+			var stored_notes = note_repo.Engine.GetNotes ();
 			
 			foreach (var kvp in stored_notes) {
 				var note = new DTONote ();
@@ -104,7 +105,7 @@ namespace Rainy.WebService
 			
 			var return_notes = new GetNotesResponse ();
 			return_notes.Notes = notes;
-			return_notes.LatestSyncRevision = note_repo.LatestSyncRevision;
+			return_notes.LatestSyncRevision = note_repo.Manifest.LatestSyncRevision;
 
 			return return_notes;
 		}
@@ -112,7 +113,7 @@ namespace Rainy.WebService
 		// webservice method: HTTP GET request
 		public object Get (NotesRequest request)
 		{
-			using (var note_repo = new NoteRepository (request.Username)) {
+			using (var note_repo = GetNotes (request.Username)) {
 				var notes = GetStoredNotes (note_repo);
 
 				string since = Request.GetParam ("since");
@@ -144,16 +145,16 @@ namespace Rainy.WebService
 		}
 		public object Put (PutNotesRequest request)
 		{
-			using (var note_repo = new NoteRepository (request.Username)) {
+			using (var note_repo = GetNotes (request.Username)) {
 
 				// constraint taken from snowy source code at http://git.gnome.org/browse/snowy/tree/api/handlers.py:143
-				var new_sync_rev = note_repo.LatestSyncRevision + 1;
+				var new_sync_rev = note_repo.Manifest.LatestSyncRevision + 1;
 
 				if (request.LatestSyncRevision.HasValue) {
 					new_sync_rev = request.LatestSyncRevision.Value;
 				}
 
-				if (new_sync_rev != note_repo.LatestSyncRevision + 1)
+				if (new_sync_rev != note_repo.Manifest.LatestSyncRevision + 1)
 					throw new Exception ("Sync revisions differ by more than one, sth went wrong");
 
 				foreach (var dto_note in request.Notes) {
@@ -162,18 +163,18 @@ namespace Rainy.WebService
 					note.PopulateWith (dto_note);
 
 					if (dto_note.Command == "delete") {
-						note_repo.NoteEngine.DeleteNote (note);
+						note_repo.Engine.DeleteNote (note);
 					} else {
 						// track the revision of the note
 						note_repo.NoteRevisions [dto_note.Guid] = (int)new_sync_rev;
 
-						note_repo.NoteEngine.SaveNote (note);
+						note_repo.Engine.SaveNote (note);
 					}
 				}
 
 				// only update the sync revision if changes were sent
 				if (request.Notes.Count > 0)
-					note_repo.LatestSyncRevision = new_sync_rev;
+					note_repo.Manifest.LatestSyncRevision = new_sync_rev;
 
 				var notes_to_return = NotesService.GetStoredNotes (note_repo);
 				notes_to_return.LatestSyncRevision = new_sync_rev;

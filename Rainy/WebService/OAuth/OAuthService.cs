@@ -40,7 +40,7 @@ namespace Rainy.WebService.OAuth
 
 			try {
 				IOAuthContext context = new OAuthContextBuilder ().FromWebRequest (original_request, request.RequestStream);
-				IToken token = AppHost.OAuth.Provider.GrantRequestToken (context);
+				IToken token = Rainy.RainyStandaloneServer.OAuth.Provider.GrantRequestToken (context);
 				Logger.DebugFormat ("granting request token {0} to consumer", token);
 
 				Response.StatusCode = 200;
@@ -93,14 +93,14 @@ namespace Rainy.WebService.OAuth
 			// TODO this is ugly as it bypasses the OAuth DevDefined API
 			// however, I can't find to this date any documentation or API code that would
 			// expose how to generate and set the Verifier correctly
-			var token = AppHost.OAuth.RequestTokens.GetToken (context.Token);
+			var token = Rainy.RainyStandaloneServer.OAuth.RequestTokens.GetToken (context.Token);
 			token.Verifier = Guid.NewGuid ().ToString ();
-			token.AccessToken = (AccessToken) AppHost.OAuth.TokenStore.CreateAccessToken (context);
+			token.AccessToken = (AccessToken) Rainy.RainyStandaloneServer.OAuth.TokenStore.CreateAccessToken (context);
 			token.AccessDenied = false;
 			// store the username in the access token
 			token.AccessToken.UserName = request.Username;
 		
-			AppHost.OAuth.RequestTokens.SaveToken (token);
+			Rainy.RainyStandaloneServer.OAuth.RequestTokens.SaveToken (token);
 			Logger.DebugFormat ("created an access token for user {0}: {1}", request.Username, token);
 
 			// redirect to the provded callback
@@ -142,7 +142,7 @@ namespace Rainy.WebService.OAuth
 
 			try {
 				var context = new OAuthContextBuilder ().FromWebRequest (original_request, new MemoryStream ());
-				var token = AppHost.OAuth.Provider.ExchangeRequestTokenForAccessToken (context);
+				var token = Rainy.RainyStandaloneServer.OAuth.Provider.ExchangeRequestTokenForAccessToken (context);
 				Logger.DebugFormat ("exchanging request token for access token {0}", token);
 				Response.Write (token.ToString ());
 			} catch (Exception e) {
