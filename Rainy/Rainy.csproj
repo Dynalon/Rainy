@@ -88,6 +88,7 @@
     <Compile Include="Options.cs" />
     <Compile Include="RainyStandaloneServer.cs" />
     <Compile Include="NoteRepository.cs" />
+    <Compile Include="Interfaces.cs" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="WebService\" />

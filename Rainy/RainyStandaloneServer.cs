@@ -40,6 +40,8 @@ namespace Rainy
 			Port = 8080;
 			Hostname = "127.0.0.1";
 			logger = LogManager.GetLogger (this.GetType ());
+
+			OAuth = handler;
 			DataBackend = backend;
 
 		}

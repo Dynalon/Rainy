@@ -107,6 +107,7 @@ namespace Rainy
 			var logger = LogManager.GetLogger ("Main");
 			SetupLogging (loglevel);
 
+			// TODO the oauth handler must be put into different data backends
 			var oauth_handler = new OAuthHandler ("/tmp/rainy/oauth/");
 			oauth_handler.StartIntervallWriteThread ();
 
@@ -125,11 +126,4 @@ namespace Rainy
 			oauth_handler.StopIntervallWriteThread ();
 		}
 	}
-
-	public interface IDataBackend 
-	{
-		INoteRepository GetNoteRepository (string username);
-	}
-
-
 }

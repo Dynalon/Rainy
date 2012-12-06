@@ -19,13 +19,6 @@ using Mono.Options;
 
 namespace Rainy
 {
-	public interface INoteRepository : IDisposable
-	{
-		Tomboy.Engine Engine { get; }
-		NoteManifest Manifest { get; }
-		Dictionary<string, int> NoteRevisions { get; set; }
-	}
-
 	// TODO replace with tomboy library manifest
 	// used internally to mimic the manifest.xml data storage
 	[DataContract]
@@ -47,6 +40,7 @@ namespace Rainy
 			CurrentSyncGuid = Guid.NewGuid ().ToString ();
 		}
 	}
+
 	// TODO move OAuth stuff into here
 	public class RainyFileSystemDataBackend : IDataBackend
 	{

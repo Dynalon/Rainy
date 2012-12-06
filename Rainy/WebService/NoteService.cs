@@ -11,12 +11,7 @@ using Rainy.WebService.OAuth;
 
 namespace Rainy.WebService
 {
-	[Route("/{Username}/{Password}/api/1.0/")]
-	public class ApiRequest : IReturn<ApiResponse>
-	{
-		public string Username { get; set; }
-		public string Password { get; set; }
-	}
+
 
 	public class ApiService : RainyServiceBase
 	{
@@ -25,21 +20,25 @@ namespace Rainy.WebService
 		}
 		public object Get (ApiRequest request)
 		{
+			string username = request.Username;
+			string password = request.Password;
+
 			Logger.Debug ("ApiRequest received");
 			var response = new ApiResponse ();
 			var baseUri = ((HttpListenerRequest)this.Request.OriginalRequest).Url;
 			string baseUrl = baseUri.Scheme + "://" + baseUri.Authority + "/";
 
 			response.UserRef = new ContentRef () {
-				ApiRef = baseUrl + "api/1.0/" + request.Username,
-				Href = baseUrl + request.Username
+				ApiRef = baseUrl + "api/1.0/" + username,
+				Href = baseUrl + username
 			};
 
+			response.ApiVersion = "1.0";
 			string oauthBaseUrl = baseUrl + "oauth/";
 			response.OAuthRequestTokenUrl = oauthBaseUrl + "request_token";
 			response.OAuthAccessTokenUrl = oauthBaseUrl + "access_token";
 			// HACK we hardencode the username / password pair into the authorize step
-			response.OAuthAuthorizeUrl = oauthBaseUrl + "authorize/" + request.Username + "/" + request.Password + "/";
+			response.OAuthAuthorizeUrl = oauthBaseUrl + "authorize/" + username + "/" + password + "/";
 
 			return response;
 		}

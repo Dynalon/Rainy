@@ -8,6 +8,13 @@ using System.IO;
 
 namespace Rainy.WebService
 {
+	[Route("/{Username}/{Password}/api/1.0/")]
+	public class ApiRequest : IReturn<ApiResponse>
+	{
+		public string Username { get; set; }
+		public string Password { get; set; }
+	}
+
 	[DataContract]
 	public class ApiResponse
 	{
@@ -24,7 +31,7 @@ namespace Rainy.WebService
 		public string OAuthAccessTokenUrl { get; set; }
 
 		[DataMember (Name = "api-version")]
-		public string ApiVersion { get { return "1.0"; } }
+		public string ApiVersion { get; set; }
 
 	}
 
@@ -84,9 +91,6 @@ namespace Rainy.WebService
 
 		[DataMember (Name = "note-changes")]
 		public IList<DTONote> Notes { get; set; }
-
-		[DataMember (Name = "test")]
-		public int test { get; set; }
 
 	}
 
