@@ -30,6 +30,7 @@ namespace Rainy.WebService
 			get { return 1; }
 		}
 	}
+
 	public class ResponseLogFilterAttribute : Attribute, IHasResponseFilter
 	{
 		protected ILog Logger;
@@ -49,8 +50,9 @@ namespace Rainy.WebService
 			get { return 1; }
 		}
 	}
-	[RequestLogFilterAttribute]
-	[ResponseLogFilterAttribute]
+
+	[RequestLogFilter]
+	[ResponseLogFilter]
 	public abstract class RainyServiceBase : Service
 	{
 		protected INoteRepository GetNotes (string username)

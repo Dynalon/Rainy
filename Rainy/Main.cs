@@ -107,11 +107,24 @@ namespace Rainy
 			var logger = LogManager.GetLogger ("Main");
 			SetupLogging (loglevel);
 
+			// simply use user/password list from config for authentication
+			OAuthAuthenticator config_authenticator = (username, password) => {
+				// call the authenticater callback
+				if (string.IsNullOrEmpty (username) || string.IsNullOrEmpty (password))
+				return false;
+				
+				foreach (dynamic credentials in Config.Global.Users) {
+					if (credentials.Username == username && credentials.Password == password)
+						return true;
+				}
+				return false;
+			};
+
 			// TODO the oauth handler must be put into different data backends
-			var oauth_handler = new OAuthHandler ("/tmp/rainy/oauth/");
+			var oauth_handler = new OAuthHandler ("/tmp/rainy/oauth/", config_authenticator);
 			oauth_handler.StartIntervallWriteThread ();
 
-			var data_backend = new RainyFileSystemDataBackend ();
+			var data_backend = new RainyFileSystemDataBackend (NotesPath);
 
 			using (var listener = new RainyStandaloneServer (oauth_handler, data_backend)) {
 

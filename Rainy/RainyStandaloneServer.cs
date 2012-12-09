@@ -1,21 +1,11 @@
 using System;
-using System.Threading;
-using System.Collections.Generic;
 using ServiceStack.WebHost.Endpoints;
 using ServiceStack.Common.Web;
-using System.IO;
-using System.Runtime.Serialization;
 
-using ServiceStack.Common;
-using ServiceStack.Text;
-
-using Tomboy;
 using log4net;
 
 using Rainy.OAuth;
 using Rainy.WebService;
-using JsonConfig;
-using Mono.Options;
 
 namespace Rainy
 {
@@ -59,6 +49,7 @@ namespace Rainy
 		public void Stop ()
 		{
 			appHost.Stop ();
+			appHost.Dispose ();
 		}
 		public void Dispose ()
 		{
@@ -69,7 +60,7 @@ namespace Rainy
 	public class AppHost : AppHostHttpListenerBase
 	{
 
-		public AppHost () : base("Rainy", typeof(DTONote).Assembly)
+		public AppHost () : base("Rainy", typeof(GetNotesRequest).Assembly)
 		{
 		}
 		public override void Configure (Funq.Container container)

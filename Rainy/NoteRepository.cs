@@ -44,9 +44,15 @@ namespace Rainy
 	// TODO move OAuth stuff into here
 	public class RainyFileSystemDataBackend : IDataBackend
 	{
+		protected string notesBasePath;
+
+		public RainyFileSystemDataBackend (string notes_base_path)
+		{
+			this.notesBasePath = notes_base_path;
+		}
 		public INoteRepository GetNoteRepository (string username)
 		{
-			return new NoteRepository (username);
+			return new NoteRepository (username, notesBasePath);
 		}
 		/// <summary>
 		/// Note repository. There may only exists one repository of a username at any given time in memory. 
@@ -65,6 +71,7 @@ namespace Rainy
 
 			public NoteManifest Manifest { get; set; }
 
+			protected string notesBasePath;
 			protected IStorage storage;
 			protected string storagePath;
 			protected string manifestPath;
@@ -72,9 +79,10 @@ namespace Rainy
 			// holds semaphores for each user to avoid multiple instances
 			protected static Dictionary<string, Semaphore> userLocks = new Dictionary<string, Semaphore> ();
 
-			public NoteRepository (string username)
+			public NoteRepository (string username, string notes_base_path)
 			{
 				this.Username = username;
+				this.notesBasePath = notes_base_path;
 
 				lock (userLocks) {
 					if (!userLocks.ContainsKey (Username))
@@ -83,7 +91,7 @@ namespace Rainy
 				// if another instance for this user exists, wait until it is freed
 				userLocks [username].WaitOne ();
 
-				storagePath = MainClass.NotesPath + "/" + Username;
+				storagePath = this.notesBasePath + "/" + Username;
 				if (!Directory.Exists (storagePath)) {
 					Directory.CreateDirectory (storagePath);
 				}

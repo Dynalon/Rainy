@@ -4,15 +4,10 @@ using System.Linq;
 using ServiceStack.Common;
 using ServiceStack.ServiceHost;
 using Tomboy;
-using ServiceStack.Text;
 using System.Net;
-using log4net;
-using Rainy.WebService.OAuth;
 
 namespace Rainy.WebService
 {
-
-
 	public class ApiService : RainyServiceBase
 	{
 		public ApiService () : base ()
@@ -24,11 +19,11 @@ namespace Rainy.WebService
 			string password = request.Password;
 
 			Logger.Debug ("ApiRequest received");
-			var response = new ApiResponse ();
+			var response = new Tomboy.Sync.DTO.ApiResponse ();
 			var baseUri = ((HttpListenerRequest)this.Request.OriginalRequest).Url;
 			string baseUrl = baseUri.Scheme + "://" + baseUri.Authority + "/";
 
-			response.UserRef = new ContentRef () {
+			response.UserRef = new Tomboy.Sync.DTO.ContentRef () {
 				ApiRef = baseUrl + "api/1.0/" + username,
 				Href = baseUrl + username
 			};
@@ -44,12 +39,6 @@ namespace Rainy.WebService
 		}
 	}
 
-	[Route("/api/1.0/{Username}/")]
-	public class UserRequest : IReturn<UserResponse>
-	{
-		public string Username { get; set; }
-	}
-
 	public class UserService : RainyServiceBase
 	{
 		public object Get (UserRequest request)
@@ -57,12 +46,12 @@ namespace Rainy.WebService
 			var baseUri = ((HttpListenerRequest)this.Request.OriginalRequest).Url;
 			string baseUrl = baseUri.Scheme + "://" + baseUri.Authority + "/";
 
-			var u = new UserResponse ();
+			var u = new Tomboy.Sync.DTO.UserResponse ();
 			u.Username = request.Username;
 			u.Firstname = "Not";
 			u.Lastname = "Important";
 
-			u.NotesRef = new ContentRef () {
+			u.NotesRef = new Tomboy.Sync.DTO.ContentRef () {
 				ApiRef = baseUrl + "/api/1.0/" + request.Username + "/notes",
 				Href = baseUrl + "/api/1.0/" + request.Username + "/notes"
 			};
@@ -75,23 +64,16 @@ namespace Rainy.WebService
 		}
 	}
 
-	[Route("/api/1.0/{Username}/notes", "GET")]
-	[OAuthRequiredAttribute]
-	public class NotesRequest : IReturn<GetNotesResponse>
-	{
-		public string Username { get; set; }
-	}
-
 	public class NotesService : RainyServiceBase
 	{
 		protected static IDataBackend DataBackend;
-		protected static GetNotesResponse GetStoredNotes (INoteRepository note_repo)
+		protected static Tomboy.Sync.DTO.GetNotesResponse GetStoredNotes (INoteRepository note_repo)
 		{
-			var notes = new List<DTONote> ();
+			var notes = new List<Tomboy.Sync.DTO.DTONote> ();
 			var stored_notes = note_repo.Engine.GetNotes ();
 			
 			foreach (var kvp in stored_notes) {
-				var note = new DTONote ();
+				var note = new Tomboy.Sync.DTO.DTONote ();
 				note.PopulateWith (kvp.Value);
 
 				// if we have a sync revision, set it	
@@ -102,7 +84,7 @@ namespace Rainy.WebService
 				notes.Add (note);
 			}
 			
-			var return_notes = new GetNotesResponse ();
+			var return_notes = new Tomboy.Sync.DTO.GetNotesResponse ();
 			return_notes.Notes = notes;
 			return_notes.LatestSyncRevision = note_repo.Manifest.LatestSyncRevision;
 
@@ -110,7 +92,7 @@ namespace Rainy.WebService
 		}
 
 		// webservice method: HTTP GET request
-		public object Get (NotesRequest request)
+		public object Get (GetNotesRequest request)
 		{
 			using (var note_repo = GetNotes (request.Username)) {
 				var notes = GetStoredNotes (note_repo);

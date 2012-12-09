@@ -36,6 +36,9 @@ using DevDefined.OAuth.Utility;
 
 namespace Rainy.OAuth
 {
+
+	public delegate bool OAuthAuthenticator (string username, string password);
+
 	/// <summary>
 	/// Data store manager. Is also responsible for serializing and deserializing the OAuth
 	/// data (i.e. AccessTokens). Data integrity is very weak - we will just
@@ -51,6 +54,7 @@ namespace Rainy.OAuth
 		public INonceStore NonceStore;
 		public IConsumerStore ConsumerStore;
 		public OAuthProvider Provider;
+		public OAuthAuthenticator Authenticator;
 
 		// the paths where we store our data
 		protected DirectoryInfo OauthDataPath;
@@ -60,9 +64,10 @@ namespace Rainy.OAuth
 		protected uint DiskWriteInterval;
 		protected Thread WriteThread;
 
-		public OAuthHandler (string oauth_data_path, uint disk_write_interval = 300)
+		public OAuthHandler (string oauth_data_path, OAuthAuthenticator auth, uint disk_write_interval = 300)
 		{
 			this.DiskWriteInterval = disk_write_interval;
+			this.Authenticator = auth;
 
 			// initialize the pathes for on-disk storage
 			OauthDataPath = new DirectoryInfo (oauth_data_path);

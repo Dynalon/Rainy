@@ -29,8 +29,8 @@ namespace Rainy.WebService.OAuth
 			string Username = "";
 			if (requestDto is UserRequest) {
 				Username = ((UserRequest)requestDto).Username;
-			} else if (requestDto is NotesRequest) {
-				Username = ((NotesRequest)requestDto).Username;
+			} else if (requestDto is GetNotesRequest) {
+				Username = ((GetNotesRequest)requestDto).Username;
 			} else {
 				response.ReturnAuthRequired ();
 				return;
@@ -41,7 +41,8 @@ namespace Rainy.WebService.OAuth
 		
 			try {
 				Logger.Debug ("trying to acquire authorization");
-				Rainy.RainyStandaloneServer.OAuth.Provider.AccessProtectedResourceRequest (context);
+				Logger.Debug ("Received headers:" + request.Headers.Dump ());
+				RainyStandaloneServer.OAuth.Provider.AccessProtectedResourceRequest (context);
 			} catch {
 				Logger.DebugFormat ("failed to obtain authorization, oauth context is: {0}", context.Dump ());
 				response.ReturnAuthRequired ();
@@ -51,9 +52,11 @@ namespace Rainy.WebService.OAuth
 			var access_token = Rainy.RainyStandaloneServer.OAuth.AccessTokens.GetToken (context.Token);
 			if (access_token.UserName != Username) {
 				// forbidden
+				Logger.Debug ("username does not match the one in the access token, denying");
 				response.ReturnAuthRequired ();
 				return;
 			}
+			Logger.DebugFormat ("authorization granted for user {0}", Username);
 		}
 	}
 	

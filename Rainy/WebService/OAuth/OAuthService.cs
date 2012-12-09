@@ -100,7 +100,7 @@ namespace Rainy.WebService.OAuth
 			// store the username in the access token
 			token.AccessToken.UserName = request.Username;
 		
-			Rainy.RainyStandaloneServer.OAuth.RequestTokens.SaveToken (token);
+			RainyStandaloneServer.OAuth.RequestTokens.SaveToken (token);
 			Logger.DebugFormat ("created an access token for user {0}: {1}", request.Username, token);
 
 			// redirect to the provded callback
@@ -111,14 +111,8 @@ namespace Rainy.WebService.OAuth
 		}
 		protected bool userIsAllowed (string username, string password)
 		{
-			if (string.IsNullOrEmpty (username) || string.IsNullOrEmpty (password))
-				return false;
+			return RainyStandaloneServer.OAuth.Authenticator (username, password);
 
-			foreach (dynamic credentials in Config.Global.Users) {
-				if (credentials.Username == username && credentials.Password == password)
-					return true;
-			}
-			return false;
 		}
 	}
 
