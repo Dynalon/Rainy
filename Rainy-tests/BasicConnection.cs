@@ -9,6 +9,9 @@ using Tomboy.Sync.DTO;
 using Rainy.OAuth;
 using System.IO;
 using System.Threading;
+using Tomboy.Sync.Web;
+using System.Collections.Generic;
+using Tomboy;
 
 namespace Rainy.Tests
 {
@@ -18,6 +21,8 @@ namespace Rainy.Tests
 		private string baseUri = "http://127.0.0.1:8080/";
 		private RainyStandaloneServer rainyServer;
 		private string tmpPath;
+
+		private bool useOwnRainyInstance = true; 
 
 		[SetUp]
 		public virtual void SetUp ()
@@ -36,14 +41,18 @@ namespace Rainy.Tests
 			rainyServer = new RainyStandaloneServer (handler, backend);
 			rainyServer.Port = 8080;
 			rainyServer.Hostname = "127.0.0.1";
-			rainyServer.Start ();
+
+			if (useOwnRainyInstance)
+				rainyServer.Start ();
 
 		}
 		[TearDown]
 		public virtual void TearDown ()
 		{
-			rainyServer.Stop ();
-			Directory.Delete (tmpPath, true);
+			if (useOwnRainyInstance) {
+				rainyServer.Stop ();
+				Directory.Delete (tmpPath, true);
+			}
 
 		}
 
@@ -167,48 +176,52 @@ namespace Rainy.Tests
 			var user_service_url = api_ref.UserRef.ApiRef;
 
 			var restClient = new JsonServiceClient (baseUri);
-			restClient.SetAccessToken (GetAccessToken ());
+			restClient.SetAccessToken (this.GetAccessToken ());
 		
 			var response = restClient.Get<UserResponse> (user_service_url);
 
 			Assert.AreEqual (response.Username, "johndoe");
 			Assert.AreEqual (response.LatestSyncRevision, -1);
 		}
-	}
 
-	public static class OAuthRestHelper
-	{
-		public static void SetAccessToken (this JsonServiceClient client, IToken access_token)
+		[Test()]
+		public void WebSyncServerBasic ()
 		{
-			// we use a request filter to add the required OAuth header
-			client.LocalHttpWebRequestFilter += webservice_request => {
-				
-				OAuthConsumerContext consumer_context = new OAuthConsumerContext ();
-				
-				consumer_context.SignatureMethod = "HMAC-SHA1";
-				consumer_context.ConsumerKey = access_token.ConsumerKey;
-				consumer_context.ConsumerSecret = "anyone";
-				consumer_context.UseHeaderForOAuthParameters = true;
+			var server = new WebSyncServer (baseUri, GetAccessToken ());
+			server.BeginSyncTransaction ();
+		}
 
-				// the OAuth process creates a signature, which uses several data from
-				// the web request like method, hostname, headers etc.
-				OAuthContext request_context = new OAuthContext ();
-				request_context.Headers = webservice_request.Headers;
-				request_context.RequestMethod = webservice_request.Method;
-				request_context.RawUri = webservice_request.RequestUri;
+		[Test()]
+		public void WebSyncServerPutNotes ()
+		{
+			var server = new WebSyncServer (baseUri, GetAccessToken ());
+			server.BeginSyncTransaction ();
 
-				// now create the signature for that context
-				consumer_context.SignContextWithToken (request_context, access_token);
-
-				// BUG TODO the oauth_token is not included when generating the header,
-				// this is a bug ing DevDefined.OAuth. We add it manually as a workaround
-				request_context.AuthorizationHeaderParameters.Add ("oauth_token", access_token.Token);
-
-				string oauth_header = request_context.GenerateOAuthParametersForHeader ();
-
-				webservice_request.Headers.Add ("Authorization", oauth_header);
-
+			var notes = new List<Note> ();
+			var sample_note = new Note () {
+				Title = "This is a sample title",
+				Text = "This is a sample text"
 			};
+			notes.Add (sample_note);
+
+			server.UploadNotes (notes);
+
+			// after upload, we should be able to get that very same note
+			var received_notes = server.GetAllNotes (true);
+
+			Assert.AreEqual(1, received_notes.Count);
+			Assert.AreEqual(received_notes.First ().Title, sample_note.Title);
+			Assert.AreEqual(received_notes.First ().Text, sample_note.Text);
+
+		}
+		[Test()]
+		public void WebSyncServerGetAllNotes ()
+		{
+			var server = new WebSyncServer (baseUri, GetAccessToken ());
+			server.BeginSyncTransaction ();
+			server.GetAllNotes (true);
 		}
 	}
+
+
 }

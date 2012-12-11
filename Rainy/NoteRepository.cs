@@ -22,6 +22,7 @@ namespace Rainy
 	// TODO replace with tomboy library manifest
 	// used internally to mimic the manifest.xml data storage
 	[DataContract]
+	[Obsolete]
 	public class NoteManifest
 	{
 		[DataMember (Name = "note-revisions")]
@@ -67,7 +68,7 @@ namespace Rainy
 
 			public Tomboy.Engine Engine { get; set; }
 
-			public Dictionary<string, int> NoteRevisions { get; set; }
+			//public Dictionary<string, int> NoteRevisions { get; set; }
 
 			public NoteManifest Manifest { get; set; }
 
@@ -114,7 +115,7 @@ namespace Rainy
 			{
 				// write back the manifest
 				var manifest = new NoteManifest ();
-				manifest.PopulateWith (this);
+				manifest.PopulateWith (this.Manifest);
 				string manifest_json = manifest.ToJson ();
 				File.WriteAllText (this.manifestPath, manifest_json);
 

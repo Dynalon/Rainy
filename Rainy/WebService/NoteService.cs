@@ -77,8 +77,8 @@ namespace Rainy.WebService
 				note.PopulateWith (kvp.Value);
 
 				// if we have a sync revision, set it	
-				if (note_repo.NoteRevisions.Keys.Contains (note.Guid)) {
-					note.LastSyncRevision = note_repo.NoteRevisions [note.Guid];
+				if (note_repo.Manifest.NoteRevisions.Keys.Contains (note.Guid)) {
+					note.LastSyncRevision = note_repo.Manifest.NoteRevisions [note.Guid];
 				}
 
 				notes.Add (note);
@@ -108,8 +108,8 @@ namespace Rainy.WebService
 				// select only those notes that changed since last sync
 				// which means, only those notes that have a HIGHER revision as "since"
 				var changed_notes = notes.Notes.Where (n => {
-					if (note_repo.NoteRevisions.Keys.Contains (n.Guid)) {
-						if (note_repo.NoteRevisions [n.Guid] > since_revision)
+					if (note_repo.Manifest.NoteRevisions.Keys.Contains (n.Guid)) {
+						if (note_repo.Manifest.NoteRevisions [n.Guid] > since_revision)
 							return true;
 					}
 					return false;
@@ -139,6 +139,7 @@ namespace Rainy.WebService
 					throw new Exception ("Sync revisions differ by more than one, sth went wrong");
 
 				foreach (var dto_note in request.Notes) {
+					Logger.Debug ("FOO");
 					var note = new Note ("note://tomboy/" + dto_note.Guid);
 					// map from the DTO 
 					note.PopulateWith (dto_note);
@@ -147,11 +148,11 @@ namespace Rainy.WebService
 						note_repo.Engine.DeleteNote (note);
 					} else {
 						// track the revision of the note
-						note_repo.NoteRevisions [dto_note.Guid] = (int)new_sync_rev;
-
+						note_repo.Manifest.NoteRevisions [dto_note.Guid] = (int)new_sync_rev;
 						note_repo.Engine.SaveNote (note);
 					}
 				}
+
 
 				// only update the sync revision if changes were sent
 				if (request.Notes.Count > 0)

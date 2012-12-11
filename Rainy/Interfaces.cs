@@ -7,7 +7,7 @@ namespace Rainy
 	{
 		Tomboy.Engine Engine { get; }
 		NoteManifest Manifest { get; }
-		Dictionary<string, int> NoteRevisions { get; set; }
+		//Dictionary<string, int> NoteRevisions { get; set; }
 	}
 
 	public interface IDataBackend 
