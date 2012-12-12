@@ -18,7 +18,7 @@ namespace Rainy.Tests
 		[Test()]
 		public void WebSyncServerBasic ()
 		{
-			var server = new WebSyncServer (baseUri, GetAccessToken ());
+			var server = new WebSyncServer (baseUri, sampleManifest, GetAccessToken ());
 			server.BeginSyncTransaction ();
 
 			Assert.That (!string.IsNullOrEmpty (server.Id));
@@ -27,7 +27,7 @@ namespace Rainy.Tests
 		[Test()]
 		public void WebSyncServerPutNotes ()
 		{
-			var server = new WebSyncServer (baseUri, GetAccessToken ());
+			var server = new WebSyncServer (baseUri, sampleManifest, GetAccessToken ());
 			server.BeginSyncTransaction ();
 			
 			server.UploadNotes (sampleNotes);
@@ -62,17 +62,32 @@ namespace Rainy.Tests
 		}
 
 		[Test()]
-		public void WebSyncServerGetAllNotes ()
+		public void WebSyncServerGetAllNotesWithBody ()
 		{
-			var server = new WebSyncServer (baseUri, GetAccessToken ());
+			var server = new WebSyncServer (baseUri, sampleManifest, GetAccessToken ());
 			server.BeginSyncTransaction ();
-			server.GetAllNotes (true);
+			var notes = server.GetAllNotes (true);
+
+			notes.ToList ().ForEach (note => {
+				Assert.That (!string.IsNullOrEmpty (note.Text));
+			});
+		}
+
+		[Test()]
+		public void WebSyncServerGetAllNotesWithoutBody ()
+		{
+			var server = new WebSyncServer (baseUri, sampleManifest, GetAccessToken ());
+			server.BeginSyncTransaction ();
+			var notes = server.GetAllNotes (false);
+			notes.ToList ().ForEach (note => {
+				Assert.AreEqual ("", note.Text);
+			});
 		}
 
 		[Test()]
 		public void WebSyncServerDeleteAllNotes()
 		{
-			var server = new WebSyncServer (baseUri, GetAccessToken ());
+			var server = new WebSyncServer (baseUri, sampleManifest, GetAccessToken ());
 			server.BeginSyncTransaction ();
 
 			server.UploadNotes (sampleNotes);
@@ -88,7 +103,7 @@ namespace Rainy.Tests
 		[Test()]
 		public void WebSyncServerDeleteSingleNote ()
 		{
-			var server = new WebSyncServer (baseUri, GetAccessToken ());
+			var server = new WebSyncServer (baseUri, sampleManifest, GetAccessToken ());
 			server.BeginSyncTransaction ();
 
 			server.UploadNotes (sampleNotes);
@@ -105,6 +120,29 @@ namespace Rainy.Tests
 			Assert.AreEqual (deleted_note.Guid, server.DeletedServerNotes.First ());
 
 		}
+
+		[Test()]
+		public void WebSyncServerRevision ()
+		{
+			var server = new WebSyncServer (baseUri, sampleManifest, GetAccessToken ());
+			server.BeginSyncTransaction ();
+
+			server.GetAllNotes (false);
+			Assert.AreEqual(-1, server.LatestRevision);
+
+			server.UploadNotes (new List<Note> () { sampleNotes[0] });
+			server.CommitSyncTransaction ();
+
+			Assert.AreEqual(0, server.LatestRevision);
+
+			server = new WebSyncServer (baseUri, sampleManifest, GetAccessToken ());
+
+			server.BeginSyncTransaction ();
+			server.UploadNotes (new List<Note> () { sampleNotes[1] });
+			server.CommitSyncTransaction ();
+
+			Assert.AreEqual(1, server.LatestRevision);
+
+		}
 	}
 }
-

@@ -131,7 +131,9 @@ namespace Rainy.WebService
 				// constraint taken from snowy source code at http://git.gnome.org/browse/snowy/tree/api/handlers.py:143
 				var new_sync_rev = note_repo.Manifest.LatestSyncRevision + 1;
 
-				if (request.LatestSyncRevision.HasValue) {
+				// if the client does not send a latest-sync-revision field, or it is -1, the client has 
+				// never synced before
+				if (request.LatestSyncRevision.HasValue && request.LatestSyncRevision.Value != -1) {
 					new_sync_rev = request.LatestSyncRevision.Value;
 				}
 

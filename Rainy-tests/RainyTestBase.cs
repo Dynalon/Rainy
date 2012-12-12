@@ -11,6 +11,7 @@ using System.IO;
 using Tomboy.Sync.Web;
 using System.Collections.Generic;
 using Tomboy;
+using Tomboy.Sync;
 
 namespace Rainy.Tests
 {
@@ -24,6 +25,7 @@ namespace Rainy.Tests
 		private bool useOwnRainyInstance = true; 
 
 		protected IList<Note> sampleNotes;
+		protected SyncManifest sampleManifest;
 
 		[SetUp]
 		public void SetUp ()
@@ -47,6 +49,7 @@ namespace Rainy.Tests
 				rainyServer.Start ();
 
 			SetupSampleNotes ();
+			SetupSampleManifest ();
 		}
 
 		[TearDown]
@@ -86,6 +89,13 @@ namespace Rainy.Tests
 				ChangeDate = DateTime.MinValue,
 				MetadataChangeDate = DateTime.MinValue
 			});
+		}
+
+		protected void SetupSampleManifest ()
+		{
+			sampleManifest = new SyncManifest ();
+			sampleManifest.LastSyncDate = DateTime.MinValue;
+			sampleManifest.LastSyncRevision = -1;
 		}
 
 		protected ApiResponse GetRootApiRef (string user_pw_url = "/johndoe/none") 
