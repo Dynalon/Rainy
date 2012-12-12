@@ -139,7 +139,6 @@ namespace Rainy.WebService
 					throw new Exception ("Sync revisions differ by more than one, sth went wrong");
 
 				foreach (var dto_note in request.Notes) {
-					Logger.Debug ("FOO");
 					var note = new Note ("note://tomboy/" + dto_note.Guid);
 					// map from the DTO 
 					note.PopulateWith (dto_note);

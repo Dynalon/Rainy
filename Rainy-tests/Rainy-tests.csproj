@@ -45,8 +45,10 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="AssemblyInfo.cs" />
-    <Compile Include="BasicConnection.cs" />
-    <Compile Include="SyncTests.cs" />
+    <Compile Include="WebSyncServerTests.cs" />
+    <Compile Include="RainyTestBase.cs" />
+    <Compile Include="BasicTests.cs" />
+    <Compile Include="OAuthTests.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <ItemGroup>
