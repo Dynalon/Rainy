@@ -50,7 +50,7 @@ Like the client, the server also stores the date of the last sync. This is a sin
 The server stores a single global revision number, that tells the global revision of the whole note repository.
 
 - Note revisions
-In contrast to the client, the server **MUST** maintain a list of ALL notes and their repsective revisions. A note revision on the server is **always** less or equal to the global latest sync revision that the server stores.
+The server **MUST** maintain a list of ALL notes and their repsective revisions. A note revision on the server is **always** less or equal to the global latest sync revision that the server stores.
 
 - Note deletions
 In contrast to the client, the server **SHOULD NOT** store a list of notes deleted. This wouldn't make much sense anyways, as the server never deletes a note. Instead, user does on the client, and the client then deletes the note on the server on the next sync.
@@ -117,7 +117,7 @@ Here is some pseudocode of how a client and a server may be synced:
 TODO
 ```
 
-### Syncing protocoll
+### Syncing protocol
 
 The REST API and datatypes are described in the REST API 1.0 documentation, see the introduction text in this document. Hence we focus on the logic in the syncing process. We assume the OAuth process has already taken place and the client starts to sync the notes.
 
@@ -129,23 +129,19 @@ Along with the first request, the client sends his global revision counter `late
 
 The client MAY use the `include_notes` parameters to get the full note body in this request. When using the `since` parameter, client SHOULD set the `include_notes` parameter to `true`, since the note's body has to be transfered at some point in the syncing process.
 
-**NOTE**: The `since` parameter is somewhat redundant, as the `latest-sync-revision` is send by the client and usually should equal to the value in `since`. For historic reasons, `since` has precedence  over `latest-sync-revision`. Nonetheless, the fields should be equal with every client request anyways.
+**NOTE**: The `since` parameter is somewhat redundant, as the `latest-sync-revision` is send by the client and usually should equal to the value in `since`. For historic reasons, `since` has precedence  over `latest-sync-revision`. Nonetheless, the fields should be equal with every client request anyways for compatibility reasons. For future releases and API versions, dropping of the `since` parameter in favor of the `latests-sync-revision` parameter is advised.
 
 2) Server reponds with any changed notes
 
-The server now checks the `since` parameter and responds with a list of notes for which `last-sync-revision` is *GREATER THAN* the revision specified in the `since` / `latest-sync-revision` parameter. The server also sends his own value of the server-side global revision counter `latest-sync-revision` (which might only be equal (which means both sides are in sync) or higher (which means the client is out-of-sync) than the one sent by the client) in the response.
+The server now checks the `since` parameter and responds with a list of notes for which `last-sync-revision` is *GREATER THAN* the revision specified in the `since` / `latest-sync-revision` parameter. The server also sends his own value of the server-side global revision counter `latest-sync-revision` (which might only be equal (which means both sides are in sync) or higher (which means the client is out-of-sync) than the one sent by the client) in the response. The client adapts the server-sent `latest-sync-revision` to be his new, own global repository revision once the sync is successfull and complete.
 
 3) Client retrieves any updated notes from the server
 
-If the list of notes retrieved is non-empty, there a notes on the server which are newer (have a higher `last-sync-revision` on the remote note than the local note). If the client had specified the `include_notes=true` parameter on the first request, it can directly use the notes data retrieved to update its local notes. Else, it must now repeat the first request using the `include_notes=true` parameter, or retrieve each note one-by-one through the /api/1.0/notes/<id> call (not recommended as this produces lots of HTTP requests and thus overhead). The best way is to set `?since=rev&include_notes=true` on the very first request, since all transfered notes are newer and therefore the body is required anyways.
+If the list of notes retrieved is non-empty, there are notes on the server which are newer (have a higher `last-sync-revision` on the remote note than the local global repository revision). If the client had specified the `include_notes=true` parameter on the first request, it can directly use the notes data retrieved to update its local notes. Else, it must now repeat the first request using the `include_notes=true` parameter, or retrieve each note one-by-one through the /api/1.0/notes/<id> call (not recommended as this produces lots of HTTP requests and thus overhead). The best way is to set `?since=rev&include_notes=true` on the very first request, since all transfered notes are newer and therefore the body is required anyways.
 
-4) The clients sends all notes updates to the server
+4) The clients sends all note updates to the server
 
-???
-
-
-
-3) Clients
+END OF DOCUMENTATION - please contribute to complete this documentation.
 
 
 
