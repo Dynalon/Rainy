@@ -25,7 +25,7 @@ namespace Rainy.Tests
 		private bool useOwnRainyInstance = true; 
 
 		protected IList<Note> sampleNotes;
-		protected SyncManifest sampleManifest;
+		protected SyncManifest localManifest;
 
 		[SetUp]
 		public void SetUp ()
@@ -93,9 +93,9 @@ namespace Rainy.Tests
 
 		protected void SetupSampleManifest ()
 		{
-			sampleManifest = new SyncManifest ();
-			sampleManifest.LastSyncDate = DateTime.MinValue;
-			sampleManifest.LastSyncRevision = -1;
+			localManifest = new SyncManifest ();
+			localManifest.LastSyncDate = DateTime.MinValue;
+			localManifest.LastSyncRevision = -1;
 		}
 
 		protected ApiResponse GetRootApiRef (string user_pw_url = "/johndoe/none") 

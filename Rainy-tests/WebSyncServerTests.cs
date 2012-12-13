@@ -3,6 +3,8 @@ using Tomboy.Sync.Web;
 using System.Collections.Generic;
 using Tomboy;
 using System.Linq;
+using Tomboy.Sync.Filesystem;
+using Tomboy.Sync;
 
 namespace Rainy.Tests
 {
@@ -18,7 +20,7 @@ namespace Rainy.Tests
 		[Test()]
 		public void WebSyncServerBasic ()
 		{
-			var server = new WebSyncServer (baseUri, sampleManifest, GetAccessToken ());
+			var server = new WebSyncServer (baseUri, localManifest, GetAccessToken ());
 			server.BeginSyncTransaction ();
 
 			Assert.That (!string.IsNullOrEmpty (server.Id));
@@ -27,7 +29,7 @@ namespace Rainy.Tests
 		[Test()]
 		public void WebSyncServerPutNotes ()
 		{
-			var server = new WebSyncServer (baseUri, sampleManifest, GetAccessToken ());
+			var server = new WebSyncServer (baseUri, localManifest, GetAccessToken ());
 			server.BeginSyncTransaction ();
 			
 			server.UploadNotes (sampleNotes);
@@ -64,7 +66,7 @@ namespace Rainy.Tests
 		[Test()]
 		public void WebSyncServerGetAllNotesWithBody ()
 		{
-			var server = new WebSyncServer (baseUri, sampleManifest, GetAccessToken ());
+			var server = new WebSyncServer (baseUri, localManifest, GetAccessToken ());
 			server.BeginSyncTransaction ();
 			var notes = server.GetAllNotes (true);
 
@@ -76,7 +78,7 @@ namespace Rainy.Tests
 		[Test()]
 		public void WebSyncServerGetAllNotesWithoutBody ()
 		{
-			var server = new WebSyncServer (baseUri, sampleManifest, GetAccessToken ());
+			var server = new WebSyncServer (baseUri, localManifest, GetAccessToken ());
 			server.BeginSyncTransaction ();
 			var notes = server.GetAllNotes (false);
 			notes.ToList ().ForEach (note => {
@@ -87,7 +89,7 @@ namespace Rainy.Tests
 		[Test()]
 		public void WebSyncServerDeleteAllNotes()
 		{
-			var server = new WebSyncServer (baseUri, sampleManifest, GetAccessToken ());
+			var server = new WebSyncServer (baseUri, localManifest, GetAccessToken ());
 			server.BeginSyncTransaction ();
 
 			server.UploadNotes (sampleNotes);
@@ -103,7 +105,7 @@ namespace Rainy.Tests
 		[Test()]
 		public void WebSyncServerDeleteSingleNote ()
 		{
-			var server = new WebSyncServer (baseUri, sampleManifest, GetAccessToken ());
+			var server = new WebSyncServer (baseUri, localManifest, GetAccessToken ());
 			server.BeginSyncTransaction ();
 
 			server.UploadNotes (sampleNotes);
@@ -124,7 +126,7 @@ namespace Rainy.Tests
 		[Test()]
 		public void WebSyncServerRevision ()
 		{
-			var server = new WebSyncServer (baseUri, sampleManifest, GetAccessToken ());
+			var server = new WebSyncServer (baseUri, localManifest, GetAccessToken ());
 			server.BeginSyncTransaction ();
 
 			server.GetAllNotes (false);
@@ -134,15 +136,54 @@ namespace Rainy.Tests
 			server.CommitSyncTransaction ();
 
 			Assert.AreEqual(0, server.LatestRevision);
+			Assert.AreEqual(0, localManifest.LastSyncRevision);
 
-			server = new WebSyncServer (baseUri, sampleManifest, GetAccessToken ());
+/*			server = new WebSyncServer (baseUri, localManifest, GetAccessToken ());
 
 			server.BeginSyncTransaction ();
 			server.UploadNotes (new List<Note> () { sampleNotes[1] });
 			server.CommitSyncTransaction ();
 
 			Assert.AreEqual(1, server.LatestRevision);
+*/
+		}
 
+		[Test]
+		public void FirstSyncForBothSides ()
+		{
+			var storage = new DiskStorage ();
+			storage.SetPath ("/tmp/rainytest/");
+			var engine = new Engine (storage);
+			engine.SaveNote (new Note () { Title = "Sample Title", Text = "Sample Text" });
+
+			var client = new FilesystemSyncClient (engine, localManifest);
+			var server = new WebSyncServer (baseUri, localManifest, GetAccessToken ());
+
+			SyncManager sync_manager = new SyncManager (client, server);
+
+			// before the sync, the client should have an empty AssociatedServerId
+			Assert.That (string.IsNullOrEmpty (client.AssociatedServerId));
+			Assert.That (string.IsNullOrEmpty (localManifest.ServerId));
+
+			sync_manager.DoSync ();
+
+			var local_notes = engine.GetNotes ().Values;
+			var server_notes = server.GetAllNotes (true);
+
+			// make sure each local note exists on the server
+			foreach (var note in local_notes) {
+				Assert.That (server_notes.Contains (note));
+			}
+
+			Assert.That (!string.IsNullOrEmpty (client.AssociatedServerId));
+			Assert.AreEqual (client.AssociatedServerId, server.Id);
+			Assert.That (!string.IsNullOrEmpty (localManifest.ServerId));
+
+			// both revisions should be 0
+			Assert.AreEqual (0, client.LastSynchronizedRevision);
+			Assert.AreEqual (0, localManifest.LastSyncRevision);
+
+			Assert.AreEqual (0, server.LatestRevision);
 		}
 	}
 }
