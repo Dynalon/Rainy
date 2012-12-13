@@ -150,7 +150,7 @@ namespace Rainy.WebService
 					} else {
 						// track the revision of the note
 						note_repo.Manifest.NoteRevisions [dto_note.Guid] = (int)new_sync_rev;
-						note_repo.Engine.SaveNote (note);
+						note_repo.Engine.SaveNote (note, false);
 					}
 				}
 

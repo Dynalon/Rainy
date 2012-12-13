@@ -17,7 +17,10 @@ namespace Rainy.Tests
 {
 	public class RainyTestBase
 	{
-		protected string baseUri = "http://127.0.0.1:8080/";
+		protected string baseUri = "http://127.0.0.1:8080/johndoe/none/";
+
+		protected string rainyListenUrl = "http://127.0.0.1:8080/";
+
 		protected RainyStandaloneServer rainyServer;
 		protected string tmpPath;
 
@@ -41,9 +44,7 @@ namespace Rainy.Tests
 			OAuthHandler handler = new OAuthHandler (tmpPath, debug_authenticator, 60);
 			IDataBackend backend = new RainyFileSystemDataBackend (tmpPath);
 
-			rainyServer = new RainyStandaloneServer (handler, backend);
-			rainyServer.Port = 8080;
-			rainyServer.Hostname = "127.0.0.1";
+			rainyServer = new RainyStandaloneServer (handler, backend, rainyListenUrl);
 
 			if (useOwnRainyInstance)
 				rainyServer.Start ();
@@ -82,27 +83,28 @@ namespace Rainy.Tests
 				MetadataChangeDate = new DateTime (2012, 12, 12, 12, 12, 12, DateTimeKind.Utc),
 			});
 
+			// note that DateTime.MinValue is not an allowed timestamp for notes!
 			sampleNotes.Add(new Note () {
 				Title = "3rd exampel title",
 				Text = "Another example note",
-				CreateDate = DateTime.MinValue,
-				ChangeDate = DateTime.MinValue,
-				MetadataChangeDate = DateTime.MinValue
+				CreateDate = DateTime.MinValue + new TimeSpan (1, 0, 0, 0, 0),
+				ChangeDate = DateTime.MinValue + new TimeSpan (1, 0, 0, 0, 0),
+				MetadataChangeDate = DateTime.MinValue + new TimeSpan (1, 0, 0, 0, 0)
 			});
 		}
 
 		protected void SetupSampleManifest ()
 		{
 			localManifest = new SyncManifest ();
-			localManifest.LastSyncDate = DateTime.MinValue;
+			localManifest.LastSyncDate = DateTime.MinValue + new TimeSpan (0, 0, 0, 1, 0);
 			localManifest.LastSyncRevision = -1;
 		}
 
-		protected ApiResponse GetRootApiRef (string user_pw_url = "/johndoe/none") 
+		protected ApiResponse GetRootApiRef () 
 		{
-			var restClient = new JsonServiceClient (baseUri);
+			var restClient = new JsonServiceClient ();
 
-			return restClient.Get<ApiResponse> (user_pw_url + "/api/1.0");
+			return restClient.Get<ApiResponse> (baseUri + "/api/1.0/");
 		}
 
 		protected UserResponse GetUserInfo ()

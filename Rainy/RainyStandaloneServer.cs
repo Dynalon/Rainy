@@ -14,8 +14,7 @@ namespace Rainy
 	public class RainyStandaloneServer : IDisposable
 	{
 
-		public int Port { get; set; }
-		public string Hostname { get; set; }
+		public readonly string ListenUrl;
 
 		public static OAuthHandler OAuth;
 		public static string Passkey;	
@@ -25,10 +24,9 @@ namespace Rainy
 		private AppHost appHost;
 		private ILog logger;
 
-		public RainyStandaloneServer (OAuthHandler handler, IDataBackend backend)
+		public RainyStandaloneServer (OAuthHandler handler, IDataBackend backend, string listen_url)
 		{
-			Port = 8080;
-			Hostname = "127.0.0.1";
+			ListenUrl = listen_url;
 			logger = LogManager.GetLogger (this.GetType ());
 
 			OAuth = handler;
@@ -37,13 +35,11 @@ namespace Rainy
 		}
 		public void Start ()
 		{
-			string listen_url = "http://" + Hostname + ":" + Port + "/";
-
 			appHost = new AppHost ();
 			appHost.Init ();
 
-			logger.DebugFormat ("starting http listener at: {0}", listen_url);
-			appHost.Start (listen_url);
+			logger.DebugFormat ("starting http listener at: {0}", ListenUrl);
+			appHost.Start (ListenUrl);
 
 		}
 		public void Stop ()

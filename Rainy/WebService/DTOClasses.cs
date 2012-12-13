@@ -1,6 +1,4 @@
-using System;
 using System.Runtime.Serialization;
-using System.Collections.Generic;
 using ServiceStack.ServiceHost;
 using Rainy.WebService.OAuth;
 

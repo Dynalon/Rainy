@@ -20,7 +20,7 @@ namespace Rainy.Tests
 		[Test()]
 		public void WebSyncServerBasic ()
 		{
-			var server = new WebSyncServer (baseUri, localManifest, GetAccessToken ());
+			var server = new WebSyncServer (baseUri, GetAccessToken ());
 			server.BeginSyncTransaction ();
 
 			Assert.That (!string.IsNullOrEmpty (server.Id));
@@ -29,7 +29,7 @@ namespace Rainy.Tests
 		[Test()]
 		public void WebSyncServerPutNotes ()
 		{
-			var server = new WebSyncServer (baseUri, localManifest, GetAccessToken ());
+			var server = new WebSyncServer (baseUri, GetAccessToken ());
 			server.BeginSyncTransaction ();
 			
 			server.UploadNotes (sampleNotes);
@@ -39,7 +39,6 @@ namespace Rainy.Tests
 
 			Assert.AreEqual (sampleNotes.Count, received_notes.Count);
 			Assert.AreEqual (sampleNotes.Count, server.UploadedNotes.Count);
-
 
 			sampleNotes.ToList().ForEach (local_note => {
 
@@ -54,19 +53,17 @@ namespace Rainy.Tests
 				Assert.AreEqual(local_note.Text, server_note.Text);
 				Assert.AreEqual(local_note.CreateDate, server_note.CreateDate);
 
-				// FAILs: Rainy is not allowed to save the ChangeDate in its own engine
+				// FAILs: Rainy is not allowed to modify the ChangeDate in its own engine
 				Assert.AreEqual(local_note.MetadataChangeDate, server_note.MetadataChangeDate);
 				Assert.AreEqual(local_note.ChangeDate, server_note.ChangeDate);
 
-
 			});
-
 		}
 
 		[Test()]
 		public void WebSyncServerGetAllNotesWithBody ()
 		{
-			var server = new WebSyncServer (baseUri, localManifest, GetAccessToken ());
+			var server = new WebSyncServer (baseUri, GetAccessToken ());
 			server.BeginSyncTransaction ();
 			var notes = server.GetAllNotes (true);
 
@@ -78,7 +75,7 @@ namespace Rainy.Tests
 		[Test()]
 		public void WebSyncServerGetAllNotesWithoutBody ()
 		{
-			var server = new WebSyncServer (baseUri, localManifest, GetAccessToken ());
+			var server = new WebSyncServer (baseUri, GetAccessToken ());
 			server.BeginSyncTransaction ();
 			var notes = server.GetAllNotes (false);
 			notes.ToList ().ForEach (note => {
@@ -89,7 +86,7 @@ namespace Rainy.Tests
 		[Test()]
 		public void WebSyncServerDeleteAllNotes()
 		{
-			var server = new WebSyncServer (baseUri, localManifest, GetAccessToken ());
+			var server = new WebSyncServer (baseUri, GetAccessToken ());
 			server.BeginSyncTransaction ();
 
 			server.UploadNotes (sampleNotes);
@@ -105,7 +102,7 @@ namespace Rainy.Tests
 		[Test()]
 		public void WebSyncServerDeleteSingleNote ()
 		{
-			var server = new WebSyncServer (baseUri, localManifest, GetAccessToken ());
+			var server = new WebSyncServer (baseUri, GetAccessToken ());
 			server.BeginSyncTransaction ();
 
 			server.UploadNotes (sampleNotes);
@@ -126,7 +123,7 @@ namespace Rainy.Tests
 		[Test()]
 		public void WebSyncServerRevision ()
 		{
-			var server = new WebSyncServer (baseUri, localManifest, GetAccessToken ());
+			var server = new WebSyncServer (baseUri, GetAccessToken ());
 			server.BeginSyncTransaction ();
 
 			server.GetAllNotes (false);
@@ -136,28 +133,27 @@ namespace Rainy.Tests
 			server.CommitSyncTransaction ();
 
 			Assert.AreEqual(0, server.LatestRevision);
-			Assert.AreEqual(0, localManifest.LastSyncRevision);
 
-/*			server = new WebSyncServer (baseUri, localManifest, GetAccessToken ());
+			server = new WebSyncServer (baseUri, GetAccessToken ());
 
 			server.BeginSyncTransaction ();
 			server.UploadNotes (new List<Note> () { sampleNotes[1] });
 			server.CommitSyncTransaction ();
 
 			Assert.AreEqual(1, server.LatestRevision);
-*/
 		}
 
 		[Test]
 		public void FirstSyncForBothSides ()
 		{
+			// TODO move this into own test class
 			var storage = new DiskStorage ();
 			storage.SetPath ("/tmp/rainytest/");
 			var engine = new Engine (storage);
 			engine.SaveNote (new Note () { Title = "Sample Title", Text = "Sample Text" });
 
 			var client = new FilesystemSyncClient (engine, localManifest);
-			var server = new WebSyncServer (baseUri, localManifest, GetAccessToken ());
+			var server = new WebSyncServer (baseUri, GetAccessToken ());
 
 			SyncManager sync_manager = new SyncManager (client, server);
 

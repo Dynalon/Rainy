@@ -1,19 +1,12 @@
 using System;
 using System.Threading;
 using System.Collections.Generic;
-using ServiceStack.WebHost.Endpoints;
-using ServiceStack.Common.Web;
 using System.IO;
-using System.Runtime.Serialization;
 
-using ServiceStack.Common;
-using ServiceStack.Text;
 
-using Tomboy;
 using log4net;
 
 using Rainy.OAuth;
-using Rainy.WebService;
 using JsonConfig;
 using Mono.Options;
 
@@ -126,10 +119,8 @@ namespace Rainy
 
 			var data_backend = new RainyFileSystemDataBackend (NotesPath);
 
-			using (var listener = new RainyStandaloneServer (oauth_handler, data_backend)) {
-
-				listener.Port = Config.Global.ListenPort;
-				listener.Hostname = Config.Global.ListenAddress;
+			var listen_url = "http://" + Config.Global.ListenAddress + ":" + Config.Global.ListenPort;
+			using (var listener = new RainyStandaloneServer (oauth_handler, data_backend, listen_url)) {
 
 				listener.Start ();
 
