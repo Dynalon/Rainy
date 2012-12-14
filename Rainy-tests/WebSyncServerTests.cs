@@ -143,7 +143,29 @@ namespace Rainy.Tests
 			Assert.AreEqual(1, server.LatestRevision);
 		}
 
+
 		[Test]
+		public void WebSyncServerInstanceCanBeReused ()
+		{
+			var server = new WebSyncServer (baseUri, GetAccessToken ());
+			server.BeginSyncTransaction ();
+
+			server.UploadNotes (new List<Note> { this.sampleNotes[0] });
+
+			server.CommitSyncTransaction ();
+
+			Assert.AreEqual (1, server.UploadedNotes.Count);
+			Assert.AreEqual (sampleNotes[0], server.UploadedNotes[0]);
+
+			server.BeginSyncTransaction ();
+			server.UploadNotes (new List<Note> { this.sampleNotes[1] });
+			server.CommitSyncTransaction ();
+
+			Assert.AreEqual (1, server.UploadedNotes.Count);
+			Assert.AreEqual (sampleNotes[1], server.UploadedNotes[0]);
+		}
+
+		/*[Test]
 		public void FirstSyncForBothSides ()
 		{
 			// TODO move this into own test class
@@ -180,6 +202,6 @@ namespace Rainy.Tests
 			Assert.AreEqual (0, localManifest.LastSyncRevision);
 
 			Assert.AreEqual (0, server.LatestRevision);
-		}
+		} */
 	}
 }

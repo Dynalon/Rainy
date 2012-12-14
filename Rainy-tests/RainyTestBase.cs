@@ -15,7 +15,7 @@ using Tomboy.Sync;
 
 namespace Rainy.Tests
 {
-	public class RainyTestBase
+	public class RainyTestBase : Tomboy.AbstractSyncTests
 	{
 		protected string baseUri = "http://127.0.0.1:8080/johndoe/none/";
 
@@ -33,21 +33,7 @@ namespace Rainy.Tests
 		[SetUp]
 		public void SetUp ()
 		{
-			tmpPath = Path.GetTempPath () + Path.GetRandomFileName ();
-			Directory.CreateDirectory (tmpPath);
-
-			// for debugging, we only use a simple single user authentication 
-			OAuthAuthenticator debug_authenticator = (user,pass) => {
-				if (user == "johndoe" && pass == "none") return true;
-				else return false;
-			};
-			OAuthHandler handler = new OAuthHandler (tmpPath, debug_authenticator, 60);
-			IDataBackend backend = new RainyFileSystemDataBackend (tmpPath);
-
-			rainyServer = new RainyStandaloneServer (handler, backend, rainyListenUrl);
-
-			if (useOwnRainyInstance)
-				rainyServer.Start ();
+			StartNewRainyStandaloneServer ();
 
 			SetupSampleNotes ();
 			SetupSampleManifest ();
@@ -56,11 +42,38 @@ namespace Rainy.Tests
 		[TearDown]
 		public void TearDown ()
 		{
+			StopRainyStandaloneServer ();
+		}
+
+		protected override void ClearServer (bool reset=false)
+		{
+		}
+
+		protected void StartNewRainyStandaloneServer ()
+		{
+			tmpPath = Path.GetTempPath () + Path.GetRandomFileName ();
+			Directory.CreateDirectory (tmpPath);
+			
+			// for debugging, we only use a simple single user authentication 
+			OAuthAuthenticator debug_authenticator = (user,pass) => {
+				if (user == "johndoe" && pass == "none") return true;
+				else return false;
+			};
+			OAuthHandler handler = new OAuthHandler (tmpPath, debug_authenticator, 60);
+			IDataBackend backend = new RainyFileSystemDataBackend (tmpPath);
+			
+			rainyServer = new RainyStandaloneServer (handler, backend, rainyListenUrl);
+			
+			if (useOwnRainyInstance)
+				rainyServer.Start ();
+			
+		}
+		protected void StopRainyStandaloneServer ()
+		{
 			if (useOwnRainyInstance) {
 				rainyServer.Stop ();
 				Directory.Delete (tmpPath, true);
 			}
-
 		}
 
 		protected void SetupSampleNotes ()

@@ -49,6 +49,7 @@
     <Compile Include="RainyTestBase.cs" />
     <Compile Include="BasicTests.cs" />
     <Compile Include="OAuthTests.cs" />
+    <Compile Include="WebSyncBasic.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <ItemGroup>
