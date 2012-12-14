@@ -119,7 +119,7 @@ namespace Rainy
 
 			var data_backend = new RainyFileSystemDataBackend (NotesPath);
 
-			var listen_url = "http://" + Config.Global.ListenAddress + ":" + Config.Global.ListenPort;
+			var listen_url = "http://" + Config.Global.ListenAddress + ":" + Config.Global.ListenPort + "/";
 			using (var listener = new RainyStandaloneServer (oauth_handler, data_backend, listen_url)) {
 
 				listener.Start ();
