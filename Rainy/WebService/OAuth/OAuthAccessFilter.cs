@@ -31,6 +31,8 @@ namespace Rainy.WebService.OAuth
 				Username = ((UserRequest)requestDto).Username;
 			} else if (requestDto is GetNotesRequest) {
 				Username = ((GetNotesRequest)requestDto).Username;
+			} else if (requestDto is PutNotesRequest) {
+				Username = ((PutNotesRequest)requestDto).Username;
 			} else {
 				response.ReturnAuthRequired ();
 				return;

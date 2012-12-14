@@ -4,7 +4,9 @@ using Rainy.WebService.OAuth;
 
 namespace Rainy.WebService
 {
+	// TODO Username/Password should not be use in the Route in the ApiRequest service
 	[Route("/{Username}/{Password}/api/1.0/")]
+	[DataContract]
 	public class ApiRequest : Tomboy.Sync.DTO.ApiRequest, IReturn<Tomboy.Sync.DTO.ApiResponse>
 	{
 		[DataMember (Name="Username")]
@@ -14,7 +16,8 @@ namespace Rainy.WebService
 	}
 
 	[Route("/api/1.0/{Username}/")]
-	[OAuthRequiredAttribute]
+	[OAuthRequired]
+	[DataContract]
 	public class UserRequest : IReturn<Tomboy.Sync.DTO.UserResponse>
 	{
 		[DataMember (Name="Username")]
@@ -22,7 +25,8 @@ namespace Rainy.WebService
 	}
 
 	[Route("/api/1.0/{Username}/notes", "GET")]
-	[OAuthRequiredAttribute]
+	[OAuthRequired]
+	[DataContract]
 	public class GetNotesRequest : IReturn<Tomboy.Sync.DTO.GetNotesResponse>
 	{
 		[DataMember (Name="Username")]
@@ -30,7 +34,7 @@ namespace Rainy.WebService
 	}
 
 	[Route("/api/1.0/{Username}/notes", "PUT,POST")]
-	//[OAuthRequired]
+	[OAuthRequired]
 	[DataContract]
 	public class PutNotesRequest : Tomboy.Sync.DTO.PutNotesRequest, IReturn<Tomboy.Sync.DTO.GetNotesResponse>
 	{
