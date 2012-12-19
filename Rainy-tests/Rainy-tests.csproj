@@ -42,14 +42,12 @@
     <Reference Include="System.Security" />
     <Reference Include="System.Core" />
     <Reference Include="System.Web" />
+    <Reference Include="ServiceStack.Text">
+      <HintPath>..\lib\ServiceStack.Text.dll</HintPath>
+    </Reference>
   </ItemGroup>
   <ItemGroup>
     <Compile Include="AssemblyInfo.cs" />
-    <Compile Include="WebSyncServerTests.cs" />
-    <Compile Include="RainyTestBase.cs" />
-    <Compile Include="BasicTests.cs" />
-    <Compile Include="OAuthTests.cs" />
-    <Compile Include="WebSyncBasic.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <ItemGroup>
@@ -69,5 +67,9 @@
       <Project>{216746A7-D297-4108-933A-1E926EB9B167}</Project>
       <Name>Tomboy-library-tests</Name>
     </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="BasicTests.cs" />
+    <None Include="OAuthTests.cs" />
   </ItemGroup>
 </Project>

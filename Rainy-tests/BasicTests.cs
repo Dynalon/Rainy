@@ -1,3 +1,23 @@
+//
+//  Author:
+//       Timo Dörr <timo@latecrew.de>
+//
+//  Copyright (c) 2012 Timo Dörr
+//
+//  This library is free software; you can redistribute it and/or modify
+//  it under the terms of the GNU Lesser General Public License as
+//  published by the Free Software Foundation; either version 2.1 of the
+//  License, or (at your option) any later version.
+//
+//  This library is distributed in the hope that it will be useful, but
+//  WITHOUT ANY WARRANTY; without even the implied warranty of
+//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+//  Lesser General Public License for more details.
+//
+//  You should have received a copy of the GNU Lesser General Public
+//  License along with this library; if not, write to the Free Software
+//  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
+
 using System;
 using NUnit.Framework;
 using ServiceStack.ServiceClient.Web;
@@ -6,9 +26,9 @@ using Tomboy.Sync.DTO;
 namespace Rainy.Tests
 {
 
-	public class BasicTests : RainyTestBase
+	public class BasicTests 
 	{
-		[Test()]
+		[Test]
 		public void CheckApiRef ()
 		{
 			var response = GetRootApiRef ();
@@ -26,7 +46,7 @@ namespace Rainy.Tests
 		}
 
 		// TODO implement way more security tests
-		[Test()]
+		[Test]
 		// since the exception name is returned in the webservice result,
 		// we can't use [ExpcetedException] here
 		public void UnauthenticatedUserAccessFails()
@@ -47,7 +67,7 @@ namespace Rainy.Tests
 			}
 		}
 
-		[Test()]
+		[Test]
 		public void GetUser ()
 		{
 

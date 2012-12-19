@@ -97,13 +97,17 @@ namespace Rainy.WebService
 			using (var note_repo = GetNotes (request.Username)) {
 				var notes = GetStoredNotes (note_repo);
 
+				// check if we need to include the note body
+				bool include_note_body  = true; 
+				string include_notes = Request.GetParam ("include_notes");
+				if (!string.IsNullOrEmpty (include_notes) && !bool.TryParse (include_notes, out include_note_body))
+					throw new Exception ("unable to parse parameter include_notes to boolean");
+
+				// if since is given, we might only need to return a subset of notes
 				string since = Request.GetParam ("since");
-
-				// if no since is given, return all notes
-				if (string.IsNullOrEmpty (since))
-					return notes;
-
-				long since_revision = long.Parse (since);
+				long since_revision = -1;
+				if (!string.IsNullOrEmpty (since) && !long.TryParse (since, out since_revision))
+					throw new Exception ("unable to parse parameter since to long");
 
 				// select only those notes that changed since last sync
 				// which means, only those notes that have a HIGHER revision as "since"
@@ -115,7 +119,13 @@ namespace Rainy.WebService
 					return false;
 				});
 
-				notes.Notes = changed_notes.ToList ();
+				if (include_note_body) {
+					notes.Notes = changed_notes.ToList ();
+				} else {
+					// empty the note Text
+					notes.Notes = changed_notes.Select (n => { n.Text = ""; return n; }).ToList ();
+				}
+
 
 				return notes;
 			}
@@ -131,14 +141,17 @@ namespace Rainy.WebService
 				// constraint taken from snowy source code at http://git.gnome.org/browse/snowy/tree/api/handlers.py:143
 				var new_sync_rev = note_repo.Manifest.LatestSyncRevision + 1;
 
+				// TODO LatestSyncRevision is not correctly SERIALIZED
+				Logger.DebugFormat ("client sent LatestSyncRevision: {0}", request.LatestSyncRevision);
+
 				// if the client does not send a latest-sync-revision field, or it is -1, the client has 
 				// never synced before
-				if (request.LatestSyncRevision.HasValue && request.LatestSyncRevision.Value != -1) {
-					new_sync_rev = request.LatestSyncRevision.Value;
+				if (request.LatestSyncRevision != -1) {
+					new_sync_rev = request.LatestSyncRevision;
 				}
 
-				if (new_sync_rev != note_repo.Manifest.LatestSyncRevision + 1)
-					throw new Exception ("Sync revisions differ by more than one, sth went wrong");
+				//if (new_sync_rev != note_repo.Manifest.LatestSyncRevision + 1)
+				//	throw new Exception ("Sync revisions differ by more than one, sth went wrong");
 
 				foreach (var dto_note in request.Notes) {
 					var note = new Note ("note://tomboy/" + dto_note.Guid);

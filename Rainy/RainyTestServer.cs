@@ -1,5 +1,4 @@
 using System;
-using NUnit.Framework;
 using ServiceStack.ServiceClient.Web;
 using DevDefined.OAuth.Consumer;
 using DevDefined.OAuth.Framework;
@@ -8,48 +7,20 @@ using System.Linq;
 using Tomboy.Sync.DTO;
 using Rainy.OAuth;
 using System.IO;
-using Tomboy.Sync.Web;
-using System.Collections.Generic;
-using Tomboy;
-using Tomboy.Sync;
 
 namespace Rainy.Tests
 {
-	public class RainyTestBase : Tomboy.AbstractSyncTests
+
+	// simple server that can be used for unit tests
+	public static class RainyTestServer
 	{
-		protected string baseUri = "http://127.0.0.1:8080/johndoe/none/";
+		public static string BaseUri = "http://127.0.0.1:8080/johndoe/none/";
+		public static string RainyListenUrl = "http://127.0.0.1:8080/";
 
-		protected string rainyListenUrl = "http://127.0.0.1:8080/";
+		private static RainyStandaloneServer rainyServer;
+		private static string tmpPath;
 
-		protected RainyStandaloneServer rainyServer;
-		protected string tmpPath;
-
-		// helper var, swith to false when using u1/snowy/external rainy
-		private bool useOwnRainyInstance = true; 
-
-		protected IList<Note> sampleNotes;
-		protected SyncManifest localManifest;
-
-		[SetUp]
-		public void SetUp ()
-		{
-			StartNewRainyStandaloneServer ();
-
-			SetupSampleNotes ();
-			SetupSampleManifest ();
-		}
-
-		[TearDown]
-		public void TearDown ()
-		{
-			StopRainyStandaloneServer ();
-		}
-
-		protected override void ClearServer (bool reset=false)
-		{
-		}
-
-		protected void StartNewRainyStandaloneServer ()
+		public static void StartNewRainyStandaloneServer ()
 		{
 			tmpPath = Path.GetTempPath () + Path.GetRandomFileName ();
 			Directory.CreateDirectory (tmpPath);
@@ -62,49 +33,18 @@ namespace Rainy.Tests
 			OAuthHandler handler = new OAuthHandler (tmpPath, debug_authenticator, 60);
 			IDataBackend backend = new RainyFileSystemDataBackend (tmpPath);
 			
-			rainyServer = new RainyStandaloneServer (handler, backend, rainyListenUrl);
+			rainyServer = new RainyStandaloneServer (handler, backend, RainyListenUrl);
+
+			rainyServer.Start ();
 			
-			if (useOwnRainyInstance)
-				rainyServer.Start ();
-			
 		}
-		protected void StopRainyStandaloneServer ()
+		public static void StopRainyStandaloneServer ()
 		{
-			if (useOwnRainyInstance) {
-				rainyServer.Stop ();
-				Directory.Delete (tmpPath, true);
-			}
+			rainyServer.Stop ();
+			Directory.Delete (tmpPath, true);
 		}
 
-		protected void SetupSampleNotes ()
-		{
-			sampleNotes = new List<Note> ();
-
-			sampleNotes.Add(new Note () {
-				Title = "Sämplé title 1!",
-				Text = "** This is the text of Sämple Note 1**",
-				CreateDate = DateTime.Now,
-				MetadataChangeDate = DateTime.Now,
-				ChangeDate = DateTime.Now
-			});
-
-			sampleNotes.Add(new Note () {
-				Title = "2nd Example",
-				Text = "This is the text of the second sample note",
-				CreateDate = new DateTime (1984, 04, 14, 4, 32, 0, DateTimeKind.Utc),
-				ChangeDate = new DateTime (2012, 04, 14, 4, 32, 0, DateTimeKind.Utc),
-				MetadataChangeDate = new DateTime (2012, 12, 12, 12, 12, 12, DateTimeKind.Utc),
-			});
-
-			// note that DateTime.MinValue is not an allowed timestamp for notes!
-			sampleNotes.Add(new Note () {
-				Title = "3rd exampel title",
-				Text = "Another example note",
-				CreateDate = DateTime.MinValue + new TimeSpan (1, 0, 0, 0, 0),
-				ChangeDate = DateTime.MinValue + new TimeSpan (1, 0, 0, 0, 0),
-				MetadataChangeDate = DateTime.MinValue + new TimeSpan (1, 0, 0, 0, 0)
-			});
-		}
+/*
 
 		protected void SetupSampleManifest ()
 		{
@@ -131,16 +71,20 @@ namespace Rainy.Tests
 			return restClient.Get<UserResponse> (user_service_url);
 		}
 
+*/
+
 		// this performs our main OAuth authentication, performing
 		// the request token retrieval, authorization, and exchange
 		// for an access token
-		protected IToken GetAccessToken ()
+		public static IToken GetAccessToken ()
 		{
 			var consumerContext = new OAuthConsumerContext () {
 				ConsumerKey = "anyone"
 			};
-			
-			var api_ref = GetRootApiRef ();
+
+			var restClient = new JsonServiceClient (BaseUri);
+			var api_ref = restClient.Get<ApiResponse> ("/api/1.0");
+
 			var session = new OAuthSession (consumerContext, api_ref.OAuthRequestTokenUrl,
 			                                api_ref.OAuthAuthorizeUrl, api_ref.OAuthAccessTokenUrl);
 			
@@ -162,12 +106,6 @@ namespace Rainy.Tests
 
 			IToken access_token = session.ExchangeRequestTokenForAccessToken (request_token, oauth_data ["oauth_verifier"]);
 
-			// TODO the verifier should be checked against previous verifier to
-			// make sure there was no man-in-the-middle attack
-			Assert.AreEqual (request_token.Token, oauth_data ["oauth_token"]);
-			Assert.That (!string.IsNullOrEmpty (oauth_data ["oauth_verifier"]));
-			Assert.That (oauth_data ["oauth_verifier"].Length > 12);
-			
 			return access_token;
 		}
 	}
