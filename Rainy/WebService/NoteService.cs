@@ -144,11 +144,8 @@ namespace Rainy.WebService
 				// TODO LatestSyncRevision is not correctly SERIALIZED
 				Logger.DebugFormat ("client sent LatestSyncRevision: {0}", request.LatestSyncRevision);
 
-				// if the client does not send a latest-sync-revision field, or it is -1, the client has 
-				// never synced before
-				if (request.LatestSyncRevision != -1) {
-					new_sync_rev = request.LatestSyncRevision;
-				}
+				// TODO sanitize LatestSyncRevision sent by client - we don't need it to update notes
+				// but a wrong LatestSyncRevision may be an indicator for a bug in the client
 
 				//if (new_sync_rev != note_repo.Manifest.LatestSyncRevision + 1)
 				//	throw new Exception ("Sync revisions differ by more than one, sth went wrong");
