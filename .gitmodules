@@ -1,9 +1,6 @@
 [submodule "tomboy-library"]
 	path = tomboy-library
 	url = https://github.com/Dynalon/tomboy-library.git
-[submodule "DevDefined.OAuth"]
-	path = DevDefined.OAuth
-	url = https://github.com/Dynalon/DevDefined.OAuth.git
 [submodule "JsonConfig"]
 	path = JsonConfig
 	url = https://github.com/Dynalon/JsonConfig.git

@@ -67,10 +67,6 @@
       <Project>{040AA912-9738-438A-A7FD-5BB02C40C30A}</Project>
       <Name>Tomboy-library</Name>
     </ProjectReference>
-    <ProjectReference Include="..\DevDefined.OAuth\src\DevDefined.OAuth\DevDefined.OAuth.csproj">
-      <Project>{61B700B6-3911-4CEF-8751-7F42CA765068}</Project>
-      <Name>DevDefined.OAuth</Name>
-    </ProjectReference>
     <ProjectReference Include="..\JsonConfig\JsonConfig\JsonConfig.csproj">
       <Project>{10095092-E1E5-441F-9380-B6329F3CFEB4}</Project>
       <Name>JsonConfig</Name>

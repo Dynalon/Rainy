@@ -5,8 +5,6 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Rainy", "Rainy\Rainy.csproj
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Tomboy-library", "tomboy-library\Tomboy-library\Tomboy-library.csproj", "{040AA912-9738-438A-A7FD-5BB02C40C30A}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DevDefined.OAuth", "DevDefined.OAuth\src\DevDefined.OAuth\DevDefined.OAuth.csproj", "{61B700B6-3911-4CEF-8751-7F42CA765068}"
-EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "JsonConfig", "JsonConfig\JsonConfig\JsonConfig.csproj", "{10095092-E1E5-441F-9380-B6329F3CFEB4}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Tomboy-library-tests", "tomboy-library\Tomboy-library\Tomboy-library-tests\Tomboy-library-tests.csproj", "{216746A7-D297-4108-933A-1E926EB9B167}"
@@ -38,10 +36,6 @@ Global
 		{29E069BB-47ED-4E03-92F8-35754D22F600}.Default|Any CPU.Build.0 = Debug|Any CPU
 		{29E069BB-47ED-4E03-92F8-35754D22F600}.Release|x86.ActiveCfg = Release|Any CPU
 		{29E069BB-47ED-4E03-92F8-35754D22F600}.Release|x86.Build.0 = Release|Any CPU
-		{61B700B6-3911-4CEF-8751-7F42CA765068}.Debug|x86.ActiveCfg = Debug|Any CPU
-		{61B700B6-3911-4CEF-8751-7F42CA765068}.Debug|x86.Build.0 = Debug|Any CPU
-		{61B700B6-3911-4CEF-8751-7F42CA765068}.Release|x86.ActiveCfg = Release|Any CPU
-		{61B700B6-3911-4CEF-8751-7F42CA765068}.Release|x86.Build.0 = Release|Any CPU
 		{7BB12286-1E31-4CBE-9C07-9E66D4AF0336}.Debug|x86.ActiveCfg = Debug|x86
 		{7BB12286-1E31-4CBE-9C07-9E66D4AF0336}.Debug|x86.Build.0 = Debug|x86
 		{7BB12286-1E31-4CBE-9C07-9E66D4AF0336}.Release|x86.ActiveCfg = Release|x86

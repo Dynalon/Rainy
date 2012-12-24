@@ -59,10 +59,6 @@
       <Project>{7BB12286-1E31-4CBE-9C07-9E66D4AF0336}</Project>
       <Name>Rainy</Name>
     </ProjectReference>
-    <ProjectReference Include="..\DevDefined.OAuth\src\DevDefined.OAuth\DevDefined.OAuth.csproj">
-      <Project>{61B700B6-3911-4CEF-8751-7F42CA765068}</Project>
-      <Name>DevDefined.OAuth</Name>
-    </ProjectReference>
     <ProjectReference Include="..\tomboy-library\Tomboy-library\Tomboy-library.csproj">
       <Project>{040AA912-9738-438A-A7FD-5BB02C40C30A}</Project>
       <Name>Tomboy-library</Name>
