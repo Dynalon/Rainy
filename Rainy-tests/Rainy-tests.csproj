@@ -30,20 +30,17 @@
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="System" />
-    <Reference Include="ServiceStack.Common">
-      <HintPath>..\lib\ServiceStack.Common.dll</HintPath>
-    </Reference>
-    <Reference Include="ServiceStack.Interfaces">
-      <HintPath>..\lib\ServiceStack.Interfaces.dll</HintPath>
-    </Reference>
     <Reference Include="System.Security" />
     <Reference Include="System.Core" />
     <Reference Include="System.Web" />
-    <Reference Include="ServiceStack.Text">
-      <HintPath>..\lib\ServiceStack.Text.dll</HintPath>
-    </Reference>
     <Reference Include="nunit.framework, Version=2.4.8.0, Culture=neutral, PublicKeyToken=96d09a1eb7f44a77">
       <Private>False</Private>
+    </Reference>
+    <Reference Include="ServiceStack.Common">
+      <HintPath>..\tomboy-library\Tomboy-library\Libs\ServiceStack-v3.9.32\ServiceStack.Common.dll</HintPath>
+    </Reference>
+    <Reference Include="ServiceStack.Text">
+      <HintPath>..\tomboy-library\Tomboy-library\Libs\ServiceStack-v3.9.32\ServiceStack.Text.dll</HintPath>
     </Reference>
   </ItemGroup>
   <ItemGroup>
@@ -66,6 +63,10 @@
     <ProjectReference Include="..\tomboy-library\Tomboy-library\Tomboy-library-tests\Tomboy-library-tests.csproj">
       <Project>{216746A7-D297-4108-933A-1E926EB9B167}</Project>
       <Name>Tomboy-library-tests</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\tomboy-library\DevDefined.OAuth\src\DevDefined.OAuth\DevDefined.OAuth.csproj">
+      <Project>{61B700B6-3911-4CEF-8751-7F42CA765068}</Project>
+      <Name>DevDefined.OAuth</Name>
     </ProjectReference>
   </ItemGroup>
 </Project>
