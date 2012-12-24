@@ -30,9 +30,6 @@
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="System" />
-    <Reference Include="nunit.framework, Version=2.6.0.12051, Culture=neutral, PublicKeyToken=96d09a1eb7f44a77">
-      <Private>False</Private>
-    </Reference>
     <Reference Include="ServiceStack.Common">
       <HintPath>..\lib\ServiceStack.Common.dll</HintPath>
     </Reference>
@@ -45,9 +42,16 @@
     <Reference Include="ServiceStack.Text">
       <HintPath>..\lib\ServiceStack.Text.dll</HintPath>
     </Reference>
+    <Reference Include="nunit.framework, Version=2.4.8.0, Culture=neutral, PublicKeyToken=96d09a1eb7f44a77">
+      <Private>False</Private>
+    </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="AssemblyInfo.cs" />
+    <Compile Include="RainyWebSyncServerTests.cs" />
+    <Compile Include="OAuthTests.cs" />
+    <Compile Include="RainyTestBase.cs" />
+    <Compile Include="RainyTestServerTests.cs" />
+    <Compile Include="RainySyncManagerTests.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <ItemGroup>
@@ -67,9 +71,5 @@
       <Project>{216746A7-D297-4108-933A-1E926EB9B167}</Project>
       <Name>Tomboy-library-tests</Name>
     </ProjectReference>
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="BasicTests.cs" />
-    <None Include="OAuthTests.cs" />
   </ItemGroup>
 </Project>

@@ -7,11 +7,12 @@ using System.Linq;
 using Tomboy.Sync.DTO;
 using Rainy.OAuth;
 using System.IO;
+using Tomboy.Sync.Web;
 
-namespace Rainy.Tests
+namespace Rainy
 {
 
-	// simple server that can be used for unit tests
+	// simple server that can be used from within unit tests
 	public static class RainyTestServer
 	{
 		public static string BaseUri = "http://127.0.0.1:8080/johndoe/none/";
@@ -44,34 +45,30 @@ namespace Rainy.Tests
 			Directory.Delete (tmpPath, true);
 		}
 
-/*
-
-		protected void SetupSampleManifest ()
+		public static JsonServiceClient GetJsonClient ()
 		{
-			localManifest = new SyncManifest ();
-			localManifest.LastSyncDate = DateTime.MinValue + new TimeSpan (0, 0, 0, 1, 0);
-			localManifest.LastSyncRevision = -1;
+			var rest_client = new JsonServiceClient ();
+			rest_client.SetAccessToken (GetAccessToken ());
+			
+			return rest_client;
 		}
 
-		protected ApiResponse GetRootApiRef () 
+		public static ApiResponse GetRootApiRef () 
 		{
-			var restClient = new JsonServiceClient ();
+			var rest_client = new JsonServiceClient ();
 
-			return restClient.Get<ApiResponse> (baseUri + "/api/1.0/");
+			return rest_client.Get<ApiResponse> (BaseUri + "/api/1.0/");
 		}
 
-		protected UserResponse GetUserInfo ()
+		public static UserResponse GetUserInfo ()
 		{
 			var api_ref = GetRootApiRef ();
 			var user_service_url = api_ref.UserRef.ApiRef;
+	
+			var rest_client = GetJsonClient ();
 		
-			var restClient = new JsonServiceClient (baseUri);
-			restClient.SetAccessToken (this.GetAccessToken ());
-		
-			return restClient.Get<UserResponse> (user_service_url);
+			return rest_client.Get<UserResponse> (user_service_url);
 		}
-
-*/
 
 		// this performs our main OAuth authentication, performing
 		// the request token retrieval, authorization, and exchange

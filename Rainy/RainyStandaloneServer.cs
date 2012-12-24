@@ -9,8 +9,6 @@ using Rainy.WebService;
 
 namespace Rainy
 {
-
-	
 	public class RainyStandaloneServer : IDisposable
 	{
 

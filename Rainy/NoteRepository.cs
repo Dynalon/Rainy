@@ -1,8 +1,6 @@
 using System;
 using System.Threading;
 using System.Collections.Generic;
-using ServiceStack.WebHost.Endpoints;
-using ServiceStack.Common.Web;
 using System.IO;
 using System.Runtime.Serialization;
 
@@ -10,12 +8,7 @@ using ServiceStack.Common;
 using ServiceStack.Text;
 
 using Tomboy;
-using log4net;
 
-using Rainy.OAuth;
-using Rainy.WebService;
-using JsonConfig;
-using Mono.Options;
 
 namespace Rainy
 {
