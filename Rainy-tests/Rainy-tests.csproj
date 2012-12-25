@@ -42,6 +42,13 @@
     <Reference Include="ServiceStack.Text">
       <HintPath>..\tomboy-library\Tomboy-library\Libs\ServiceStack-v3.9.32\ServiceStack.Text.dll</HintPath>
     </Reference>
+    <Reference Include="ServiceStack.OrmLite.Sqlite">
+      <HintPath>..\lib\ServiceStack-v3.9.32\ServiceStack.OrmLite.Sqlite.dll</HintPath>
+    </Reference>
+    <Reference Include="ServiceStack.OrmLite">
+      <HintPath>..\lib\ServiceStack-v3.9.32\ServiceStack.OrmLite.dll</HintPath>
+    </Reference>
+    <Reference Include="Mono.Data.Sqlite" />
   </ItemGroup>
   <ItemGroup>
     <Compile Include="RainyWebSyncServerTests.cs" />
@@ -49,6 +56,7 @@
     <Compile Include="RainyTestBase.cs" />
     <Compile Include="RainyTestServerTests.cs" />
     <Compile Include="RainySyncManagerTests.cs" />
+    <Compile Include="ORM\DbClassesTest.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <ItemGroup>
@@ -68,5 +76,8 @@
       <Project>{61B700B6-3911-4CEF-8751-7F42CA765068}</Project>
       <Name>DevDefined.OAuth</Name>
     </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="ORM\" />
   </ItemGroup>
 </Project>
