@@ -4,4 +4,6 @@
 *.pidb
 *.mdb
 settings.conf
+bin/
+test-results/
 .DS_Store
