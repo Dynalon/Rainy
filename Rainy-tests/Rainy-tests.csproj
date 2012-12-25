@@ -49,6 +49,7 @@
       <HintPath>..\lib\ServiceStack-v3.9.32\ServiceStack.OrmLite.dll</HintPath>
     </Reference>
     <Reference Include="Mono.Data.Sqlite" />
+    <Reference Include="System.Data" />
   </ItemGroup>
   <ItemGroup>
     <Compile Include="RainyWebSyncServerTests.cs" />
@@ -56,7 +57,10 @@
     <Compile Include="RainyTestBase.cs" />
     <Compile Include="RainyTestServerTests.cs" />
     <Compile Include="RainySyncManagerTests.cs" />
-    <Compile Include="ORM\DbClassesTest.cs" />
+    <Compile Include="ORM\DbBasicTests.cs" />
+    <Compile Include="ORM\DbBenchmarks.cs" />
+    <Compile Include="ORM\DbTestsBase.cs" />
+    <Compile Include="ORM\DbStorageTests.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <ItemGroup>
