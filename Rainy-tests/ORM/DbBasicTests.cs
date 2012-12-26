@@ -193,5 +193,26 @@ namespace Rainy.Db
 				Assert.AreEqual (0, result.Count);
 			}
 		}
+
+		[Test]
+		public void DeleteNonExistingNoteDoesNotCancelTransaction ()
+		{
+			var sample_note = GetDBSampleNote (username: "test");
+			
+			using (var conn = dbFactory.OpenDbConnection ()) {
+				using (var trans = conn.BeginTransaction ()) {
+					conn.Delete (sample_note);
+					conn.Insert (sample_note);
+
+					trans.Commit ();
+				}
+			}
+			
+			using (var conn = dbFactory.OpenDbConnection ()) {
+				var result = conn.Select<DBNote> ("Username = {0}", "test");
+				Assert.AreEqual (1, result.Count);
+			}
+
+		}
 	}
 }

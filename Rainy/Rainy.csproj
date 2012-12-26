@@ -100,6 +100,7 @@
     <Compile Include="RainyTestServer.cs" />
     <Compile Include="ORM\DbClasses.cs" />
     <Compile Include="ORM\DbStorage.cs" />
+    <Compile Include="DatabaseBackend.cs" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="WebService\" />

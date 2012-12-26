@@ -46,7 +46,7 @@ namespace Rainy
 		}
 		public INoteRepository GetNoteRepository (string username)
 		{
-			return new NoteRepository (username, notesBasePath);
+			return new DirectoryBasedNoteRepository (username, notesBasePath);
 		}
 		/// <summary>
 		/// Note repository. There may only exists one repository of a username at any given time in memory. 
@@ -54,7 +54,7 @@ namespace Rainy
 		/// repository of that user was disposed. Best is to always use using (new NoteRepository (username)) {  ... }
 		/// to make sure the repository is freed afterwards.
 		/// </summary>
-		public class NoteRepository : INoteRepository
+		public class DirectoryBasedNoteRepository : INoteRepository
 		{
 
 			public string Username { get; protected set; }
@@ -73,7 +73,7 @@ namespace Rainy
 			// holds semaphores for each user to avoid multiple instances
 			protected static Dictionary<string, Semaphore> userLocks = new Dictionary<string, Semaphore> ();
 
-			public NoteRepository (string username, string notes_base_path)
+			public DirectoryBasedNoteRepository (string username, string notes_base_path)
 			{
 				this.Username = username;
 				this.notesBasePath = notes_base_path;

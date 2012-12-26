@@ -1,18 +1,14 @@
 using System;
-using Tomboy.Sync.DTO;
 using NUnit.Framework;
 using System.Data;
 using ServiceStack.OrmLite;
-using ServiceStack.Common;
 using System.Diagnostics;
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using System.IO;
-using System.Linq;
 
 namespace Rainy.Db
 {
-
+	[Ignore]
 	[TestFixture]
 	public class DbBenchmarks : DbTestsBase
 	{
