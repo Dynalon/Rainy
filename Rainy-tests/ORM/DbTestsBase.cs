@@ -5,23 +5,24 @@ using System.Data;
 using ServiceStack.OrmLite;
 using System.Collections.Generic;
 using System.IO;
+using Rainy.OAuth.SimpleStore;
 
 namespace Rainy.Db
 {
 	public class DbTestsBase
 	{
-		protected string connectionString = "rainy-test.db";
 		protected OrmLiteConnectionFactory dbFactory;
 		
 		[TestFixtureSetUp]
 		public void FixtureSetUp ()
 		{
+			DbConfig.SqliteFile = "rainy-test.db";
 			// remove the rainy-test.db file if it exists
-			if (File.Exists ("rainy-test.db")) {
-				File.Delete ("rainy-test.db");
+			if (File.Exists (DbConfig.SqliteFile)) {
+				File.Delete (DbConfig.SqliteFile);
 			}
 
-			dbFactory = new OrmLiteConnectionFactory (connectionString, SqliteDialect.Provider);
+			dbFactory = new OrmLiteConnectionFactory (DbConfig.ConnectionString, SqliteDialect.Provider);
 
 		}
 		
@@ -32,6 +33,7 @@ namespace Rainy.Db
 			using (var c = dbFactory.OpenDbConnection ()) {
 				c.DropAndCreateTable <DBNote> ();
 				c.DropAndCreateTable <DBUser> ();
+				c.DropAndCreateTable <DBAccessToken> ();
 			}
 		}
 

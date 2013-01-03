@@ -43,23 +43,27 @@ namespace Rainy.WebService
 	{
 		public object Get (UserRequest request)
 		{
-			var baseUri = ((HttpListenerRequest)this.Request.OriginalRequest).Url;
-			string baseUrl = baseUri.Scheme + "://" + baseUri.Authority + "/";
-
 			var u = new Tomboy.Sync.DTO.UserResponse ();
-			u.Username = request.Username;
-			u.Firstname = "Not";
-			u.Lastname = "Important";
+			try {
+				var baseUri = ((HttpListenerRequest)this.Request.OriginalRequest).Url;
+				string baseUrl = baseUri.Scheme + "://" + baseUri.Authority + "/";
 
-			u.NotesRef = new Tomboy.Sync.DTO.ContentRef () {
+				u.Username = request.Username;
+				u.Firstname = "Not";
+				u.Lastname = "Important";
+
+				u.NotesRef = new Tomboy.Sync.DTO.ContentRef () {
 				ApiRef = baseUrl + "/api/1.0/" + request.Username + "/notes",
 				Href = baseUrl + "/api/1.0/" + request.Username + "/notes"
 			};
-			using (var note_repo = GetNotes (request.Username)) {
-				u.LatestSyncRevision = note_repo.Manifest.LatestSyncRevision;
-				u.CurrentSyncGuid = note_repo.Manifest.CurrentSyncGuid;
+				using (var note_repo = GetNotes (request.Username)) {
+					u.LatestSyncRevision = note_repo.Manifest.LastSyncRevision;
+					u.CurrentSyncGuid = note_repo.Manifest.ServerId;
+				}
+			} catch (Exception e) {
+				Logger.Debug ("CAUGHT EXCEPTION: " + e.Message);
+				throw;
 			}
-
 			return u;
 		}
 	}
@@ -86,7 +90,7 @@ namespace Rainy.WebService
 			
 			var return_notes = new Tomboy.Sync.DTO.GetNotesResponse ();
 			return_notes.Notes = notes;
-			return_notes.LatestSyncRevision = note_repo.Manifest.LatestSyncRevision;
+			return_notes.LatestSyncRevision = note_repo.Manifest.LastSyncRevision;
 
 			return return_notes;
 		}
@@ -94,42 +98,50 @@ namespace Rainy.WebService
 		// webservice method: HTTP GET request
 		public object Get (GetNotesRequest request)
 		{
-			using (var note_repo = GetNotes (request.Username)) {
-				var notes = GetStoredNotes (note_repo);
+			try {
+				using (var note_repo = GetNotes (request.Username)) {
+					var notes = GetStoredNotes (note_repo);
 
-				// check if we need to include the note body
-				bool include_note_body  = true; 
-				string include_notes = Request.GetParam ("include_notes");
-				if (!string.IsNullOrEmpty (include_notes) && !bool.TryParse (include_notes, out include_note_body))
-					throw new Exception ("unable to parse parameter include_notes to boolean");
+					// check if we need to include the note body
+					bool include_note_body = true; 
+					string include_notes = Request.GetParam ("include_notes");
+					if (!string.IsNullOrEmpty (include_notes) && !bool.TryParse (include_notes, out include_note_body))
+						throw new Exception ("unable to parse parameter include_notes to boolean");
 
-				// if since is given, we might only need to return a subset of notes
-				string since = Request.GetParam ("since");
-				long since_revision = -1;
-				if (!string.IsNullOrEmpty (since) && !long.TryParse (since, out since_revision))
-					throw new Exception ("unable to parse parameter since to long");
+					// if since is given, we might only need to return a subset of notes
+					string since = Request.GetParam ("since");
+					long since_revision = -1;
+					if (!string.IsNullOrEmpty (since) && !long.TryParse (since, out since_revision))
+						throw new Exception ("unable to parse parameter since to long");
 
-				// select only those notes that changed since last sync
-				// which means, only those notes that have a HIGHER revision as "since"
-				var changed_notes = notes.Notes.Where (n => {
-					if (note_repo.Manifest.NoteRevisions.Keys.Contains (n.Guid)) {
-						if (note_repo.Manifest.NoteRevisions [n.Guid] > since_revision)
-							return true;
+					// select only those notes that changed since last sync
+					// which means, only those notes that have a HIGHER revision as "since"
+					var changed_notes = notes.Notes.Where (n => {
+						if (note_repo.Manifest.NoteRevisions.Keys.Contains (n.Guid)) {
+							if (note_repo.Manifest.NoteRevisions [n.Guid] > since_revision)
+								return true;
+						}
+						return false;
+					});
+
+					if (include_note_body) {
+						notes.Notes = changed_notes.ToList ();
+					} else {
+						// empty the note Text
+						notes.Notes = changed_notes.Select (n => {
+							n.Text = "";
+							return n; }).ToList ();
 					}
-					return false;
-				});
 
-				if (include_note_body) {
-					notes.Notes = changed_notes.ToList ();
-				} else {
-					// empty the note Text
-					notes.Notes = changed_notes.Select (n => { n.Text = ""; return n; }).ToList ();
+
+					return notes;
 				}
-
-
-				return notes;
+			} catch (Exception e) {
+				Logger.DebugFormat ("CAUGHT EXCEPTION: {0} {1}", e.Message, e.StackTrace);
+				throw;
 			}
 		}
+
 		public object Post (PutNotesRequest request)
 		{
 			return Put (request);
@@ -139,7 +151,7 @@ namespace Rainy.WebService
 			using (var note_repo = GetNotes (request.Username)) {
 
 				// constraint taken from snowy source code at http://git.gnome.org/browse/snowy/tree/api/handlers.py:143
-				var new_sync_rev = note_repo.Manifest.LatestSyncRevision + 1;
+				var new_sync_rev = note_repo.Manifest.LastSyncRevision + 1;
 
 				// TODO LatestSyncRevision is not correctly SERIALIZED
 				Logger.DebugFormat ("client sent LatestSyncRevision: {0}", request.LatestSyncRevision);
@@ -167,7 +179,7 @@ namespace Rainy.WebService
 
 				// only update the sync revision if changes were sent
 				if (request.Notes.Count > 0)
-					note_repo.Manifest.LatestSyncRevision = new_sync_rev;
+					note_repo.Manifest.LastSyncRevision = new_sync_rev;
 
 				var notes_to_return = NotesService.GetStoredNotes (note_repo);
 				notes_to_return.LatestSyncRevision = new_sync_rev;

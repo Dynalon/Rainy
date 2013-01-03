@@ -8,33 +8,13 @@ using ServiceStack.Common;
 using ServiceStack.Text;
 
 using Tomboy;
+using Tomboy.Sync;
+using System.Xml;
+using System.Text;
 
 
 namespace Rainy
 {
-	// TODO replace with tomboy library manifest
-	// used internally to mimic the manifest.xml data storage
-	[DataContract]
-	[Obsolete]
-	public class NoteManifest
-	{
-		[DataMember (Name = "note-revisions")]
-		public Dictionary<string, int> NoteRevisions { get; set; }
-		
-		[DataMember (Name = "latest-sync-revision")]
-		public long LatestSyncRevision { get; set; }
-		
-		[DataMember (Name = "current-sync-guid")]
-		public string CurrentSyncGuid { get; set; }
-		
-		public NoteManifest ()
-		{
-			LatestSyncRevision = -1;
-			NoteRevisions = new Dictionary<string, int> ();
-			CurrentSyncGuid = Guid.NewGuid ().ToString ();
-		}
-	}
-
 	// TODO move OAuth stuff into here
 	public class RainyFileSystemDataBackend : IDataBackend
 	{
@@ -63,7 +43,7 @@ namespace Rainy
 
 			//public Dictionary<string, int> NoteRevisions { get; set; }
 
-			public NoteManifest Manifest { get; set; }
+			public SyncManifest Manifest { get; set; }
 
 			protected string notesBasePath;
 			protected IStorage storage;
@@ -95,23 +75,24 @@ namespace Rainy
 				Engine = new Engine (storage);
 
 				// read in data from "manifest" file
-				manifestPath = Path.Combine (storagePath, "manifest.json");
+				manifestPath = Path.Combine (storagePath, "manifest.xml");
 				if (File.Exists (manifestPath)) {	
-					string manifest_json = File.ReadAllText (manifestPath);
-					Manifest = manifest_json.FromJson <NoteManifest> ();
+					string manifest_xml = File.ReadAllText (manifestPath);
+					var textreader = new StringReader (manifest_xml);
+					var xmlreader = new XmlTextReader (textreader);
+					Manifest = SyncManifest.Read (xmlreader);
 				} else {
-					Manifest = new NoteManifest ();
+					Manifest = new SyncManifest ();
+					Manifest.ServerId = Guid.NewGuid ().ToString ();
 				}	
 
 			}
 			public void Dispose ()
 			{
 				// write back the manifest
-				var manifest = new NoteManifest ();
-				manifest.PopulateWith (this.Manifest);
-				string manifest_json = manifest.ToJson ();
-				File.WriteAllText (this.manifestPath, manifest_json);
-
+				using (var xmlwriter = new XmlTextWriter (this.manifestPath, Encoding.UTF8)) {
+					SyncManifest.Write (xmlwriter, this.Manifest);
+				}
 				userLocks [Username].Release ();
 			}
 		}

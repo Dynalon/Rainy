@@ -4,11 +4,11 @@ using NUnit.Framework;
 using System.Data;
 using ServiceStack.OrmLite;
 using ServiceStack.Common;
-using System.Diagnostics;
 using System.Collections.Generic;
-using System.Threading.Tasks;
-using System.IO;
 using System.Linq;
+using DevDefined.OAuth.Framework;
+using Rainy.OAuth.SimpleStore;
+using DevDefined.OAuth.Storage.Basic;
 
 namespace Rainy.Db
 {
@@ -212,7 +212,75 @@ namespace Rainy.Db
 				var result = conn.Select<DBNote> ("Username = {0}", "test");
 				Assert.AreEqual (1, result.Count);
 			}
+		}
 
+		[Test]
+		public void SaveAndReadUser ()
+		{
+
+			var user = new DBUser ();
+			using (var conn = dbFactory.OpenDbConnection ()) {
+				user.Username = "test";
+				user.Manifest.ServerId = Guid.NewGuid ().ToString ();
+				user.Manifest.LastSyncRevision = 123;
+				user.Manifest.NoteRevisions.Add (Guid.NewGuid ().ToString (), 666);
+
+				conn.Save (user);
+			}
+			using (var conn = dbFactory.OpenDbConnection ()) {
+				var db_user = conn.First<DBUser> ("Username = {0}", "test");
+
+				Assert.AreEqual (user.Manifest.ServerId, db_user.Manifest.ServerId);
+				Assert.AreEqual (user.Manifest.NoteRevisions.First (), db_user.Manifest.NoteRevisions.First ());
+				Assert.AreEqual (user.Manifest.LastSyncRevision, db_user.Manifest.LastSyncRevision);
+
+			}
+		}
+	}
+
+	[TestFixture]
+	public class DbOauthTests : DbTestsBase
+	{
+		[Test]
+		public void SaveAndReadTokenBase ()
+		{
+			var token = new TokenBase ();
+			token.Token = Guid.NewGuid ().ToString ();
+			token.TokenSecret = Guid.NewGuid ().ToString ();
+
+			using (var conn = dbFactory.OpenDbConnection ()) {
+				conn.Insert (token.ToDBAccessToken ());
+			}
+			using (var conn = dbFactory.OpenDbConnection ()) {
+				var dbtoken = conn.Select<DBAccessToken> ().First ();
+				Assert.AreEqual (token.Token, dbtoken.Token);
+				Assert.AreEqual (token.TokenSecret, dbtoken.TokenSecret);
+			}
+		}
+
+		[Test]
+		public void DbTokenRepository ()
+		{
+			var repo = new DbAccessTokenRepository<AccessToken> ();
+
+			var token1 = new AccessToken () {
+				ConsumerKey = "anyone",
+				UserName = "johndoe",
+				ExpiryDate = DateTime.Now.AddYears (10),
+				Realm = "tomboy",
+				Token = Guid.NewGuid ().ToString (),
+				TokenSecret = Guid.NewGuid ().ToString (),
+			};
+			repo.SaveToken (token1);
+
+			var token2 =  repo.GetToken (token1.Token);
+
+			Assert.AreEqual (token1.ConsumerKey, token2.ConsumerKey);
+			Assert.AreEqual (token1.Realm, token2.Realm);
+			Assert.AreEqual (token1.UserName, token2.UserName);
+			Assert.AreEqual (token1.ExpiryDate, token2.ExpiryDate);
+			Assert.AreEqual (token1.Token, token2.Token);
+			Assert.AreEqual (token1.TokenSecret, token2.TokenSecret);
 		}
 	}
 }

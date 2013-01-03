@@ -248,25 +248,4 @@ namespace Rainy.OAuth.SimpleStore
 			return TestCertificates.OAuthTestCertificate().PublicKey.Key;
 		}
 	}
-	/// <summary>
-	/// </summary>
-	public class SimpleTokenRepository<T> : ITokenRepository<T>
-		where T : TokenBase
-	{
-		public Dictionary<string, T> _tokens { get; set; }
-		public SimpleTokenRepository ()
-		{
-			_tokens = new Dictionary<string, T> ();
-		}
-
-		public T GetToken(string token)
-		{
-			return _tokens[token];
-		}
-		
-		public void SaveToken(T token)
-		{
-			_tokens[token.Token] = token;
-		}
-	}
 }

@@ -14,9 +14,9 @@ namespace Rainy.Db
 		private IDbConnection db;
 		private IDbTransaction trans;
 
-		public DbStorage (string username, OrmLiteConnectionFactory factory)
+		public DbStorage (string username)
 		{
-			this.db = factory.OpenDbConnection ();
+			this.db = DbConfig.GetConnection ();
 			this.Username = username;
 
 			// start everything as a transaction

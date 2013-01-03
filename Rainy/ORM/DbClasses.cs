@@ -1,5 +1,10 @@
 using Tomboy.Sync.DTO;
 using ServiceStack.DataAnnotations;
+using Tomboy.Sync;
+using ServiceStack.OrmLite;
+using System.Data;
+using Rainy.OAuth.SimpleStore;
+using System;
 
 namespace Rainy.Db
 {
@@ -15,11 +20,61 @@ namespace Rainy.Db
 	public class DBUser
 	{
 		[PrimaryKey]
-		public string Id { get; set; }
-
 		public string Username { get; set; }
+
+		public SyncManifest Manifest { get; set; }
+
+		public DBUser ()
+		{
+			Manifest = new SyncManifest ();
+		}
+
 	}
 
+
+	public static class DbConfig
+	{
+		public static string SqliteFile = "rainy.db";
+
+		public static string ConnectionString {
+			get { return SqliteFile; }
+		}
+
+		private static object syncRoot = new object ();
+		private static OrmLiteConnectionFactory dbFactory; 
+		public static IDbConnection GetConnection ()
+		{
+			lock (syncRoot) {
+				if (dbFactory == null) {
+					dbFactory = new OrmLiteConnectionFactory (ConnectionString, SqliteDialect.Provider);
+				}
+			}
+			return dbFactory.OpenDbConnection ();
+		}
+
+		public static void CreateSchema (bool overwrite = false)
+		{
+			using (var conn = GetConnection ()) {
+				if (overwrite) {
+					conn.DropAndCreateTable <DBUser> ();
+					conn.DropAndCreateTable <DBNote> ();
+					conn.DropAndCreateTable <DBAccessToken> ();
+					// insert an empty test user
+					conn.Insert (new DBUser () {
+						Username = "johndoe",
+						Manifest = new SyncManifest {
+							ServerId = Guid.NewGuid ().ToString ()
+						}
+					});
+				} else {
+					conn.CreateTableIfNotExists <DBUser> ();
+					conn.CreateTableIfNotExists <DBNote> ();
+					conn.CreateTableIfNotExists <DBAccessToken> ();
+				}
+
+			}
+		}
+	}
 	public static class DbClassConverter
 	{
 		public static DBNote ToDBNote (this DTONote dto)

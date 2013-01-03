@@ -79,7 +79,9 @@ Here is an example of a manifest.xml that holds all the required information for
 	  </note-deletions>
 	</manifest>
 
-Note: From what I found when looking to the tomboy sourcecode, the note-revisions field is ignored and just a relict of previous versions. There is **no need** to store note revisions on the client!
+Note: From what I found when looking to the tomboy sourcecode, the note-revisions field is ignored and just a relict of previous versions. There is, however, a usecase where you at least need to mark notes as tainted:
+
+If two clients sync, a note is modified by client A, and then B modifies the same note and tries to sync to the server, there is a conflict (because both notes were modified). But this conflict is hard to detect without per-note revision numbers (comparing server and client times are not allowed because of possible drift!). A possible solution is to compare the last MetadataChangeDate of client B's  note with client B's last sync date to determine, is the note is "tainted". This avoids comparing client and server clocks, but still relies on the client clock (which might still produce errors if the clock 'jumps')
 
 Syncing
 -------
@@ -93,7 +95,7 @@ All syncing decision is currently done by the client. That means that the client
 
 The server is solely responsible for executing the clients requests (retrieve, update, delete note), and is  providing secure storage of the notes.
 
-It is noteworthy, that the various date values associated for each note (create-date, last-metadata-change-date, etc.) should not be used at all for synchronisation. It is ok to compare local timestamps with each other (as Tomboy does for selecting changed notes), but *under no circumstances* is it allowed to compare a server-generated timestamp with a client-generated timestamp. The reason is simple: Client and Server clocks may be out-of-sync and have completely different times set.
+It is noteworthy, that the various date values associated for each note (create-date, last-metadata-change-date, etc.) should not be used at all for synchronisation. It is ok (also still error prone) to compare local timestamps with each other (as Tomboy does for selecting changed notes), but *under no circumstances* is it allowed to compare a server-generated timestamp with a client-generated timestamp. The reason is simple: Client and Server clocks may be out-of-sync and have completely different times set.
 
 ### Syncing relationship
 
@@ -114,7 +116,7 @@ Tomboy performs a reset basically by deleting it's manifest.xml file and startin
 Here is some pseudocode of how a client and a server may be synced:
 
 ```
-TODO
+TODO. Check tomboy-libraries sourcecode for Sync.cs in the meantime.
 ```
 
 ### Syncing protocol

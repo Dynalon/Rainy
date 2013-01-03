@@ -58,11 +58,11 @@ namespace Rainy.Db
 			string username = "test";
 			var sample_notes = GetSampleNotes ();
 
-			using (var store = new DbStorage (username, dbFactory)) {
+			using (var store = new DbStorage (username)) {
 				sample_notes.ForEach (n => store.SaveNote (n));
 			}
 			// now check if we have stored that notes
-			using (var store = new DbStorage (username, dbFactory)) {
+			using (var store = new DbStorage (username)) {
 				var stored_notes = store.GetNotes ().Values.ToList ();
 
 				Assert.AreEqual (sample_notes.Count, stored_notes.Count);
@@ -76,7 +76,7 @@ namespace Rainy.Db
 		{
 			StoreSomeNotes ();
 
-			using (var store = new DbStorage ("test", dbFactory)) {
+			using (var store = new DbStorage ("test")) {
 				var stored_notes = store.GetNotes ().Values.ToList ();
 
 				var deleted_note = stored_notes[0];

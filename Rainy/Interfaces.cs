@@ -1,12 +1,12 @@
 using System;
+using Tomboy.Sync;
 
 namespace Rainy
 {
 	public interface INoteRepository : IDisposable
 	{
 		Tomboy.Engine Engine { get; }
-		NoteManifest Manifest { get; }
-		//Dictionary<string, int> NoteRevisions { get; set; }
+		SyncManifest Manifest { get; }
 	}
 
 	public interface IDataBackend 
