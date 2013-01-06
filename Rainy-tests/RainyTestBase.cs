@@ -10,14 +10,13 @@ namespace Rainy
 		[SetUp]
 		public void SetUp ()
 		{
-			RainyTestServer.StartNewRainyStandaloneServer ();
+			RainyTestServer.StartNewServer ();
 			baseUri = RainyTestServer.BaseUri;
-
 		}
 		[TearDown]
 		public void TearDown ()
 		{
-			RainyTestServer.StopRainyStandaloneServer ();
+			RainyTestServer.Stop ();
 		}
 	}
 	

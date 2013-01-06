@@ -12,7 +12,7 @@ namespace Rainy
 		{
 			CreateSomeSampleNotes ();
 
-			RainyTestServer.StartNewRainyStandaloneServer ();
+			RainyTestServer.StartNewServer ();
 
 			syncServer = new WebSyncServer (RainyTestServer.BaseUri, RainyTestServer.GetAccessToken ());
 		}
@@ -20,7 +20,7 @@ namespace Rainy
 		[TearDown]
 		public void TearDown ()
 		{
-			RainyTestServer.StopRainyStandaloneServer ();
+			RainyTestServer.Stop ();
 		}
 	}
 

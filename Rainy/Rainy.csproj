@@ -103,7 +103,6 @@
     <Compile Include="WebService\OAuth\SimpleTokenRepository.cs" />
     <Compile Include="ORM\DatabaseBackend.cs" />
     <Compile Include="WebService\OAuth\OAuthDatabaseHandler.cs" />
-    <Compile Include="WebService\OAuth\OAuthPlainFileHandler.cs" />
     <Compile Include="WebService\OAuth\OAuthHandlerBase.cs" />
   </ItemGroup>
   <ItemGroup>

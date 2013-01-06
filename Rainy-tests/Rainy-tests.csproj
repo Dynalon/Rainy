@@ -61,6 +61,7 @@
     <Compile Include="ORM\DbBenchmarks.cs" />
     <Compile Include="ORM\DbTestsBase.cs" />
     <Compile Include="ORM\DbStorageTests.cs" />
+    <Compile Include="ORM\DatabaseBackendTests.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <ItemGroup>

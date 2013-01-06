@@ -23,6 +23,8 @@ namespace Rainy.Db
 		[PrimaryKey]
 		public string Username { get; set; }
 
+		public string Password { get; set; }
+
 		public SyncManifest Manifest { get; set; }
 
 		public DBUser ()
@@ -40,7 +42,7 @@ namespace Rainy.Db
 	public static class DbConfig
 	{
 		private static bool isInitialized = false;
-		private static string sqliteFile;
+		private static string sqliteFile = "rainy.db";
 
 		public static string SqliteFile {
 			get { return sqliteFile; }
@@ -82,6 +84,7 @@ namespace Rainy.Db
 					conn.DropAndCreateTable <DBNote> ();
 					conn.DropAndCreateTable <DBAccessToken> ();
 					// insert an empty test user
+					// TODO remove this and put into the testcases
 					conn.Insert (new DBUser () {
 						Username = "johndoe",
 						Manifest = new SyncManifest {

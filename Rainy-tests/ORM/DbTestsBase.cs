@@ -5,7 +5,6 @@ using System.Data;
 using ServiceStack.OrmLite;
 using System.Collections.Generic;
 using System.IO;
-using Rainy.OAuth.SimpleStore;
 
 namespace Rainy.Db
 {
@@ -16,7 +15,7 @@ namespace Rainy.Db
 		[TestFixtureSetUp]
 		public void FixtureSetUp ()
 		{
-			DbConfig.SetSqliteFile ("rainy-test.db");
+			DbConfig.SetSqliteFile ("/tmp/rainy-test-data/rainy-test.db");
 			// remove the rainy-test.db file if it exists
 			if (File.Exists (DbConfig.SqliteFile)) {
 				File.Delete (DbConfig.SqliteFile);

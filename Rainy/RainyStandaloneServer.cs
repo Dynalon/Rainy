@@ -21,12 +21,13 @@ namespace Rainy
 		private AppHost appHost;
 		private ILog logger;
 
-		public RainyStandaloneServer (OAuthHandlerBase handler, IDataBackend backend, string listen_url)
+		public RainyStandaloneServer (IDataBackend backend, string listen_url)
 		{
 			ListenUrl = listen_url;
 			logger = LogManager.GetLogger (this.GetType ());
 
-			OAuth = handler;
+			OAuth = backend.OAuth;
+
 			DataBackend = backend;
 
 		}

@@ -1,26 +1,23 @@
 using System;
 using System.IO;
+using System.Data;
 
-using ServiceStack.Text;
-
-using Tomboy;
+using Rainy.OAuth;
 using Rainy.Db;
 using ServiceStack.OrmLite;
-using ServiceStack.Common;
+using Tomboy;
 using Tomboy.Sync;
-using System.Data;
 
 namespace Rainy
 {
 	public class DatabaseBackend : IDataBackend
 	{
-		private bool reset;
+		OAuthHandlerBase oauthHandler;
 
-		public DatabaseBackend (string data_path, bool reset = false)
+		public DatabaseBackend (string database_path, OAuthAuthenticator auth, bool reset = false)
 		{
-			DbConfig.SetSqliteFile (Path.Combine (data_path, "rainy.db"));
+			oauthHandler = new OAuthDatabaseHandler (auth);
 			DbConfig.CreateSchema (reset);
-
 		}
 		#region IDataBackend implementation
 		public INoteRepository GetNoteRepository (string username)
@@ -28,6 +25,12 @@ namespace Rainy
 			var rep = new DatabaseNoteRepository (username);
 			return rep;
 		}
+		public OAuthHandlerBase OAuth {
+			get {
+				return oauthHandler;
+			}
+		}
+
 		#endregion
 	}
 
@@ -72,7 +75,12 @@ namespace Rainy
 			storage.Dispose ();
 
 			// write back the user
-			dbConnection.Update (dbUser);
+
+			using (var trans = dbConnection.BeginTransaction ()) {
+				dbConnection.Delete (dbUser);
+				dbConnection.Insert (dbUser);
+				trans.Commit ();
+			}
 
 			dbConnection.Dispose ();
 		}

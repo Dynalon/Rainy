@@ -9,6 +9,7 @@ using Rainy.OAuth;
 using System.IO;
 using Tomboy.Sync.Web;
 using DevDefined.OAuth.Storage.Basic;
+using Rainy.Db;
 
 namespace Rainy
 {
@@ -30,34 +31,33 @@ namespace Rainy
 		private static RainyStandaloneServer rainyServer;
 		private static string tmpPath;
 
-		public static void StartNewRainyStandaloneServer ()
+		public static void StartNewServer (string use_backend = "sqlite")
 		{
-			tmpPath = "/tmp/data/";
+			tmpPath = "/tmp/rainy-test-data/";
 			if (Directory.Exists (tmpPath)) {
 				Directory.Delete (tmpPath, true);
 			}	
 			Directory.CreateDirectory (tmpPath);
-
-			//Path.GetTempPath () + Path.GetRandomFileName ();
+			DbConfig.SetSqliteFile (Path.Combine (tmpPath, "rainy-test.db"));
+			// tmpPath = Path.GetTempPath () + Path.GetRandomFileName ();
 
 			// for debugging, we only use a simple single user authentication 
 			OAuthAuthenticator debug_authenticator = (user,pass) => {
 				if (user == TEST_USER  && pass == TEST_PASS) return true;
 				else return false;
 			};
-			OAuthHandlerBase handler;
 
-			//handler = new OAuthPlainFileHandler (tmpPath, debug_authenticator, 60);
-			//IDataBackend backend = new RainyFileSystemDataBackend (tmpPath);
+			IDataBackend backend;
+			if (use_backend == "sqlite")
+				backend = new DatabaseBackend (tmpPath, debug_authenticator, reset: true);
+			else
+				backend = new RainyFileSystemBackend (tmpPath, debug_authenticator);
 
-			IDataBackend backend = new DatabaseBackend (tmpPath, reset: true);
-			handler = new OAuthDatabaseHandler (debug_authenticator);
-
-			rainyServer = new RainyStandaloneServer (handler, backend, RainyListenUrl);
+			rainyServer = new RainyStandaloneServer (backend, RainyListenUrl);
 
 			rainyServer.Start ();
 		}
-		public static void StopRainyStandaloneServer ()
+		public static void Stop ()
 		{
 			rainyServer.Stop ();
 			//Directory.Delete (tmpPath, true);

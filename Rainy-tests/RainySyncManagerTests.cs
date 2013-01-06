@@ -10,7 +10,7 @@ namespace Rainy
 		[SetUp]
 		public new void SetUp ()
 		{
-			RainyTestServer.StartNewRainyStandaloneServer ();
+			RainyTestServer.StartNewServer ();
 
 			syncServer = new WebSyncServer (RainyTestServer.BaseUri, RainyTestServer.GetAccessToken ());
 		}
@@ -18,7 +18,7 @@ namespace Rainy
 		[TearDown]
 		public new void TearDown ()
 		{
-			RainyTestServer.StopRainyStandaloneServer ();
+			RainyTestServer.Stop ();
 		}
 
 		protected override void ClearServer (bool reset = false)

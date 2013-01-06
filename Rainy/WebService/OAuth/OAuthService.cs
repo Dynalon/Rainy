@@ -39,7 +39,7 @@ namespace Rainy.WebService.OAuth
 
 			try {
 				IOAuthContext context = new OAuthContextBuilder ().FromWebRequest (original_request, request.RequestStream);
-				IToken token = Rainy.RainyStandaloneServer.OAuth.Provider.GrantRequestToken (context);
+				IToken token = RainyStandaloneServer.OAuth.Provider.GrantRequestToken (context);
 				Logger.DebugFormat ("granting request token {0} to consumer", token);
 
 				Response.StatusCode = 200;

@@ -11,23 +11,31 @@ using Tomboy;
 using Tomboy.Sync;
 using System.Xml;
 using System.Text;
+using Rainy.OAuth;
 
 
 namespace Rainy
 {
 	// TODO move OAuth stuff into here
-	public class RainyFileSystemDataBackend : IDataBackend
+	public class RainyFileSystemBackend : IDataBackend
 	{
-		protected string notesBasePath;
+		string notesBasePath;
+		OAuthHandlerBase oauthHandler;
 
-		public RainyFileSystemDataBackend (string data_path)
+		public RainyFileSystemBackend (string data_path, OAuthAuthenticator auth)
 		{
+			oauthHandler = new OAuthDatabaseHandler (auth);
 			this.notesBasePath = Path.Combine (data_path, "notes");
 		}
 		public INoteRepository GetNoteRepository (string username)
 		{
 			return new DirectoryBasedNoteRepository (username, notesBasePath);
 		}
+		public OAuthHandlerBase OAuth {
+			get { return oauthHandler; }
+		}
+
+
 		/// <summary>
 		/// Note repository. There may only exists one repository of a username at any given time in memory. 
 		/// When trying to create another one of the same username, the thread will block until the previous

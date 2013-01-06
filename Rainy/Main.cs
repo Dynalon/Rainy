@@ -8,6 +8,7 @@ using log4net;
 using Rainy.OAuth;
 using JsonConfig;
 using Mono.Options;
+using Rainy.Db;
 
 namespace Rainy
 {
@@ -87,6 +88,8 @@ namespace Rainy
 			if (string.IsNullOrEmpty (data_path)) {
 				data_path = Directory.GetCurrentDirectory ();
 			}
+			var sqlite_file = Path.Combine (data_path, "rainy.db");
+			DbConfig.SetSqliteFile (sqlite_file);
 
 			var logger = LogManager.GetLogger ("Main");
 			SetupLogging (loglevel);
@@ -110,29 +113,24 @@ namespace Rainy
 			// determine and setup data backend
 			string backend = Config.Global.Backend;
 
-			OAuthHandlerBase oauth_handler;
 			IDataBackend data_backend;
-
 			if (string.IsNullOrEmpty (backend)) {
 				backend = "filesystem";
 			}
 			if (backend == "sqlite") {
-				oauth_handler = new OAuthDatabaseHandler (config_authenticator);
-				data_backend = new RainyFileSystemDataBackend (data_path);
+				data_backend = new DatabaseBackend (data_path, config_authenticator, reset: false);
 			} else {
-				oauth_handler = new OAuthPlainFileHandler (data_path, config_authenticator);
-				data_backend = new DatabaseBackend (data_path, reset: false);
+				data_backend = new RainyFileSystemBackend (data_path, config_authenticator);
 			}
 
 			var listen_url = "http://" + Config.Global.ListenAddress + ":" + Config.Global.ListenPort + "/";
-			using (var listener = new RainyStandaloneServer (oauth_handler, data_backend, listen_url)) {
+			using (var listener = new RainyStandaloneServer (data_backend, listen_url)) {
 
 				listener.Start ();
 
 				Console.WriteLine ("Press RETURN to stop Rainy");
 				Console.ReadLine ();
 			}
-
 		}
 	}
 }
