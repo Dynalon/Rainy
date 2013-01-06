@@ -12,7 +12,6 @@ namespace Rainy
 		{
 			CreateSomeSampleNotes ();
 
-			RainyTestServer.BaseUri = "http://127.0.0.1:8080/johndoe/none";
 			RainyTestServer.StartNewRainyStandaloneServer ();
 
 			syncServer = new WebSyncServer (RainyTestServer.BaseUri, RainyTestServer.GetAccessToken ());

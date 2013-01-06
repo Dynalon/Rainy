@@ -15,8 +15,16 @@ namespace Rainy
 	// simple server that can be used from within unit tests
 	public static class RainyTestServer
 	{
-		public static string BaseUri = "http://127.0.0.1:8080/johndoe/none/";
+		public static string TEST_USER = "johndoe";
+		public static string TEST_PASS = "none";
 		public static string RainyListenUrl = "http://127.0.0.1:8080/";
+
+		public static string BaseUri {
+			// i.e. http://127.0.0.1:8080/johndoe/none/
+			get {
+				return RainyListenUrl + TEST_USER + "/" + TEST_PASS + "/";
+			}
+		}
 
 		private static RainyStandaloneServer rainyServer;
 		private static string tmpPath;
@@ -28,7 +36,7 @@ namespace Rainy
 			
 			// for debugging, we only use a simple single user authentication 
 			OAuthAuthenticator debug_authenticator = (user,pass) => {
-				if (user == "johndoe" && pass == "none") return true;
+				if (user == TEST_USER  && pass == TEST_PASS) return true;
 				else return false;
 			};
 			OAuthHandler handler = new OAuthHandler (tmpPath, debug_authenticator, 60);
