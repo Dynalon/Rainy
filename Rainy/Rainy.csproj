@@ -87,7 +87,6 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Main.cs" />
-    <Compile Include="WebService\OAuth\OAuthHandler.cs" />
     <Compile Include="WebService\OAuth\OAuthService.cs" />
     <Compile Include="WebService\NoteService.cs" />
     <Compile Include="WebService\DTOClasses.cs" />
@@ -103,6 +102,9 @@
     <Compile Include="ORM\DbStorage.cs" />
     <Compile Include="WebService\OAuth\SimpleTokenRepository.cs" />
     <Compile Include="ORM\DatabaseBackend.cs" />
+    <Compile Include="WebService\OAuth\OAuthDatabaseHandler.cs" />
+    <Compile Include="WebService\OAuth\OAuthPlainFileHandler.cs" />
+    <Compile Include="WebService\OAuth\OAuthHandlerBase.cs" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="WebService\" />

@@ -1,16 +1,11 @@
-
 using System.Collections.Generic;
-
-
-using System;
-using DevDefined.OAuth.Framework;
-using ServiceStack.DataAnnotations;
 using ServiceStack.Common;
-using Rainy.Db;
 using ServiceStack.OrmLite;
 using DevDefined.OAuth.Storage.Basic;
+using DevDefined.OAuth.Framework;
+using Rainy.Db;
 
-namespace Rainy.OAuth.SimpleStore
+namespace Rainy.OAuth
 {
 	/// <summary>
 	/// Simple token store. Holds our RequestTokens and AccessTokens.
@@ -59,12 +54,6 @@ namespace Rainy.OAuth.SimpleStore
 				}
 			}
 		}
-	}
-
-	public class DBAccessToken : AccessToken
-	{
-		[PrimaryKey]
-		public new string Token { get; set; }
 	}
 
 	public static class DbTokenConverter

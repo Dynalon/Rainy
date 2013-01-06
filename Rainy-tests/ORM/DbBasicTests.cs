@@ -9,6 +9,7 @@ using System.Linq;
 using DevDefined.OAuth.Framework;
 using Rainy.OAuth.SimpleStore;
 using DevDefined.OAuth.Storage.Basic;
+using Rainy.OAuth;
 
 namespace Rainy.Db
 {

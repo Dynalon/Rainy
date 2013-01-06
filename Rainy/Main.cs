@@ -3,7 +3,6 @@ using System.Threading;
 using System.Collections.Generic;
 using System.IO;
 
-
 using log4net;
 
 using Rainy.OAuth;
@@ -43,7 +42,7 @@ namespace Rainy
 			LogManager.GetLogger("Logsystem").Debug ("logsystem initialized");
 			
 			/* ColoredConsoleAppender is win32 only. A managed version was introduced to log4net svn
-			and should be available when log4net >1.2.12 comes out.
+			and should be available when log4net 1.2.12 comes out.
 		
 			Below codes is not tested/working!	
 				
@@ -114,7 +113,7 @@ namespace Rainy
 			};
 
 			// TODO the oauth handler must be put into different data backends
-			var oauth_handler = new OAuthHandler ("/tmp/rainy/oauth/", config_authenticator);
+			var oauth_handler = new OAuthPlainFileHandler ("/tmp/rainy/oauth/", config_authenticator);
 			oauth_handler.StartIntervallWriteThread ();
 
 			var data_backend = new RainyFileSystemDataBackend (NotesPath);

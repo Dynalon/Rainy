@@ -39,9 +39,9 @@ namespace Rainy
 				if (user == TEST_USER  && pass == TEST_PASS) return true;
 				else return false;
 			};
-			OAuthHandler handler = new OAuthHandler (tmpPath, debug_authenticator, 60);
-			//IDataBackend backend = new RainyFileSystemDataBackend (tmpPath);
-			IDataBackend backend = new DatabaseBackend (tmpPath, reset: true);
+			OAuthPlainFileHandler handler = new OAuthPlainFileHandler (tmpPath, debug_authenticator, 60);
+			IDataBackend backend = new RainyFileSystemDataBackend (tmpPath);
+			//IDataBackend backend = new DatabaseBackend (tmpPath, reset: true);
 
 			rainyServer = new RainyStandaloneServer (handler, backend, RainyListenUrl);
 

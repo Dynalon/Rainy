@@ -5,6 +5,7 @@ using ServiceStack.OrmLite;
 using System.Data;
 using Rainy.OAuth.SimpleStore;
 using System;
+using DevDefined.OAuth.Storage.Basic;
 
 namespace Rainy.Db
 {
@@ -28,9 +29,13 @@ namespace Rainy.Db
 		{
 			Manifest = new SyncManifest ();
 		}
-
 	}
 
+	public class DBAccessToken : AccessToken
+	{
+		[PrimaryKey]
+		public new string Token { get; set; }
+	}
 
 	public static class DbConfig
 	{
