@@ -78,24 +78,7 @@ namespace Rainy.OAuth.SimpleStore
 		/// <returns></returns>
 		public IToken CreateAccessToken(IOAuthContext context)
 		{
-			if (context == null)
-			{
-				throw new ArgumentNullException("context");
-			}
-			
-			var accessToken = new AccessToken
-			{
-				ConsumerKey = context.ConsumerKey,
-				ExpiryDate = DateTime.UtcNow.AddYears (99),
-				Realm = context.Realm,
-				Token = Guid.NewGuid().ToString(),
-				TokenSecret = Guid.NewGuid().ToString(),
-				UserName = Guid.NewGuid().ToString(),
-			};
-			
-			_accessTokenRepository.SaveToken(accessToken);
-			
-			return accessToken;
+			throw new NotImplementedException ();
 		}
 		
 		public void ConsumeRequestToken(IOAuthContext requestContext)

@@ -13,9 +13,6 @@ namespace Rainy
 {
 	public class MainClass
 	{
-		public static string NotesPath;
-		public static string OAuthDataPath;
-
 		// HACK a dictionary holding usernames and their repos
 		// can be used for locking
 		public static Dictionary<string, Semaphore> UserLocks;
@@ -90,14 +87,12 @@ namespace Rainy
 			if (string.IsNullOrEmpty (data_path)) {
 				data_path = Directory.GetCurrentDirectory ();
 			}
-			NotesPath = Path.Combine (data_path, "notes");
-			OAuthDataPath = Path.Combine (data_path, "oauth");
-
-			string listen_hostname = Config.Global.ListenAddress;
-			int listen_port = Config.Global.ListenPort;
 
 			var logger = LogManager.GetLogger ("Main");
 			SetupLogging (loglevel);
+
+			string listen_hostname = Config.Global.ListenAddress;
+			int listen_port = Config.Global.ListenPort;
 
 			// simply use user/password list from config for authentication
 			OAuthAuthenticator config_authenticator = (username, password) => {
@@ -112,11 +107,22 @@ namespace Rainy
 				return false;
 			};
 
-			// TODO the oauth handler must be put into different data backends
-			var oauth_handler = new OAuthPlainFileHandler ("/tmp/rainy/oauth/", config_authenticator);
-			oauth_handler.StartIntervallWriteThread ();
+			// determine and setup data backend
+			string backend = Config.Global.Backend;
 
-			var data_backend = new RainyFileSystemDataBackend (NotesPath);
+			OAuthHandlerBase oauth_handler;
+			IDataBackend data_backend;
+
+			if (string.IsNullOrEmpty (backend)) {
+				backend = "filesystem";
+			}
+			if (backend == "sqlite") {
+				oauth_handler = new OAuthDatabaseHandler (config_authenticator);
+				data_backend = new RainyFileSystemDataBackend (data_path);
+			} else {
+				oauth_handler = new OAuthPlainFileHandler (data_path, config_authenticator);
+				data_backend = new DatabaseBackend (data_path, reset: false);
+			}
 
 			var listen_url = "http://" + Config.Global.ListenAddress + ":" + Config.Global.ListenPort + "/";
 			using (var listener = new RainyStandaloneServer (oauth_handler, data_backend, listen_url)) {
@@ -126,7 +132,7 @@ namespace Rainy
 				Console.WriteLine ("Press RETURN to stop Rainy");
 				Console.ReadLine ();
 			}
-			oauth_handler.StopIntervallWriteThread ();
+
 		}
 	}
 }

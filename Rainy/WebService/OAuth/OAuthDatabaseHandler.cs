@@ -11,13 +11,8 @@ namespace Rainy.OAuth
 
 			SetupInspectors ();
 		}
+		public override void Dispose ()
+		{
+		}
 	}
-
-	/// <summary>
-	/// Is responsible for serializing and deserializing the OAuth
-	/// data (i.e. AccessTokens). Data integrity is very weak - we will just
-	/// periodically rewrite the WHOLE data in JSON serialized formats to a file. If the server
-	/// is interrupted between two sync-to-disk processes, the authorization data is lost!
-	/// </summary>
-	
 }

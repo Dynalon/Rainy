@@ -43,17 +43,18 @@ namespace Rainy.OAuth
 		protected uint DiskWriteInterval;
 		protected Thread WriteThread;
 
-		public OAuthPlainFileHandler (string oauth_data_path, OAuthAuthenticator auth, uint disk_write_interval = 300)
+		public OAuthPlainFileHandler (string data_path, OAuthAuthenticator auth, uint disk_write_interval = 300)
 			: base (auth)
 		{
 			this.DiskWriteInterval = disk_write_interval;
 
 			// initialize the pathes for on-disk storage
-			oauthDataPath = new DirectoryInfo (oauth_data_path);
+			var oauth_data_path = Path.Combine (data_path, "oauth");
 			if (!Directory.Exists (oauth_data_path)) {
 				// create the path where we store the oauth data
 				Directory.CreateDirectory (oauth_data_path);
 			}
+			oauthDataPath = new DirectoryInfo (oauth_data_path);
 			accessRepoFile = Path.Combine (oauthDataPath.FullName, "access_tokens.json");
 
 			// read in persistent data, will initialize AccessToken
@@ -62,6 +63,8 @@ namespace Rainy.OAuth
 			TokenStore = new Rainy.OAuth.SimpleStore.SimpleTokenStore (AccessTokens, RequestTokens);
 
 			SetupInspectors ();
+
+			StartIntervallWriteThread ();
 		}
 
 		// TODO NonceStore and RequestTokens should be persistent, too.
@@ -85,7 +88,7 @@ namespace Rainy.OAuth
 			}
 		}
 
-		public void StartIntervallWriteThread ()
+		protected void StartIntervallWriteThread ()
 		{
 			WriteThread = new Thread (() => {
 				while (true) {
@@ -98,16 +101,21 @@ namespace Rainy.OAuth
 			});
 			WriteThread.Start ();
 		}
-		public void StopIntervallWriteThread ()
+		protected void StopIntervallWriteThread ()
 		{
 			lock (this) {
 				// due to the lock its save to abort the thread at this place
+				// which is in the Thread.Sleep phase
 				if (WriteThread.IsAlive) {
 					WriteThread.Abort ();
 				}
 
 				WriteDataToDisk ();
 			}
+		}
+		public override void Dispose ()
+		{
+			StopIntervallWriteThread ();
 		}
 	}
 }

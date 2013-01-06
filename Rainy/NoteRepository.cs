@@ -20,9 +20,9 @@ namespace Rainy
 	{
 		protected string notesBasePath;
 
-		public RainyFileSystemDataBackend (string notes_base_path)
+		public RainyFileSystemDataBackend (string data_path)
 		{
-			this.notesBasePath = notes_base_path;
+			this.notesBasePath = Path.Combine (data_path, "notes");
 		}
 		public INoteRepository GetNoteRepository (string username)
 		{

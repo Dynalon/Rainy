@@ -274,7 +274,7 @@ namespace Rainy.Db
 			};
 			repo.SaveToken (token1);
 
-			var token2 =  repo.GetToken (token1.Token);
+			var token2 = repo.GetToken (token1.Token);
 
 			Assert.AreEqual (token1.ConsumerKey, token2.ConsumerKey);
 			Assert.AreEqual (token1.Realm, token2.Realm);

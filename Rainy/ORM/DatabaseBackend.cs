@@ -16,11 +16,9 @@ namespace Rainy
 	{
 		private bool reset;
 
-		private string storagePath;
-
-		public DatabaseBackend (string path, bool reset = false)
+		public DatabaseBackend (string data_path, bool reset = false)
 		{
-			this.storagePath = path;
+			DbConfig.SetSqliteFile (Path.Combine (data_path, "rainy.db"));
 			DbConfig.CreateSchema (reset);
 
 		}

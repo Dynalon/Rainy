@@ -16,7 +16,7 @@ namespace Rainy.Db
 		[TestFixtureSetUp]
 		public void FixtureSetUp ()
 		{
-			DbConfig.SqliteFile = "rainy-test.db";
+			DbConfig.SetSqliteFile ("rainy-test.db");
 			// remove the rainy-test.db file if it exists
 			if (File.Exists (DbConfig.SqliteFile)) {
 				File.Delete (DbConfig.SqliteFile);

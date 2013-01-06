@@ -39,18 +39,35 @@ namespace Rainy.Db
 
 	public static class DbConfig
 	{
-		public static string SqliteFile = "rainy.db";
+		private static bool isInitialized = false;
+		private static string sqliteFile;
+
+		public static string SqliteFile {
+			get { return sqliteFile; }
+		}
 
 		public static string ConnectionString {
-			get { return SqliteFile; }
+			get { return sqliteFile; }
 		}
 
 		private static object syncRoot = new object ();
 		private static OrmLiteConnectionFactory dbFactory; 
+
+		public static void SetSqliteFile (string filename)
+		{
+			lock (syncRoot) {
+				if (isInitialized) {
+					//throw new Exception ("Filename can't be set once the class is initialized");
+				} else {
+					sqliteFile = filename;
+				}
+			}
+		}
 		public static IDbConnection GetConnection ()
 		{
 			lock (syncRoot) {
-				if (dbFactory == null) {
+				if (!isInitialized) {
+					isInitialized = true;
 					dbFactory = new OrmLiteConnectionFactory (ConnectionString, SqliteDialect.Provider);
 				}
 			}

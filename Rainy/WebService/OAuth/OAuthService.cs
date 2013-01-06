@@ -89,21 +89,24 @@ namespace Rainy.WebService.OAuth
 			// authorization succeeded, continue
 			Logger.InfoFormat ("Successfully authorized user: {0}", request.Username);
 
-			// TODO this is ugly as it bypasses the OAuth DevDefined API
-			// however, I can't find to this date any documentation or API code that would
-			// expose how to generate and set the Verifier correctly
-			var token = Rainy.RainyStandaloneServer.OAuth.RequestTokens.GetToken (context.Token);
-			token.Verifier = Guid.NewGuid ().ToString ();
-			token.AccessToken = (AccessToken) Rainy.RainyStandaloneServer.OAuth.TokenStore.CreateAccessToken (context);
-			token.AccessDenied = false;
-			// store the username in the access token
-			token.AccessToken.UserName = request.Username;
+			var request_token = Rainy.RainyStandaloneServer.OAuth.RequestTokens.GetToken (context.Token);
+			request_token.Verifier = Guid.NewGuid ().ToString ();
+			request_token.AccessDenied = false;
+
+			request_token.AccessToken = new AccessToken () {
+				ConsumerKey = request_token.ConsumerKey,
+				Realm = request_token.Realm,
+				Token = Guid.NewGuid ().ToString (),
+				TokenSecret = Guid.NewGuid ().ToString (),
+				UserName = request.Username,
+				ExpiryDate = DateTime.Now.AddYears (99)
+			};
 		
-			RainyStandaloneServer.OAuth.RequestTokens.SaveToken (token);
-			Logger.DebugFormat ("created an access token for user {0}: {1}", request.Username, token);
+			RainyStandaloneServer.OAuth.RequestTokens.SaveToken (request_token);
+			Logger.DebugFormat ("created an access token for user {0}: {1}", request.Username, request_token);
 
 			// redirect to the provded callback
-			var redirect_url = token.CallbackUrl + "?oauth_verifier=" + token.Verifier + "&oauth_token=" + token.Token;
+			var redirect_url = request_token.CallbackUrl + "?oauth_verifier=" + request_token.Verifier + "&oauth_token=" + request_token.Token;
 			Logger.DebugFormat ("redirecting user to consumer at: {1}", request.Username, redirect_url);
 			Response.Redirect (redirect_url);
 			return null;
@@ -134,10 +137,14 @@ namespace Rainy.WebService.OAuth
 			var original_request = ((HttpListenerRequest)Request.OriginalRequest).ToWebRequest ();
 
 			try {
-				var context = new OAuthContextBuilder ().FromWebRequest (original_request, new MemoryStream ());
-				var token = Rainy.RainyStandaloneServer.OAuth.Provider.ExchangeRequestTokenForAccessToken (context);
-				Logger.DebugFormat ("exchanging request token for access token {0}", token);
-				Response.Write (token.ToString ());
+				var context = new OAuthContextBuilder ()
+					.FromWebRequest (original_request, new MemoryStream ());
+				AccessToken access_token = (AccessToken) RainyStandaloneServer.OAuth.Provider.ExchangeRequestTokenForAccessToken (context);
+
+				Logger.DebugFormat ("permanently authorizting access token: {0}", access_token);
+				RainyStandaloneServer.OAuth.AccessTokens.SaveToken (access_token);
+				Response.Write (access_token.ToString ());
+
 			} catch (Exception e) {
 				Logger.ErrorFormat ("failed to exchange request token for access token, exception was: {0}", e.Message);
 				Response.StatusCode = 500;

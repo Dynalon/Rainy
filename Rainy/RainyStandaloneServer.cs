@@ -13,7 +13,7 @@ namespace Rainy
 	{
 		public readonly string ListenUrl;
 
-		public static OAuthPlainFileHandler OAuth;
+		public static OAuthHandlerBase OAuth;
 		public static string Passkey;	
 
 		public static IDataBackend DataBackend { get; private set; }
@@ -21,7 +21,7 @@ namespace Rainy
 		private AppHost appHost;
 		private ILog logger;
 
-		public RainyStandaloneServer (OAuthPlainFileHandler handler, IDataBackend backend, string listen_url)
+		public RainyStandaloneServer (OAuthHandlerBase handler, IDataBackend backend, string listen_url)
 		{
 			ListenUrl = listen_url;
 			logger = LogManager.GetLogger (this.GetType ());

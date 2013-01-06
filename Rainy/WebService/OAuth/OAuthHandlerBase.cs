@@ -33,7 +33,7 @@ namespace Rainy.OAuth
 {
 	public delegate bool OAuthAuthenticator (string username, string password);
 
-	public abstract class OAuthHandlerBase
+	public abstract class OAuthHandlerBase : IDisposable
 	{
 		// the data stores required by the OAuth process
 		public ITokenRepository<AccessToken> AccessTokens;
@@ -80,5 +80,7 @@ namespace Rainy.OAuth
 
 			Provider = new OAuthProvider (TokenStore, inspectors.ToArray ());
 		}
+
+		public abstract void Dispose ();
 	}
 }
