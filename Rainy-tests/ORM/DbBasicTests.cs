@@ -27,7 +27,7 @@ namespace Rainy.Db
 			using (var conn = dbFactory.OpenDbConnection ()) {
 				conn.Insert (db_old);
 			}
-			DTONote dto_new;
+			DTONote dto_new = null;
 			DBNote db_new;
 			using (var conn = dbFactory.OpenDbConnection ()) {
 				db_new = conn.Single <DBNote> ("Username = {0}", "test");
