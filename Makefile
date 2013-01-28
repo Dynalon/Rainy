@@ -13,8 +13,24 @@ PACKED_EXE=Rainy.exe
 MIN_MONO_VERSION=2.10.9
 
 pack: prepare build
-	echo "Packing all assembly deps into the final .exe"
+	@cp Rainy/settings.conf $(RELEASEDIR)/settings.conf
+	@echo "Packing all assembly deps into the final .exe"
 	$(MONO) ./tools/ILRepack.exe /out:$(RELEASEDIR)/$(PACKED_EXE) $(BINDIR)/Rainy.exe $(BINDIR)/*.dll
+	@echo ""
+	@echo "**********"
+	@echo ""
+	@echo "Success! Find your executable in $(RELEASEDIR)/$(PACKED_EXE)"
+	@echo "To run rainy, copy $(RELEASEDIR)/$(PACKED_EXE) along with"
+	@echo "the settings.conf to the desired location and run"
+	@echo ""
+	@echo -e "\tmono Rainy.exe -c settings.conf"
+	@echo ""
+	@echo ""
+	@echo "Please use https://github.com/Dynalon/Rainy to report any bugs!"
+	@echo ""
+	@echo "**********"
+	@echo ""
+	@echo ""
 
 build: prepare
 	$(XBUILD) Rainy.sln
@@ -31,8 +47,6 @@ prepare:
 	@cd tomboy-library/ && git submodule init && git submodule update && cd ..
 
 release: clean pack
-	cp Rainy/settings.conf $(RELEASEDIR)/settings.conf
-	rm -rf *.zip
 	cp -R $(RELEASEDIR) $(ZIPDIR)
 	zip -r $(ZIPDIR).zip $(ZIPDIR)
 	
