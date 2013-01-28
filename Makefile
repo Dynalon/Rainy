@@ -50,4 +50,5 @@ clean:
 	rm -rf $(ZIPDIR).zip
 	rm -rf $(TMPDIR)
 	rm -rf $(BINDIR)/*
-	rm -rf $(RELEASEDIR)/*
+	rm -rf $(RELEASEDIR)/*.exe
+	rm -rf $(RELEASEDIR)/*.mdb
