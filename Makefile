@@ -12,35 +12,33 @@ UNPACKED_EXE=$(BINDIR)/Rainy.exe
 PACKED_EXE=Rainy.exe
 MIN_MONO_VERSION=2.10.9
 
-
-build: prepare
-	$(XBUILD) Rainy.sln
 pack: prepare build
 	echo "Packing all assembly deps into the final .exe"
 	$(MONO) ./tools/ILRepack.exe /out:$(RELEASEDIR)/$(PACKED_EXE) $(BINDIR)/Rainy.exe $(BINDIR)/*.dll
 
-prepare:
-# this is not working?
-#pkg-config --atleast-version=$(MIN_MONO_VERSION) mono; if [ $$? != "0" ]; then $(error "mono >=2.10.9 is required");
+build: prepare
+	$(XBUILD) Rainy.sln
 
-	# rainy's submodules
+prepare:
+## this is not working?
+##pkg-config --atleast-version=$(MIN_MONO_VERSION) mono; if [ $$? != "0" ]; then $(error "mono >=2.10.9 is required");
+
+	# Fetching Rainy's submodules
 	@git submodule init
 	@git submodule update
 
-	# tomboy-library submodules
+	# Fetching tomboy-library's submodules
 	@cd tomboy-library/ && git submodule init && git submodule update && cd ..
 
 release: clean pack
-	# create a new tag
 	cp Rainy/settings.conf $(RELEASEDIR)/settings.conf
 	rm -rf *.zip
 	cp -R $(RELEASEDIR) $(ZIPDIR)
 	zip -r $(ZIPDIR).zip $(ZIPDIR)
 	
-# Packed CIL image, only requires mono to run
-# but not any deps
-
-linux_bundle: pack
+# statically linked binary
+# does not require mono but will be > 13MB of size
+linux_u: pack
 	echo "Statically linking mono runtime to create .NET-free, self-sustained executable"
 	mkdir -p $(RELEASEDIR)/linux/
 	$(MKBUNDLE) -z --static -o $(RELEASEDIR)/linux/rainy $(RELEASEDIR)/$(PACKED_EXE)
