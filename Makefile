@@ -46,8 +46,8 @@ linux_bundle: pack
 	$(MKBUNDLE) -z --static -o $(RELEASEDIR)/linux/rainy $(RELEASEDIR)/$(PACKED_EXE)
 
 clean:
-	rm -rf rainy-0.1
-	rm -rf *.zip
+	rm -rf $(ZIPDIR)
+	rm -rf $(ZIPDIR).zip
 	rm -rf $(TMPDIR)
 	rm -rf $(BINDIR)/*
 	rm -rf $(RELEASEDIR)/*
