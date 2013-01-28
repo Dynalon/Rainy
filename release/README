@@ -1,0 +1,12 @@
+To run rainy, you need to have mono >=2.10.9 installed. You can then
+execute rainy by entering:
+
+	mono Rainy.exe -c settings.conf 
+
+or 
+	mono Rainy.exe --help
+
+for a quick usage help. For more documentation, bug report and so
+on, please visist:
+
+	https://github.com/Dynalon/Rainy
