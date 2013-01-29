@@ -79,3 +79,5 @@ Private accounts
 ----------------
 
 If you for some reason really need a private account, and are unable to host a Rainy instance by yourself, [contact me][mymail] and I see what we can do.
+
+  [mymail]: mailto:timo@latecrew.de
