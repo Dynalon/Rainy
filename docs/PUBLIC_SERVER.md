@@ -8,6 +8,8 @@ There is test server running the latest rainy release available, that can be use
 
 Since this is for testing purposes only, there are no private account registration possible (yet).  Below you will find a list of valid username/password combinations, each representing a single account. If you pick one randomly, chances are good that no one will interfere with your notes while testing.
 
+  [restapi]: https://live.gnome.org/Tomboy/Synchronization/REST
+
 Setup
 -----
 
