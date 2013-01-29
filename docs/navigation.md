@@ -1,5 +1,5 @@
 [Introduction](README.md)
-[Building](BUILDING.md)
+[Getting started](GETTING_STARTED.md)
 [OAuth](OAUTH.md)
 [Syncing process](SYNC.md)
 

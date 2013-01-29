@@ -12,6 +12,7 @@ Rainy is a synchronization/cloud server intended for use with [Tomboy][tomboy] a
 
   * written in C# and runs with [mono][mono] on all major platforms (could for example be hosted at a small home server or NAS, cheap VPS/cloud server, or even an a OpenWRT router)
   * re-uses the existing [tomboy-library][tomboylib], which is a C# library that should one day put in place into Tomboy, and could be used by other potential clients
+  * has two different data backends that can be chosen: plain XML files (one per note) or single sqlite3 database
   * uses the awesome [ServiceStack][servicestack] framework for providing the [Tomboy REST API][tomboyrest]
   * licensed under the free [GNU AGPLv3 license][agplv3]
 
@@ -29,10 +30,9 @@ Rainy is a synchronization/cloud server intended for use with [Tomboy][tomboy] a
 Getting Started
 ---------------
 
-See the [build instructions][build] on how to build and run Rainy.
+See the [Getting Started guide][gettingstarted] on how to build and run Rainy.
 
-  [build]: http://markdown.io/https://raw.github.com/Dynalon/Rainy/master/docs/BUILDING.md
-
+  [gettingstarted]: http://markdown.io/https://raw.github.com/Dynalon/Rainy/master/docs/GETTING_STARTED.md
 
 
 Contribute

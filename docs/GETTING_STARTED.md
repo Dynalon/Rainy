@@ -4,25 +4,27 @@ Build and run Rainy
 ### 0. Install build requirements:
   * git
   * mono (it is best to install mono-complete or similiar meta-package on your linux distro to get everything and avoid missing libraries)
+  * automake / autotools
+  * sqlite3 (usually no need to install this, as it comes with most distros by default)
 
 ### 1. Fetch and prepare latest source code from github:
 
 	git clone https://github.com/Dynalon/Rainy.git
-	cd Rainy
-	git submodule init
-	git submodule update
 
-### 2. Start compilation
+	# will fetch any deps and compile rainy from source
+	# the resulting binaries will be in Rainy/bin/Debug/*
+	make
 
-	xbuild Rainy.sln
+	# optional: create a single, packed Rainy.exe for easy deployment
+	# which can then be found in ./release/Rainy.exe
+	make pack
 
-(if this step fails, you might want to update to latest mono)
 
-### 3. Edit settings.conf
+### 2. Edit settings.conf
 
-There is a sample settings.conf which needs to be edited, i.e. change username/password and set the `DataPath`, which will tell Rainy where to store your notes. _Double check_ your settings.conf is valid JSON (besides the comment lines and the missing quotes for keys). Pay special attention note to have any invalid value delimiters (like a comma) in place where it does not belong.
+There is a sample settings.conf which needs to be edited, i.e. change username/password and set the `DataPath`, which will tell Rainy where to store your notes. _Double check_ your settings.conf is valid JSON (besides the comment lines and the missing quotes for keys). Pay special attention not to have any invalid value delimiters (like a comma) in place where it does not belong.
 
-### 4. Start Rainy
+### 3. Start Rainy
 
 	cd Rainy/bin/Debug/
 	mono Rainy.exe -c ../../settings.conf
