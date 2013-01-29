@@ -15,7 +15,7 @@ Setup
 
 Pick a username/password combination below, and then use this URL in Tomboy/Tomdroid as a sync url:
 
-	http://notesync.org/<username>/<password>/
+	http://notesync.org:8080/<username>/<password>/
 
 
 Public account list
