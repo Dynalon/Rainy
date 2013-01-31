@@ -7,14 +7,14 @@ TMPDIR=$(shell pwd)/.tmp
 MONO=$(shell which mono)
 XBUILD=$(shell which xbuild)
 
-XBUILD_ARGS='/p:TargetFrameworkProfile=""'
+#XBUILD_ARGS='/p:TargetFrameworkProfile=""'
 MKBUNDLE=$(shell which mkbundle)
 
 UNPACKED_EXE=$(BINDIR)/Rainy.exe
 PACKED_EXE=Rainy.exe
 MIN_MONO_VERSION=2.10.9
 
-pack: prepare build
+pack: build
 	@cp Rainy/settings.conf $(RELEASEDIR)/settings.conf
 	@echo "Packing all assembly deps into the final .exe"
 	$(MONO) ./tools/ILRepack.exe /out:$(RELEASEDIR)/$(PACKED_EXE) $(BINDIR)/Rainy.exe $(BINDIR)/*.dll
@@ -34,10 +34,7 @@ pack: prepare build
 	@echo ""
 	@echo ""
 
-build: prepare
-	$(XBUILD) $(XBUILD_ARGS) Rainy.sln
-
-prepare:
+build: 
 ## this is not working?
 ##pkg-config --atleast-version=$(MIN_MONO_VERSION) mono; if [ $$? != "0" ]; then $(error "mono >=2.10.9 is required");
 
@@ -47,6 +44,8 @@ prepare:
 
 	# Fetching tomboy-library's submodules
 	@cd tomboy-library/ && git submodule init && git submodule update && cd ..
+	
+	$(XBUILD) $(XBUILD_ARGS) Rainy.sln
 
 release: clean pack
 	cp -R $(RELEASEDIR) $(ZIPDIR)
@@ -60,6 +59,7 @@ linux_u: pack
 	$(MKBUNDLE) -z --static -o $(RELEASEDIR)/linux/rainy $(RELEASEDIR)/$(PACKED_EXE)
 
 clean:
+	rm -rf Rainy/obj/*
 	rm -rf $(ZIPDIR)
 	rm -rf $(ZIPDIR).zip
 	rm -rf $(TMPDIR)
