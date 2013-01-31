@@ -6,6 +6,8 @@ TMPDIR=$(shell pwd)/.tmp
 
 MONO=$(shell which mono)
 XBUILD=$(shell which xbuild)
+
+XBUILD_ARGS='/p:TargetFrameworkProfile=""'
 MKBUNDLE=$(shell which mkbundle)
 
 UNPACKED_EXE=$(BINDIR)/Rainy.exe
@@ -23,7 +25,7 @@ pack: prepare build
 	@echo "To run rainy, copy $(RELEASEDIR)/$(PACKED_EXE) along with"
 	@echo "the settings.conf to the desired location and run"
 	@echo ""
-	@echo -e "\tmono Rainy.exe -c settings.conf"
+	@echo "    mono Rainy.exe -c settings.conf"
 	@echo ""
 	@echo ""
 	@echo "Please use https://github.com/Dynalon/Rainy to report any bugs!"
@@ -33,7 +35,7 @@ pack: prepare build
 	@echo ""
 
 build: prepare
-	$(XBUILD) Rainy.sln
+	$(XBUILD) $(XBUILD_ARGS) Rainy.sln
 
 prepare:
 ## this is not working?
