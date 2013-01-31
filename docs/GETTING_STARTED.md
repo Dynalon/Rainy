@@ -1,37 +1,50 @@
 Build and run Rainy
 ===================
 
-### 0. Install build requirements:
+### 0. Install requirements:
   * git
   * mono (it is best to install mono-complete or similiar meta-package on your linux distro to get everything and avoid missing libraries)
+  * sqlite3 (usually no need to install this, as it comes with most distros by default)
+ 
+When building from source:
 
-### 1. Fetch and prepare latest source code from github:
+  * automake / autotools
+
+### 1a. Using a binary release
+
+Fetch the latest release from <http://rainy.notesync.org/release/>. Unzip the file, then go to step 2.
+
+### 1b. Building from source: 
 
 	git clone https://github.com/Dynalon/Rainy.git
-	cd Rainy
-	git submodule init
-	git submodule update
 
-### 2. Start compilation
+	# will fetch any deps and compile rainy from source
+	# the resulting binaries will be in Rainy/bin/Debug/*
+	make
 
-	xbuild Rainy.sln
+	# optional: create a single, packed Rainy.exe for easy deployment
+	# which includes all other .dll dependencies as a self-sustained
+	# file which can then be found in ./release/Rainy.exe
+	make pack
 
-(if this step fails, you might want to update to latest mono)
+### 2. Edit settings.conf
 
-### 3. Edit settings.conf
+There is a sample settings.conf which needs to be edited, i.e. change username/password and set the `DataPath`, which will tell Rainy where to store your notes. _Double check_ your settings.conf is valid JSON (besides the comment lines and the missing quotes for keys). Pay special attention not to have any invalid value delimiters (like a comma) in place where it does not belong.
 
-There is a sample settings.conf which needs to be edited, i.e. change username/password and set the `DataPath`, which will tell Rainy where to store your notes. _Double check_ your settings.conf is valid JSON (besides the comment lines and the missing quotes for keys). Pay special attention note to have any invalid value delimiters (like a comma) in place where it does not belong.
+### 3. Start Rainy
 
-### 4. Start Rainy
+	mono Rainy.exe -c settings.conf
 
-	cd Rainy/bin/Debug/
-	mono Rainy.exe -c ../../settings.conf
 
 If you want more verbose output (helpfull when supplying bug reports), you can change the loglevel by supplying the `-vvvv` parameter:
 
 	mono Rainy.exe -c ../../settings.conf -vvvv
 
-### 5. First sync in Tomboy
+There is no daemon mode yet, but you can use and install `screen` on linux to run rainy in the background:
+
+	screen mono Rainy.exe -c settings.conf
+
+### 4. First sync in Tomboy
 
 Now open up Tomboy (or another client, like [Tomdroid][tomdroid]), and point the synchronisation url to Rainy:
 
@@ -45,11 +58,11 @@ Click "Connect to server"; a browser instance should fire up and telling you imm
 
 ![](tomboy-url.png "Sample configuration in Tomboy")
 
-### 6. A word of warning & disclaimer
+### 5. A word of warning & disclaimer
 
-**Rainy is currently in alpha quality and not meant for production use, but for testing and development only. If you lose notes, don't blame me or any of the developers, you've been warned. Additionally, HTTPS is currently not supported - you will not want to sync your notes in a foreign network environment where someone can sniff your authentication data or note content.**
+**Rainy is currently in beta quality and not meant for production use, but for testing and development only. If you lose notes, don't blame me or any of the developers, you've been warned. Additionally, HTTPS is currently not supported - you will not want to sync your notes in a foreign network environment where someone can sniff your authentication data or note content.**
 
-### 7. Known issues
+### 6. Known issues
 
 There are currently some issues in Tomboy and Tomdroid that you should know of before using Rainy.
 

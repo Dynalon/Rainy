@@ -133,7 +133,6 @@ namespace Rainy.WebService
 							return n; }).ToList ();
 					}
 
-
 					return notes;
 				}
 			} catch (Exception e) {
@@ -148,42 +147,48 @@ namespace Rainy.WebService
 		}
 		public object Put (PutNotesRequest request)
 		{
-			using (var note_repo = GetNotes (request.Username)) {
+			try {
+				using (var note_repo = GetNotes (request.Username)) {
 
-				// constraint taken from snowy source code at http://git.gnome.org/browse/snowy/tree/api/handlers.py:143
-				var new_sync_rev = note_repo.Manifest.LastSyncRevision + 1;
+					// constraint taken from snowy source code at http://git.gnome.org/browse/snowy/tree/api/handlers.py:143
+					var new_sync_rev = note_repo.Manifest.LastSyncRevision + 1;
 
-				// TODO LatestSyncRevision is not correctly SERIALIZED
-				Logger.DebugFormat ("client sent LatestSyncRevision: {0}", request.LatestSyncRevision);
+					// TODO LatestSyncRevision is not correctly SERIALIZED
+					Logger.DebugFormat ("client sent LatestSyncRevision: {0}", request.LatestSyncRevision);
 
-				// TODO sanitize LatestSyncRevision sent by client - we don't need it to update notes
-				// but a wrong LatestSyncRevision may be an indicator for a bug in the client
+					// TODO sanitize LatestSyncRevision sent by client - we don't need it to update notes
+					// but a wrong LatestSyncRevision may be an indicator for a bug in the client
 
-				//if (new_sync_rev != note_repo.Manifest.LatestSyncRevision + 1)
-				//	throw new Exception ("Sync revisions differ by more than one, sth went wrong");
+					//if (new_sync_rev != note_repo.Manifest.LatestSyncRevision + 1)
+					//	throw new Exception ("Sync revisions differ by more than one, sth went wrong");
 
-				foreach (var dto_note in request.Notes) {
-					var note = new Note ("note://tomboy/" + dto_note.Guid);
-					// map from the DTO 
-					note.PopulateWith (dto_note);
+					foreach (var dto_note in request.Notes) {
+						var note = new Note ("note://tomboy/" + dto_note.Guid);
+						// map from the DTO 
+						note.PopulateWith (dto_note);
 
-					if (dto_note.Command == "delete") {
-						note_repo.Engine.DeleteNote (note);
-					} else {
-						// track the revision of the note
-						note_repo.Manifest.NoteRevisions [dto_note.Guid] = (int)new_sync_rev;
-						note_repo.Engine.SaveNote (note, false);
+						if (dto_note.Command == "delete") {
+							note_repo.Engine.DeleteNote (note);
+						} else {
+							// track the revision of the note
+							note_repo.Manifest.NoteRevisions [dto_note.Guid] = (int)new_sync_rev;
+							note_repo.Engine.SaveNote (note, false);
+						}
 					}
+
+
+					// only update the sync revision if changes were sent
+					if (request.Notes.Count > 0)
+						note_repo.Manifest.LastSyncRevision = new_sync_rev;
+
+					var notes_to_return = NotesService.GetStoredNotes (note_repo);
+					notes_to_return.LatestSyncRevision = new_sync_rev;
+					return notes_to_return;
 				}
-
-
-				// only update the sync revision if changes were sent
-				if (request.Notes.Count > 0)
-					note_repo.Manifest.LastSyncRevision = new_sync_rev;
-
-				var notes_to_return = NotesService.GetStoredNotes (note_repo);
-				notes_to_return.LatestSyncRevision = new_sync_rev;
-				return notes_to_return;
+			} catch (Exception e) {
+				// log the error and rethrow
+				Logger.DebugFormat ("CAUGHT EXCEPTION: {0} {1}", e.Message, e.StackTrace);
+				throw e;
 			}
 		}
 	}
