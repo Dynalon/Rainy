@@ -2,16 +2,13 @@ using System;
 using System.Threading;
 using System.Collections.Generic;
 using System.IO;
-using System.Runtime.Serialization;
-
-using ServiceStack.Common;
-using ServiceStack.Text;
 
 using Tomboy;
 using Tomboy.Sync;
 using System.Xml;
 using System.Text;
 using Rainy.OAuth;
+using Rainy.Db;
 
 
 namespace Rainy
@@ -22,10 +19,17 @@ namespace Rainy
 		string notesBasePath;
 		OAuthHandlerBase oauthHandler;
 
-		public RainyFileSystemBackend (string data_path, OAuthAuthenticator auth)
+		public RainyFileSystemBackend (string data_path, OAuthAuthenticator auth, bool reset = false)
 		{
 			oauthHandler = new OAuthDatabaseHandler (auth);
+
+			// TODO move this into the oauth stuff
+			DbConfig.CreateSchema ();
+
 			this.notesBasePath = Path.Combine (data_path, "notes");
+			if (!Directory.Exists (notesBasePath)) {
+				Directory.CreateDirectory (notesBasePath);
+			}
 		}
 		public INoteRepository GetNoteRepository (string username)
 		{
