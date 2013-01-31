@@ -36,9 +36,14 @@ namespace Rainy
 			}
 
 			log4net.Config.BasicConfigurator.Configure (appender);
-			
 			LogManager.GetLogger("Logsystem").Debug ("logsystem initialized");
-			
+
+			if (loglevel >= 3) {
+				var appender2 = new log4net.Appender.FileAppender (appender.Layout, "./debug.log");
+				log4net.Config.BasicConfigurator.Configure (appender2);
+				LogManager.GetLogger("Logsystem").Debug ("Writing all log messages to file: debug.log");
+			}
+
 			/* ColoredConsoleAppender is win32 only. A managed version was introduced to log4net svn
 			and should be available when log4net 1.2.12 comes out.
 		
