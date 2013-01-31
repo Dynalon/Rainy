@@ -7,3 +7,7 @@ settings.conf
 bin/
 test-results/
 .DS_Store
+Rainy/obj/
+*.zip
+# release folders
+rainy-?.??
