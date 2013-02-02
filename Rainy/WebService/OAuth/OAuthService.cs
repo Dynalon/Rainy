@@ -83,6 +83,11 @@ namespace Rainy.WebService.OAuth
 				Logger.WarnFormat ("Failed to authorize user {0}", request.Username);
 				Response.StatusCode = 403;
 				Response.StatusDescription ="Authorization failed";
+				Response.Write (
+					"<html><h1 style='margin-top: 1em'>Authorization failed for user "
+					+ "<b>" + request.Username + "</b>"
+					+ " (maybe wrong password?).</h1></html>"
+				);
 				Response.Close ();
 				return null;
 			}
