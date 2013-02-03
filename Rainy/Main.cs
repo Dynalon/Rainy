@@ -133,7 +133,11 @@ namespace Rainy
 
 				listener.Start ();
 
+#if DEBUG
+				Thread.Sleep (new TimeSpan (1, 0, 0));
+#else
 				Console.WriteLine ("Press RETURN to stop Rainy");
+#endif
 				Console.ReadLine ();
 			}
 		}

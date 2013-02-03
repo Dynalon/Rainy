@@ -27,6 +27,10 @@ namespace Rainy.Db
 
 		public SyncManifest Manifest { get; set; }
 
+		public string EmailAddress { get; set; }
+
+		public string AdditionalData { get; set; }
+
 		public DBUser ()
 		{
 			Manifest = new SyncManifest ();

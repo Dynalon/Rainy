@@ -20,7 +20,6 @@
     <WarningLevel>4</WarningLevel>
     <PlatformTarget>x86</PlatformTarget>
     <ConsolePause>False</ConsolePause>
-    <Externalconsole>True</Externalconsole>
     <Commandlineparameters>-c ../../settings.conf -vvvv</Commandlineparameters>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|x86' ">
@@ -104,11 +103,13 @@
     <Compile Include="ORM\DatabaseBackend.cs" />
     <Compile Include="WebService\OAuth\OAuthDatabaseHandler.cs" />
     <Compile Include="WebService\OAuth\OAuthHandlerBase.cs" />
+    <Compile Include="WebService\Admin\AdminService.cs" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="WebService\" />
     <Folder Include="WebService\OAuth\" />
     <Folder Include="ORM\" />
+    <Folder Include="WebService\Admin\" />
   </ItemGroup>
   <ItemGroup>
     <None Include="settings.conf" />
