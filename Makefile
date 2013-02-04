@@ -53,7 +53,7 @@ release: clean pack
 	
 # statically linked binary
 # does not require mono but will be > 13MB of size
-linux_u: pack
+linux_bundle: pack
 	echo "Statically linking mono runtime to create .NET-free, self-sustained executable"
 	mkdir -p $(RELEASEDIR)/linux/
 	$(MKBUNDLE) -z --static -o $(RELEASEDIR)/linux/rainy $(RELEASEDIR)/$(PACKED_EXE)
