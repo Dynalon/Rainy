@@ -66,3 +66,4 @@ clean:
 	rm -rf $(BINDIR)/*
 	rm -rf $(RELEASEDIR)/*.exe
 	rm -rf $(RELEASEDIR)/*.mdb
+	rm -rf $(RELEASEDIR)/data/
