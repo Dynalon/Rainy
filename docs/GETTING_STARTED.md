@@ -70,10 +70,10 @@ There are currently some issues in Tomboy and Tomdroid that you should know of b
   * There is a [bug in Tomboy][tomboy-bug-1] regarding note templates, especially the "New Note Template" note that will always reappear and cause conflicts. If you happen to get a window in Tomboy telling you that a note with the title "New Note Template" already exists, choose to *rename the local note version*. **Do not chose overwrite the local note!**. The renamed note must be kept and not deleted.
 
 * Tomdroid
-  * Due to a [bug in the stable version][tomdroid-bug-1], it is only capable of pulling notes *from* the server. Do not *modify* any notes and push them back, this will result in Tomboy to fail on the next syncing attempt.
+  * Do not use the Tomdroid version that is in the Google Play market, it is way to old and syncing will __not__ work
+  * Instead use at least version 0.7.2 from the [Tomdroid website][tomdroid]
+  * __upon first sync with Tomdroid you will lose all notes stored in Tomdroid, so backup them first!__. This is an open Tomdroid issue.
   * Due to [another bug][tomdroid-bug-2], the first time you sync in Tomdroid might not show any notes. Just create more notes in *Tomboy* and do multiple syncs. Then sync Tomdroid.
-  * I'm in contact with a Tomdroid maintainer to work those bugs out, and those will be fixed soon.
-
 
   [tomdroid]: https://launchpad.net/tomdroid
   [tomboy-bug-1]: https://bugzilla.gnome.org/show_bug.cgi?id=665679

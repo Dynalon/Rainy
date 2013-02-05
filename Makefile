@@ -1,4 +1,4 @@
-RELEASEVER=0.1.1
+RELEASEVER=0.1.3
 ZIPDIR=rainy-$(RELEASEVER)
 BINDIR=$(shell pwd)/Rainy/bin/Debug
 RELEASEDIR=$(shell pwd)/release
@@ -53,7 +53,7 @@ release: clean pack
 	
 # statically linked binary
 # does not require mono but will be > 13MB of size
-linux_u: pack
+linux_bundle: pack
 	echo "Statically linking mono runtime to create .NET-free, self-sustained executable"
 	mkdir -p $(RELEASEDIR)/linux/
 	$(MKBUNDLE) -z --static -o $(RELEASEDIR)/linux/rainy $(RELEASEDIR)/$(PACKED_EXE)
@@ -66,3 +66,4 @@ clean:
 	rm -rf $(BINDIR)/*
 	rm -rf $(RELEASEDIR)/*.exe
 	rm -rf $(RELEASEDIR)/*.mdb
+	rm -rf $(RELEASEDIR)/data/
