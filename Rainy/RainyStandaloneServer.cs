@@ -62,7 +62,12 @@ namespace Rainy
 			// not all tomboy clients send the correct content-type
 			// so we force application/json
 			SetConfig (new EndpointHostConfig {
-				DefaultContentType = ContentType.Json 
+				DefaultContentType = ContentType.Json,
+				GlobalResponseHeaders = {
+					{ "Access-Control-Allow-Origin", "*" },
+					{ "Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS" },
+					{ "Access-Control-Allow-Headers", "Content-Type" },
+				},
 			});
 		}
 	}
