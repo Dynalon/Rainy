@@ -5,6 +5,7 @@ using ServiceStack.OrmLite;
 using ServiceStack.Common;
 using ServiceStack.Common.Web;
 using System.Net;
+using System.Collections.Generic;
 
 namespace Rainy.WebService.Admin
 {
@@ -16,11 +17,29 @@ namespace Rainy.WebService.Admin
 	{
 	}
 
+	[Route("/admin/alluser/","GET")]
+	public class AdminAllUserRequest : IReturn<List<DBUser>>
+	{
+	}
+
 	public class AdminUserService : RainyServiceBase
 	{
 		public AdminUserService () : base ()
 		{
 		}
+
+		// gets a list of all users
+		public List<DBUser> Get (AdminAllUserRequest req)
+		{
+			var all_user = new List<DBUser> ();
+
+			using (var conn = DbConfig.GetConnection ()) {
+				all_user = conn.Select<DBUser> ();
+			}
+
+			return all_user;
+		}
+
 		public DBUser Get (AdminUserRequest req)
 		{
 			DBUser found_user;
