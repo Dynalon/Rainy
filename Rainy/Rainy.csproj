@@ -103,9 +103,10 @@
     <Compile Include="ORM\DatabaseBackend.cs" />
     <Compile Include="WebService\OAuth\OAuthDatabaseHandler.cs" />
     <Compile Include="WebService\OAuth\OAuthHandlerBase.cs" />
-    <Compile Include="WebService\Admin\AdminService.cs" />
     <Compile Include="WebService\Admin\Helper.cs" />
     <Compile Include="WebService\Admin\AdminUiService.cs" />
+    <Compile Include="WebService\Admin\AdminService.cs" />
+    <Compile Include="WebService\Admin\StatusService.cs" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="WebService\" />

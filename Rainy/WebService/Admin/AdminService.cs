@@ -13,27 +13,27 @@ namespace Rainy.WebService.Admin
 	// should be able to access
 	[Route("/admin/user/","POST,PUT,DELETE, OPTIONS")]
 	[Route("/admin/user/{Username}","GET")]
-	public class AdminUserRequest : DBUser, IReturn<DBUser>
+	public class UserRequest : DBUser, IReturn<DBUser>
 	{
 	}
 
 	[Route("/admin/alluser/","GET")]
-	public class AdminAllUserRequest : IReturn<List<DBUser>>
+	public class AllUserRequest : IReturn<List<DBUser>>
 	{
 	}
 
-	public class AdminUserService : RainyServiceBase
+	public class UserService : RainyServiceBase
 	{
-		public AdminUserService () : base ()
+		public UserService () : base ()
 		{
 		}
-		public HttpResult Options (AdminUserRequest req)
+		public HttpResult Options (UserRequest req)
 		{
 			return new HttpResult ();
 		}
 
 		// gets a list of all users
-		public List<DBUser> Get (AdminAllUserRequest req)
+		public List<DBUser> Get (AllUserRequest req)
 		{
 			var all_user = new List<DBUser> ();
 
@@ -44,20 +44,21 @@ namespace Rainy.WebService.Admin
 			return all_user;
 		}
 
-		public DBUser Get (AdminUserRequest req)
+		public DBUser Get (UserRequest req)
 		{
 			DBUser found_user;
 
 			using (var conn = DbConfig.GetConnection ()) {
 				found_user = conn.FirstOrDefault<DBUser> ("Username = {0}", req.Username);
 			}
+
 			if (found_user == null) throw new Exception ("User not found!");
 			return found_user;
 		}
 
 		// TODO see if we can directly use DBUser
 		// update existing user
-		public object Put (AdminUserRequest updated_user)
+		public object Put (UserRequest updated_user)
 		{
 			var user = new DBUser ();
 			updated_user.Manifest = null;
@@ -103,7 +104,7 @@ namespace Rainy.WebService.Admin
 		/// 	201 Created
 		/// 	Location: http://localhost/admin/user/{Username}
 		/// </summary>	
-		public object Post (AdminUserRequest user)
+		public object Post (UserRequest user)
 		{
 			var new_user = new DBUser ();
 			new_user.PopulateWith (user);
@@ -161,7 +162,7 @@ namespace Rainy.WebService.Admin
 		/// 	204 No Content
 		/// 	Location: http://localhost/admin/user/
 		/// </summary>
-		public object Delete (AdminUserRequest user)
+		public object Delete (UserRequest user)
 		{
 			using (var conn = DbConfig.GetConnection ()) {
 				try {

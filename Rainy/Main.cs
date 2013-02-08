@@ -18,6 +18,11 @@ namespace Rainy
 		// can be used for locking
 		public static Dictionary<string, Semaphore> UserLocks;
 
+		// some Status/Diagnostics
+		public static DateTime Uptime;
+		public static long ServedRequests;
+
+
 		protected static void SetupLogging (int loglevel)
 		{
 			// console appender
@@ -128,13 +133,14 @@ namespace Rainy
 				data_backend = new RainyFileSystemBackend (data_path, config_authenticator);
 			}
 
-			var listen_url = "http://" + Config.Global.ListenAddress + ":" + Config.Global.ListenPort + "/";
+			var listen_url = "http://" + listen_hostname + ":" + listen_port + "/";
 			using (var listener = new RainyStandaloneServer (data_backend, listen_url)) {
 
 				listener.Start ();
+				Uptime = DateTime.UtcNow;
 
 #if DEBUG
-				Thread.Sleep (new TimeSpan (1, 0, 0));
+				Thread.Sleep (new TimeSpan (96, 0, 0));
 #else
 				Console.WriteLine ("Press RETURN to stop Rainy");
 #endif

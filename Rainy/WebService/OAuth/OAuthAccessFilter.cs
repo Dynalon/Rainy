@@ -59,6 +59,10 @@ namespace Rainy.WebService.OAuth
 				return;
 			}
 			Logger.DebugFormat ("authorization granted for user {0}", Username);
+
+			// possible race condition but locking is to expensive
+			// at this point, rather accept non-precise values
+			MainClass.ServedRequests++;
 		}
 	}
 	

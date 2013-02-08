@@ -6,6 +6,7 @@ using log4net;
 
 using Rainy.OAuth;
 using Rainy.WebService;
+using ServiceStack.Text;
 
 namespace Rainy
 {
@@ -59,6 +60,8 @@ namespace Rainy
 		}
 		public override void Configure (Funq.Container container)
 		{
+			JsConfig.DateHandler = JsonDateHandler.ISO8601;
+
 			// not all tomboy clients send the correct content-type
 			// so we force application/json
 			SetConfig (new EndpointHostConfig {
