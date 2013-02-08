@@ -11,8 +11,8 @@ namespace Rainy.WebService.Admin
 {
 	// TODO only a logged in admin
 	// should be able to access
-	[Route("/admin/user/","POST,PUT")]
-	[Route("/admin/user/{Username}","GET,DELETE")]
+	[Route("/admin/user/","POST,PUT,DELETE, OPTIONS")]
+	[Route("/admin/user/{Username}","GET")]
 	public class AdminUserRequest : DBUser, IReturn<DBUser>
 	{
 	}
@@ -26,6 +26,10 @@ namespace Rainy.WebService.Admin
 	{
 		public AdminUserService () : base ()
 		{
+		}
+		public HttpResult Options (AdminUserRequest req)
+		{
+			return new HttpResult ();
 		}
 
 		// gets a list of all users
@@ -104,6 +108,23 @@ namespace Rainy.WebService.Admin
 			var new_user = new DBUser ();
 			new_user.PopulateWith (user);
 
+			// TODO move into RequestFilter
+			if (string.IsNullOrEmpty (user.Username))
+				throw new ArgumentNullException ("user.Username");
+
+			// TODO move into RequestFilter
+			if (! (user.Username.IsOnlySafeChars ()
+			    && user.Password.IsOnlySafeChars ()
+				&& user.AdditionalData.IsOnlySafeChars ()
+				&& user.EmailAddress.Replace ("@", "").IsOnlySafeChars ())) {
+
+				throw new ArgumentException ("found unsafe/unallowed characters");
+			}
+
+			// TODO move into RequestFilter
+			// lowercase the username
+			new_user.Username = new_user.Username.ToLower ();
+
 			using (var conn = DbConfig.GetConnection ()) {
 				try {
 					var existing_user = conn.FirstOrDefault<DBUser> ("Username = {0}", new_user.Username);
@@ -134,11 +155,11 @@ namespace Rainy.WebService.Admin
 		/// <summary>
 		/// DELETE /admin/user/{Username}
 		/// 
-		/// creates a new user.
+		/// deletes a user.
 		/// 
 		/// returns HTTP Response =>
 		/// 	204 No Content
-		/// 	Location: http://localhost/admin/user/{Username}
+		/// 	Location: http://localhost/admin/user/
 		/// </summary>
 		public object Delete (AdminUserRequest user)
 		{

@@ -104,6 +104,8 @@
     <Compile Include="WebService\OAuth\OAuthDatabaseHandler.cs" />
     <Compile Include="WebService\OAuth\OAuthHandlerBase.cs" />
     <Compile Include="WebService\Admin\AdminService.cs" />
+    <Compile Include="WebService\Admin\Helper.cs" />
+    <Compile Include="WebService\Admin\AdminUiService.cs" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="WebService\" />
