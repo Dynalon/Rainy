@@ -5,10 +5,12 @@ using System;
 
 namespace Rainy.WebService.Admin
 {
-	[Route("/admin/status/","GET")]
+	[Route("/api/admin/status/","GET")]
+	[AdminPasswordRequired]
 	public class StatusRequest : IReturn<Status>
 	{
 	}
+
 	public class StatusService : RainyServiceBase
 	{
 		public StatusService () : base ()
@@ -24,7 +26,7 @@ namespace Rainy.WebService.Admin
 			using (var conn = DbConfig.GetConnection ()) {
 				s.NumberOfUser = conn.Scalar<int>("SELECT COUNT(*) FROM DBUser");
 				s.TotalNumberOfNotes = conn.Scalar<int>("SELECT COUNT(*) FROM DBNote");
-				s.AverageNotesPerUser = s.TotalNumberOfNotes / s.NumberOfUser; 
+				s.AverageNotesPerUser = (float)s.TotalNumberOfNotes / (float)s.NumberOfUser; 
 			};
 			return s;
 		}

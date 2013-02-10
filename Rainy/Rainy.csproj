@@ -113,8 +113,17 @@
     <Folder Include="WebService\OAuth\" />
     <Folder Include="ORM\" />
     <Folder Include="WebService\Admin\" />
+    <Folder Include="WebService\Admin\UI\" />
   </ItemGroup>
   <ItemGroup>
     <None Include="settings.conf" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="..\..\rainy-ui\dist\built.js">
+      <Link>WebService\Admin\UI\built.js</Link>
+    </EmbeddedResource>
+    <EmbeddedResource Include="..\..\rainy-ui\dist\index.html">
+      <Link>WebService\Admin\UI\index.html</Link>
+    </EmbeddedResource>
   </ItemGroup>
 </Project>

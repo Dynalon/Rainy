@@ -11,13 +11,15 @@ namespace Rainy.WebService.Admin
 {
 	// TODO only a logged in admin
 	// should be able to access
-	[Route("/admin/user/","POST,PUT,DELETE, OPTIONS")]
-	[Route("/admin/user/{Username}","GET")]
+	[AdminPasswordRequired]
+	[Route("/api/admin/user/","POST,PUT,DELETE, OPTIONS")]
+	[Route("/api/admin/user/{Username}","GET")]
 	public class UserRequest : DBUser, IReturn<DBUser>
 	{
 	}
 
-	[Route("/admin/alluser/","GET")]
+	[AdminPasswordRequired]
+	[Route("/api/admin/alluser/","GET")]
 	public class AllUserRequest : IReturn<List<DBUser>>
 	{
 	}
@@ -165,16 +167,21 @@ namespace Rainy.WebService.Admin
 		public object Delete (UserRequest user)
 		{
 			using (var conn = DbConfig.GetConnection ()) {
-				try {
-					conn.Delete<DBUser>(u => u.Username == user.Username);
-				} catch (Exception e) {
-					Logger.DebugFormat ("error deleting user {0}, msg was: {1}",
+				using (var trans = conn.BeginTransaction ()) {
+
+					try {
+						conn.Delete<DBUser> (u => u.Username == user.Username);
+						conn.Delete<DBNote> (n => n.Username == user.Username);
+						trans.Commit ();
+					} catch (Exception e) {
+						Logger.DebugFormat ("error deleting user {0}, msg was: {1}",
 					                    user.Username, e.Message);
 
-					return new HttpResult {
-						StatusCode = HttpStatusCode.InternalServerError,
-						StatusDescription = "Error occured, msg was: " + e.Message
-					};
+						return new HttpResult {
+							StatusCode = HttpStatusCode.InternalServerError,
+							StatusDescription = "Error occured, msg was: " + e.Message
+						};
+					}
 				}
 			}
 

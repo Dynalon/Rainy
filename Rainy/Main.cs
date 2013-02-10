@@ -9,6 +9,7 @@ using Rainy.OAuth;
 using JsonConfig;
 using Mono.Options;
 using Rainy.Db;
+using System.Diagnostics;
 
 namespace Rainy
 {
@@ -138,6 +139,12 @@ namespace Rainy
 
 				listener.Start ();
 				Uptime = DateTime.UtcNow;
+
+				// start a browser instance
+				if (listen_hostname == "*")
+					Process.Start("http://localhost:" + listen_port + "/admin/");
+				else
+					Process.Start(listen_url);
 
 #if DEBUG
 				Thread.Sleep (new TimeSpan (96, 0, 0));

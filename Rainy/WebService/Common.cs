@@ -4,6 +4,7 @@ using System;
 using ServiceStack.ServiceHost;
 using Rainy.WebService.OAuth;
 using ServiceStack.Text;
+using System.Net;
 
 namespace Rainy.WebService
 {
@@ -16,7 +17,6 @@ namespace Rainy.WebService
 		}
 		public void RequestFilter (IHttpRequest req, IHttpResponse res, object requestDto)
 		{
-			// bug: .Dump () on a NullStream will throw an exception
 			if (requestDto is OAuthRequestTokenRequest)
 				return;
 
