@@ -71,6 +71,7 @@ namespace Rainy
 			string config_file = "settings.conf";
 			int loglevel = 0;
 			bool show_help = false;
+			bool open_browser = true;
 
 			var p = new OptionSet () {
 				{ "c|config=", "use config file",
@@ -79,6 +80,8 @@ namespace Rainy
 					v => { if (v != null) ++loglevel; } },
 				{ "h|help",  "show this message and exit", 
 					v => show_help = v != null },
+				{ "b|nobrowser",  "do not open browser window upon start",
+					v => { if (v != null) open_browser = false; } },
 			};
 			p.Parse (args);
 
@@ -112,7 +115,7 @@ namespace Rainy
 			OAuthAuthenticator config_authenticator = (username, password) => {
 				// call the authenticater callback
 				if (string.IsNullOrEmpty (username) || string.IsNullOrEmpty (password))
-				return false;
+					return false;
 				
 				foreach (dynamic credentials in Config.Global.Users) {
 					if (credentials.Username == username && credentials.Password == password)
@@ -134,17 +137,22 @@ namespace Rainy
 				data_backend = new RainyFileSystemBackend (data_path, config_authenticator);
 			}
 
-			var listen_url = "http://" + listen_hostname + ":" + listen_port + "/";
+			string listen_url = "http://" + listen_hostname + ":" + listen_port + "/";
+
+			string admin_ui_url = listen_url.Replace ("*", "localhost");
+
+			if (open_browser) {
+				admin_ui_url += "admin/index.html#?admin_pw=" + Config.Global.AdminPassword;
+			}
+
 			using (var listener = new RainyStandaloneServer (data_backend, listen_url)) {
 
 				listener.Start ();
 				Uptime = DateTime.UtcNow;
 
-				// start a browser instance
-				if (listen_hostname == "*")
-					Process.Start("http://localhost:" + listen_port + "/admin/");
-				else
-					Process.Start(listen_url);
+				if (open_browser) {
+					Process.Start (admin_ui_url);
+				}
 
 #if DEBUG
 				Thread.Sleep (new TimeSpan (96, 0, 0));

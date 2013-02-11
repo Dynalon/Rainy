@@ -4,7 +4,6 @@ using System;
 using ServiceStack.ServiceHost;
 using Rainy.WebService.OAuth;
 using ServiceStack.Text;
-using System.Net;
 
 namespace Rainy.WebService
 {
