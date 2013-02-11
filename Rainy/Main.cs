@@ -154,11 +154,7 @@ namespace Rainy
 					Process.Start (admin_ui_url);
 				}
 
-#if DEBUG
-				Thread.Sleep (new TimeSpan (96, 0, 0));
-#else
 				Console.WriteLine ("Press RETURN to stop Rainy");
-#endif
 				Console.ReadLine ();
 			}
 		}

@@ -21,6 +21,7 @@
     <PlatformTarget>x86</PlatformTarget>
     <ConsolePause>False</ConsolePause>
     <Commandlineparameters>-c ../../settings.conf -vvvv</Commandlineparameters>
+    <Externalconsole>True</Externalconsole>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|x86' ">
     <DebugType>none</DebugType>
