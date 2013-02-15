@@ -3,6 +3,7 @@
 *.userprefs
 *.pidb
 *.mdb
+Rainy/settings.conf
 settings.conf
 bin/
 test-results/

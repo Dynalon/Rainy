@@ -142,7 +142,7 @@ namespace Rainy
 			string admin_ui_url = listen_url.Replace ("*", "localhost");
 
 			if (open_browser) {
-				admin_ui_url += "admin/index.html#?admin_pw=" + Config.Global.AdminPassword;
+				admin_ui_url += "admin/#?admin_pw=" + Config.Global.AdminPassword;
 			}
 
 			using (var listener = new RainyStandaloneServer (data_backend, listen_url)) {

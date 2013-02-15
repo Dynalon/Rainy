@@ -7,12 +7,11 @@ using System.Net;
 
 namespace Rainy.WebService.Admin
 {
-	[Route("/admin","GET")]
-	public class AdminUiRequest : IReturn<string>
-	{
-	}
 
+	[Route("/admin","GET")]
 	[Route("/admin/{Filename}","GET")]
+	[Route("/login","GET")]
+	[Route("/login/{Filename}","GET")]
 	public class ContentRequest: IReturn<string>
 	{
 		public string Filename { get; set; }
@@ -22,21 +21,34 @@ namespace Rainy.WebService.Admin
 	{
 		public AdminUiService () : base ()
 		{
-
 		}
-		public HttpResult Get (AdminUiRequest req)
-		{
-			return new HttpResult {
-				StatusCode = HttpStatusCode.Redirect,
-				Headers = {
-					{ HttpHeaders.Location, "/admin/index.html" }
-				}
-			};
-		}
-		public string Get (ContentRequest req)
+		public object Get (ContentRequest req)
 		{
 			//Response.AddHeader ("Cache-Control: max-age: 3600");
-			return ReadInEmbeddedFile(req.Filename);
+			switch (this.Request.RawUrl) {
+			case "/admin":
+			case "/login":
+
+				// we need to append a / so that relative urls work
+				return new HttpResult {
+					StatusCode = HttpStatusCode.Redirect,
+					Headers = {
+						{ HttpHeaders.Location, this.Request.RawUrl + "/" }
+					}
+				};
+
+			case "/admin/":
+			case "/admin/index.html":
+				return ReadInEmbeddedFile ("admin.html");
+
+			case "/login/":
+			case "/login/index.html":
+			case "/login/login.html":
+				return ReadInEmbeddedFile ("login.html");
+
+			default:
+				return ReadInEmbeddedFile (req.Filename);
+			}
 		}
 		protected string ReadInEmbeddedFile (string filename) {
 			var assembly = typeof(AdminUiService).Assembly;

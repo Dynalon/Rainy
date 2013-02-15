@@ -123,8 +123,11 @@
     <EmbeddedResource Include="..\..\rainy-ui\dist\built.js">
       <Link>WebService\Admin\UI\built.js</Link>
     </EmbeddedResource>
-    <EmbeddedResource Include="..\..\rainy-ui\dist\index.html">
-      <Link>WebService\Admin\UI\index.html</Link>
+    <EmbeddedResource Include="..\..\rainy-ui\dist\admin.html">
+      <Link>WebService\Admin\UI\admin.html</Link>
+    </EmbeddedResource>
+    <EmbeddedResource Include="..\..\rainy-ui\dist\login.html">
+      <Link>WebService\Admin\UI\login.html</Link>
     </EmbeddedResource>
   </ItemGroup>
 </Project>
