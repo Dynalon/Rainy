@@ -38,7 +38,7 @@ There is a sample settings.conf which needs to be edited, i.e. change username/p
 
 If you want more verbose output (helpfull when supplying bug reports), you can change the loglevel by supplying the `-vvvv` parameter:
 
-	mono Rainy.exe -c ../../settings.conf -vvvv
+	mono Rainy.exe -c settings.conf -vvvv
 
 There is no daemon mode yet, but you can use and install `screen` on linux to run rainy in the background:
 
