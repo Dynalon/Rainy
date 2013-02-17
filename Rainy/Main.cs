@@ -111,29 +111,38 @@ namespace Rainy
 			string listen_hostname = Config.Global.ListenAddress;
 			int listen_port = Config.Global.ListenPort;
 
-			// simply use user/password list from config for authentication
-			CredentialsVerifier config_authenticator = (username, password) => {
-				// call the authenticater callback
-				if (string.IsNullOrEmpty (username) || string.IsNullOrEmpty (password))
-					return false;
-				
-				foreach (dynamic credentials in Config.Global.Users) {
-					if (credentials.Username == username && credentials.Password == password)
-						return true;
-				}
-				return false;
-			};
-
 			// determine and setup data backend
 			string backend = Config.Global.Backend;
 
 			IDataBackend data_backend;
+			// by default we use the filesystem backend
 			if (string.IsNullOrEmpty (backend)) {
 				backend = "filesystem";
 			}
+
 			if (backend == "sqlite") {
+
+				if (string.IsNullOrEmpty (Config.Global.AdminPassword)) {
+					Console.WriteLine ("FATAL: Field 'AdminPassword' in the settings config may not " +
+					                   "be empty when using the sqlite backend");
+					return;
+				}
 				data_backend = new DatabaseBackend (data_path, reset: false);
 			} else {
+
+				// simply use user/password list from config for authentication
+				CredentialsVerifier config_authenticator = (username, password) => {
+					// call the authenticater callback
+					if (string.IsNullOrEmpty (username) || string.IsNullOrEmpty (password))
+					return false;
+
+					foreach (dynamic credentials in Config.Global.Users) {
+						if (credentials.Username == username && credentials.Password == password)
+							return true;
+					}
+					return false;
+				};
+
 				data_backend = new RainyFileSystemBackend (data_path, config_authenticator);
 			}
 
