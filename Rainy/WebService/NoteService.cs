@@ -4,70 +4,9 @@ using System.Linq;
 using ServiceStack.Common;
 using ServiceStack.ServiceHost;
 using Tomboy;
-using System.Net;
 
 namespace Rainy.WebService
 {
-	public class ApiService : RainyServiceBase
-	{
-		public ApiService () : base ()
-		{
-		}
-		public object Get (ApiRequest request)
-		{
-			string username = request.Username;
-			string password = request.Password;
-
-			Logger.Debug ("ApiRequest received");
-			var response = new Tomboy.Sync.DTO.ApiResponse ();
-			var baseUri = ((HttpListenerRequest)this.Request.OriginalRequest).Url;
-			string baseUrl = baseUri.Scheme + "://" + baseUri.Authority + "/";
-
-			response.UserRef = new Tomboy.Sync.DTO.ContentRef () {
-				ApiRef = baseUrl + "api/1.0/" + username,
-				Href = baseUrl + username
-			};
-
-			response.ApiVersion = "1.0";
-			string oauthBaseUrl = baseUrl + "oauth/";
-			response.OAuthRequestTokenUrl = oauthBaseUrl + "request_token";
-			response.OAuthAccessTokenUrl = oauthBaseUrl + "access_token";
-			// HACK we hardencode the username / password pair into the authorize step
-			response.OAuthAuthorizeUrl = oauthBaseUrl + "authorize/" + username + "/" + password + "/";
-
-			return response;
-		}
-	}
-
-	public class UserService : RainyServiceBase
-	{
-		public object Get (UserRequest request)
-		{
-			var u = new Tomboy.Sync.DTO.UserResponse ();
-			try {
-				var baseUri = ((HttpListenerRequest)this.Request.OriginalRequest).Url;
-				string baseUrl = baseUri.Scheme + "://" + baseUri.Authority + "/";
-
-				u.Username = request.Username;
-				u.Firstname = "Not";
-				u.Lastname = "Important";
-
-				u.NotesRef = new Tomboy.Sync.DTO.ContentRef () {
-				ApiRef = baseUrl + "/api/1.0/" + request.Username + "/notes",
-				Href = baseUrl + "/api/1.0/" + request.Username + "/notes"
-			};
-				using (var note_repo = GetNotes (request.Username)) {
-					u.LatestSyncRevision = note_repo.Manifest.LastSyncRevision;
-					u.CurrentSyncGuid = note_repo.Manifest.ServerId;
-				}
-			} catch (Exception e) {
-				Logger.Debug ("CAUGHT EXCEPTION: " + e.Message);
-				throw;
-			}
-			return u;
-		}
-	}
-
 	public class NotesService : RainyServiceBase
 	{
 		protected static IDataBackend DataBackend;

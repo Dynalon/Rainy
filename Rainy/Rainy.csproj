@@ -89,7 +89,6 @@
     <Compile Include="Main.cs" />
     <Compile Include="WebService\OAuth\OAuthService.cs" />
     <Compile Include="WebService\NoteService.cs" />
-    <Compile Include="WebService\DTOClasses.cs" />
     <Compile Include="WebService\OAuth\OAuthStores.cs" />
     <Compile Include="WebService\Common.cs" />
     <Compile Include="WebService\OAuth\OAuthAccessFilter.cs" />
@@ -109,6 +108,9 @@
     <Compile Include="WebService\Admin\AdminService.cs" />
     <Compile Include="WebService\Admin\StatusService.cs" />
     <Compile Include="WebService\Admin\AdminLogService.cs" />
+    <Compile Include="WebService\UserService.cs" />
+    <Compile Include="WebService\ApiService.cs" />
+    <Compile Include="WebService\ServiceContracts.cs" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="WebService\" />
