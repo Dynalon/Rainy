@@ -108,6 +108,7 @@
     <Compile Include="WebService\Admin\AdminUiService.cs" />
     <Compile Include="WebService\Admin\AdminService.cs" />
     <Compile Include="WebService\Admin\StatusService.cs" />
+    <Compile Include="WebService\Admin\AdminLogService.cs" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="WebService\" />

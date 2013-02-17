@@ -10,6 +10,7 @@ using JsonConfig;
 using Mono.Options;
 using Rainy.Db;
 using System.Diagnostics;
+using log4net.Appender;
 
 namespace Rainy
 {
@@ -30,8 +31,7 @@ namespace Rainy
 			log4net.Appender.ConsoleAppender appender;
 			appender = new log4net.Appender.ConsoleAppender ();
 			appender.Layout = new log4net.Layout.PatternLayout
-				//("%-4timestamp %-5level %logger %M %ndc - %message%newline");
-				("%-4timestamp [%-5level] %logger->%M - %message%newline");
+				("%-4utcdate{yy/MM/dd_HH:mm:ss.fff} [%-5level] %logger->%M - %message%newline");
 
 			switch (loglevel) {
 			case 0: appender.Threshold = log4net.Core.Level.Error; break;
@@ -45,7 +45,7 @@ namespace Rainy
 			LogManager.GetLogger("Logsystem").Debug ("logsystem initialized");
 
 			if (loglevel >= 3) {
-				var appender2 = new log4net.Appender.FileAppender (appender.Layout, "./debug.log");
+				var appender2 = new log4net.Appender.FileAppender (appender.Layout, "./debug.log", true);
 				log4net.Config.BasicConfigurator.Configure (appender2);
 				LogManager.GetLogger("Logsystem").Debug ("Writing all log messages to file: debug.log");
 			}
@@ -105,7 +105,6 @@ namespace Rainy
 			var sqlite_file = Path.Combine (data_path, "rainy.db");
 			DbConfig.SetSqliteFile (sqlite_file);
 
-			var logger = LogManager.GetLogger ("Main");
 			SetupLogging (loglevel);
 
 			string listen_hostname = Config.Global.ListenAddress;

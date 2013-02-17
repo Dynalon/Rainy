@@ -9,8 +9,6 @@ using System.Collections.Generic;
 
 namespace Rainy.WebService.Admin
 {
-	// TODO only a logged in admin
-	// should be able to access
 	[AdminPasswordRequired]
 	[Route("/api/admin/user/","POST,PUT,DELETE")]
 	[Route("/api/admin/user/{Username}","GET")]
