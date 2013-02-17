@@ -17,12 +17,12 @@ namespace Rainy
 		public static OAuthHandlerBase OAuth;
 		public static string Passkey;	
 
-		public static IDataBackend DataBackend { get; private set; }
+		public static Rainy.Interfaces.IDataBackend DataBackend { get; private set; }
 		
 		private AppHost appHost;
 		private ILog logger;
 
-		public RainyStandaloneServer (IDataBackend backend, string listen_url)
+		public RainyStandaloneServer (Rainy.Interfaces.IDataBackend backend, string listen_url)
 		{
 			ListenUrl = listen_url;
 			logger = LogManager.GetLogger (this.GetType ());

@@ -4,6 +4,7 @@ using System.Linq;
 using ServiceStack.Common;
 using ServiceStack.ServiceHost;
 using Tomboy;
+using Rainy.Interfaces;
 
 namespace Rainy.WebService
 {

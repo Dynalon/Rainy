@@ -10,6 +10,7 @@ using System.IO;
 using Tomboy.Sync.Web;
 using DevDefined.OAuth.Storage.Basic;
 using Rainy.Db;
+using Rainy.Interfaces;
 
 namespace Rainy
 {
@@ -42,14 +43,14 @@ namespace Rainy
 			// tmpPath = Path.GetTempPath () + Path.GetRandomFileName ();
 
 			// for debugging, we only use a simple single user authentication 
-			OAuthAuthenticator debug_authenticator = (user,pass) => {
+			CredentialsVerifier debug_authenticator = (user,pass) => {
 				if (user == TEST_USER  && pass == TEST_PASS) return true;
 				else return false;
 			};
 
 			IDataBackend backend;
 			if (use_backend == "sqlite")
-				backend = new DatabaseBackend (tmpPath, debug_authenticator, reset: true);
+				backend = new DatabaseBackend (tmpPath, auth: debug_authenticator, reset: true);
 			else
 				backend = new RainyFileSystemBackend (tmpPath, debug_authenticator);
 

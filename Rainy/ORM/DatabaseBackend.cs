@@ -7,6 +7,7 @@ using Rainy.Db;
 using ServiceStack.OrmLite;
 using Tomboy;
 using Tomboy.Sync;
+using Rainy.Interfaces;
 
 namespace Rainy
 {
@@ -14,11 +15,25 @@ namespace Rainy
 	{
 		OAuthHandlerBase oauthHandler;
 
-		public DatabaseBackend (string database_path, OAuthAuthenticator auth, bool reset = false)
+		public DatabaseBackend (string database_path, CredentialsVerifier auth = null, bool reset = false)
 		{
-			oauthHandler = new OAuthDatabaseHandler (auth);
+			if (auth == null)
+				oauthHandler = new OAuthDatabaseHandler (DbAuthenticator);
 			DbConfig.CreateSchema (reset);
 		}
+		// verifies a given user/password combination
+		protected bool DbAuthenticator (string username, string password)
+		{
+			DBUser user = null;
+			using (var conn = DbConfig.GetConnection ()) {
+				user = conn.FirstOrDefault<DBUser> (u => u.Username == username && u.Password == password);
+			}
+			if (user != null)
+				return true;
+			else
+				return false;
+		}
+
 		#region IDataBackend implementation
 		public INoteRepository GetNoteRepository (string username)
 		{
@@ -35,7 +50,7 @@ namespace Rainy
 	}
 
 	// maybe move into DatabaseBackend as nested class
-	public class DatabaseNoteRepository : INoteRepository
+	public class DatabaseNoteRepository : Rainy.Interfaces.INoteRepository
 	{
 
 		private readonly string username;

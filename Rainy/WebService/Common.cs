@@ -54,7 +54,7 @@ namespace Rainy.WebService
 	[ResponseLogFilter]
 	public abstract class RainyServiceBase : Service
 	{
-		protected INoteRepository GetNotes (string username)
+		protected Rainy.Interfaces.INoteRepository GetNotes (string username)
 		{
 			return RainyStandaloneServer.DataBackend.GetNoteRepository (username);
 		}

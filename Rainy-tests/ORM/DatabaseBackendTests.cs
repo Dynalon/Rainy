@@ -1,10 +1,5 @@
 using System;
-using System.Data;
 using NUnit.Framework;
-using Tomboy;
-using System.Collections.Generic;
-using System.Linq;
-using Rainy.OAuth;
 
 namespace Rainy.Db
 {
@@ -12,7 +7,7 @@ namespace Rainy.Db
 	[TestFixture]
 	public class DatabaseBackendTests : DbTestsBase
 	{
-		OAuthAuthenticator auth = (user,pass) => { return true; };
+		Rainy.Interfaces.CredentialsVerifier auth = (user,pass) => { return true; };
 
 		[Test]
 		public void ReadWriteManifest ()

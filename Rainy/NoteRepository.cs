@@ -9,17 +9,18 @@ using System.Xml;
 using System.Text;
 using Rainy.OAuth;
 using Rainy.Db;
+using Rainy.Interfaces;
 
 
 namespace Rainy
 {
 	// TODO move OAuth stuff into here
-	public class RainyFileSystemBackend : IDataBackend
+	public class RainyFileSystemBackend : Rainy.Interfaces.IDataBackend
 	{
 		string notesBasePath;
 		OAuthHandlerBase oauthHandler;
 
-		public RainyFileSystemBackend (string data_path, OAuthAuthenticator auth, bool reset = false)
+		public RainyFileSystemBackend (string data_path, CredentialsVerifier auth, bool reset = false)
 		{
 			oauthHandler = new OAuthDatabaseHandler (auth);
 
@@ -46,7 +47,7 @@ namespace Rainy
 		/// repository of that user was disposed. Best is to always use using (new NoteRepository (username)) {  ... }
 		/// to make sure the repository is freed afterwards.
 		/// </summary>
-		public class DirectoryBasedNoteRepository : INoteRepository
+		public class DirectoryBasedNoteRepository : Rainy.Interfaces.INoteRepository
 		{
 
 			public string Username { get; protected set; }

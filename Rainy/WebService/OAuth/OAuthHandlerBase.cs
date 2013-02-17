@@ -28,11 +28,10 @@ using DevDefined.OAuth.Testing;
 using DevDefined.OAuth.Provider;
 using DevDefined.OAuth.Provider.Inspectors;
 using Rainy.OAuth.SimpleStore;
+using Rainy.Interfaces;
 
 namespace Rainy.OAuth
 {
-	public delegate bool OAuthAuthenticator (string username, string password);
-
 	// TODO: replace with Interface
 	public abstract class OAuthHandlerBase : IDisposable
 	{
@@ -41,7 +40,7 @@ namespace Rainy.OAuth
 		public ITokenRepository<RequestToken> RequestTokens;
 		public ITokenStore TokenStore;
 
-		public OAuthAuthenticator Authenticator;
+		public CredentialsVerifier Authenticator;
 		public OAuthProvider Provider;
 
 		protected INonceStore NonceStore;
@@ -49,7 +48,7 @@ namespace Rainy.OAuth
 
 		protected List<IContextInspector> inspectors = new List<IContextInspector> ();
 
-		public OAuthHandlerBase (OAuthAuthenticator auth)
+		public OAuthHandlerBase (CredentialsVerifier auth)
 		{
 			Authenticator = auth;
 

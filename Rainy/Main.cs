@@ -11,6 +11,7 @@ using Mono.Options;
 using Rainy.Db;
 using System.Diagnostics;
 using log4net.Appender;
+using Rainy.Interfaces;
 
 namespace Rainy
 {
@@ -111,7 +112,7 @@ namespace Rainy
 			int listen_port = Config.Global.ListenPort;
 
 			// simply use user/password list from config for authentication
-			OAuthAuthenticator config_authenticator = (username, password) => {
+			CredentialsVerifier config_authenticator = (username, password) => {
 				// call the authenticater callback
 				if (string.IsNullOrEmpty (username) || string.IsNullOrEmpty (password))
 					return false;
@@ -131,7 +132,7 @@ namespace Rainy
 				backend = "filesystem";
 			}
 			if (backend == "sqlite") {
-				data_backend = new DatabaseBackend (data_path, config_authenticator, reset: false);
+				data_backend = new DatabaseBackend (data_path, reset: false);
 			} else {
 				data_backend = new RainyFileSystemBackend (data_path, config_authenticator);
 			}

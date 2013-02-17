@@ -97,10 +97,7 @@
     <Compile Include="NoteRepository.cs" />
     <Compile Include="Interfaces.cs" />
     <Compile Include="RainyTestServer.cs" />
-    <Compile Include="ORM\DbClasses.cs" />
-    <Compile Include="ORM\DbStorage.cs" />
     <Compile Include="WebService\OAuth\SimpleTokenRepository.cs" />
-    <Compile Include="ORM\DatabaseBackend.cs" />
     <Compile Include="WebService\OAuth\OAuthDatabaseHandler.cs" />
     <Compile Include="WebService\OAuth\OAuthHandlerBase.cs" />
     <Compile Include="WebService\Admin\Helper.cs" />
@@ -111,13 +108,16 @@
     <Compile Include="WebService\UserService.cs" />
     <Compile Include="WebService\ApiService.cs" />
     <Compile Include="WebService\ServiceContracts.cs" />
+    <Compile Include="ORM\DbClasses.cs" />
+    <Compile Include="ORM\DbStorage.cs" />
+    <Compile Include="ORM\DatabaseBackend.cs" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="WebService\" />
     <Folder Include="WebService\OAuth\" />
-    <Folder Include="ORM\" />
     <Folder Include="WebService\Admin\" />
     <Folder Include="WebService\Admin\UI\" />
+    <Folder Include="ORM\" />
   </ItemGroup>
   <ItemGroup>
     <None Include="settings.conf" />
