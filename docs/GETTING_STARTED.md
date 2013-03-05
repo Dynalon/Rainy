@@ -44,6 +44,12 @@ There is no daemon mode yet, but you can use and install `screen` on linux to ru
 
 	screen mono Rainy.exe -c settings.conf
 
+After you have started a screen session, you may detach it by typing CTL+A, then CTL+D
+
+Alternately, if you want to start Rainy on startup in detached mode, you can use:
+
+	screen -X rainy-session -d -m mono 'Rainy.exe -c settings.conf'
+
 ### 4. First sync in Tomboy
 
 Now open up Tomboy (or another client, like [Tomdroid][tomdroid]), and point the synchronisation url to Rainy:
