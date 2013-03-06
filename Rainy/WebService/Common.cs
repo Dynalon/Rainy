@@ -18,7 +18,7 @@ namespace Rainy.WebService
 		{
 			if (requestDto is OAuthRequestTokenRequest)
 				return;
-
+		
 			Logger.DebugFormat ("Received request at: {0}\nData received:\n{1}", req.RawUrl, requestDto.Dump ());
 		}
 		public IHasRequestFilter Copy ()

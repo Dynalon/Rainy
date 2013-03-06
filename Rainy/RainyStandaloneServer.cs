@@ -7,12 +7,15 @@ using log4net;
 using Rainy.OAuth;
 using Rainy.WebService;
 using ServiceStack.Text;
+using ServiceStack.WebHost.Endpoints.Extensions;
+using ServiceStack.ServiceHost;
+using System.Web;
 
 namespace Rainy
 {
 	public class RainyStandaloneServer : IDisposable
 	{
-		public readonly string ListenUrl;
+		public readonly string ListenUrl;	
 
 		public static OAuthHandlerBase OAuth;
 		public static string Passkey;	
@@ -69,6 +72,12 @@ namespace Rainy
 				GlobalResponseHeaders = {
 					{ "Access-Control-Allow-Origin", "*" },
 					{ "Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS" },
+					// time in seconds preflight responses can be cached by the client
+//					{ "Access-Control-Max-Age", "1728000" },
+					{ "Access-Control-Max-Age", "1" },
+
+					// the Authority header must be whitelisted; it is sent be the rainy-ui
+					// for authentication
 					{ "Access-Control-Allow-Headers", "Content-Type, Authority" },
 				},
 			});

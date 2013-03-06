@@ -12,6 +12,7 @@ using Rainy.Db;
 using System.Diagnostics;
 using log4net.Appender;
 using Rainy.Interfaces;
+using System.Security.Cryptography.X509Certificates;
 
 namespace Rainy
 {
@@ -70,6 +71,8 @@ namespace Rainy
 		{
 			// parse command line arguments
 			string config_file = "settings.conf";
+			string cert_file = null, pvk_file = null;
+
 			int loglevel = 0;
 			bool show_help = false;
 			bool open_browser = true;
@@ -81,6 +84,11 @@ namespace Rainy
 					v => { if (v != null) ++loglevel; } },
 				{ "h|help",  "show this message and exit", 
 					v => show_help = v != null },
+				{ "cert=",  "use this certificate for SSL", 
+					(string file) => cert_file = file },
+				{ "pvk=",  "use private key for certSSL", 
+					(string file2) => pvk_file = file2 },
+
 				{ "b|nobrowser",  "do not open browser window upon start",
 					v => { if (v != null) open_browser = false; } },
 			};
@@ -99,6 +107,8 @@ namespace Rainy
 			// set the configuration from the specified file
 			Config.Global = Config.ApplyJsonFromPath (config_file);
 
+			InstallCerts (cert_file, pvk_file);
+
 			string data_path = Config.Global.DataPath;
 			if (string.IsNullOrEmpty (data_path)) {
 				data_path = Directory.GetCurrentDirectory ();
@@ -108,8 +118,9 @@ namespace Rainy
 
 			SetupLogging (loglevel);
 
-			string listen_hostname = Config.Global.ListenAddress;
-			int listen_port = Config.Global.ListenPort;
+			string listen_url = Config.Global.ListenUrl;
+			// servicestack expects trailing slash, else error is thrown
+			if (!listen_url.EndsWith ("/")) listen_url += "/";
 
 			// determine and setup data backend
 			string backend = Config.Global.Backend;
@@ -146,8 +157,6 @@ namespace Rainy
 				data_backend = new RainyFileSystemBackend (data_path, config_authenticator);
 			}
 
-			string listen_url = "http://" + listen_hostname + ":" + listen_port + "/";
-
 			string admin_ui_url = listen_url.Replace ("*", "localhost");
 
 			if (open_browser) {
@@ -165,6 +174,44 @@ namespace Rainy
 
 				Console.WriteLine ("Press RETURN to stop Rainy");
 				Console.ReadLine ();
+			}
+		}
+
+		// HttpListener can not be setup for SSL via API (neither in MS.NET nor
+		// mono). Mono requires for every port a .cer/.pvk pair to be placed
+		// 	$HOME/.config/mono/httplistener/<port>.cer
+		// 	$HOME/.config/mono/httplistener/<port>.pvk
+		//
+		// and then we can start listening to https://*:<port>
+		// We therefore copy the cert/pvk there every time, overwriting
+		// any previous setups.
+		public static void InstallCerts (string cert_file, string pvk_file)
+		{
+			if (!string.IsNullOrEmpty (cert_file)) {
+				if (string.IsNullOrEmpty (pvk_file)) {
+					Console.WriteLine ("Private key (pvk) must be supplied via --pvk parameter" +
+					                   "when a ssl certificate is to be used!");
+					Environment.Exit(-1);
+				}
+				Console.WriteLine("cert: {0}, pvk: {1}",cert_file, pvk_file);
+				if (!File.Exists (cert_file)) {
+					Console.WriteLine ("Certificate file {0} does not exist!", cert_file);
+					Environment.Exit(-1);
+				}
+				if (!File.Exists (pvk_file)) {
+					Console.WriteLine ("Private key file {0} does not exist!", pvk_file);
+					Environment.Exit(-1);
+				}
+				
+				string dirname = Environment.GetFolderPath (Environment.SpecialFolder.ApplicationData);
+				string path = Path.Combine (dirname, ".mono");
+				path = Path.Combine (path, "httplistener");
+				string port = "8080";
+				string cert_dst = Path.Combine (path, String.Format ("{0}.cer", port));
+				string pvk_dst = Path.Combine (path, String.Format ("{0}.pvk", port));
+				
+				File.Copy (cert_file, cert_dst, true);
+				File.Copy (pvk_file, pvk_dst, true);
 			}
 		}
 	}

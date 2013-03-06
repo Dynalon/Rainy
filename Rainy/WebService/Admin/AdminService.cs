@@ -6,18 +6,20 @@ using ServiceStack.Common;
 using ServiceStack.Common.Web;
 using System.Net;
 using System.Collections.Generic;
+using ServiceStack.ServiceInterface;
+using ServiceStack.ServiceInterface.Cors;
 
 namespace Rainy.WebService.Admin
 {
 	[AdminPasswordRequired]
-	[Route("/api/admin/user/","POST,PUT,DELETE")]
-	[Route("/api/admin/user/{Username}","GET")]
+	[Route("/api/admin/user/","POST, PUT, DELETE, OPTIONS")]
+	[Route("/api/admin/user/{Username}","GET, OPTIONS")]
 	public class UserRequest : DBUser, IReturn<DBUser>
 	{
 	}
 
 	[AdminPasswordRequired]
-	[Route("/api/admin/alluser/","GET")]
+	[Route("/api/admin/alluser/","GET, OPTIONS")]
 	public class AllUserRequest : IReturn<List<DBUser>>
 	{
 	}
@@ -27,7 +29,12 @@ namespace Rainy.WebService.Admin
 		public UserService () : base ()
 		{
 		}
+	
 		public HttpResult Options (UserRequest req)
+		{
+			return new HttpResult ();
+		}
+		public HttpResult Options (AllUserRequest req)
 		{
 			return new HttpResult ();
 		}

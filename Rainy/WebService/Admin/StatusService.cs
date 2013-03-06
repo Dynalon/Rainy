@@ -2,10 +2,12 @@ using ServiceStack.ServiceHost;
 using Rainy.Db;
 using ServiceStack.OrmLite;
 using System;
+using ServiceStack.ServiceInterface.Cors;
+using ServiceStack.Common.Web;
 
 namespace Rainy.WebService.Admin
 {
-	[Route("/api/admin/status/","GET")]
+	[Route("/api/admin/status/","GET, OPTIONS")]
 	[AdminPasswordRequired]
 	public class StatusRequest : IReturn<Status>
 	{
@@ -15,6 +17,12 @@ namespace Rainy.WebService.Admin
 	{
 		public StatusService () : base ()
 		{
+		}
+
+		[EnableCors]
+		public HttpResult Options (StatusRequest req)
+		{
+			return new HttpResult ();
 		}
 		public Status Get (StatusRequest req)
 		{

@@ -20,7 +20,7 @@
     <WarningLevel>4</WarningLevel>
     <PlatformTarget>x86</PlatformTarget>
     <ConsolePause>False</ConsolePause>
-    <Commandlineparameters>-c ../../settings.conf -vvvv</Commandlineparameters>
+    <Commandlineparameters>-c ../../settings.conf -vvvv --nobrowser</Commandlineparameters>
     <Externalconsole>True</Externalconsole>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|x86' ">
