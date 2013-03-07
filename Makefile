@@ -1,4 +1,4 @@
-RELEASEVER=0.1.3
+RELEASEVER=0.2.0
 ZIPDIR=rainy-$(RELEASEVER)
 BINDIR=$(shell pwd)/Rainy/bin/Debug
 RELEASEDIR=$(shell pwd)/release
