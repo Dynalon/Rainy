@@ -1,7 +1,7 @@
 Tomboy OAuth authentication 
 ===========================
 
-Note: This document is only intended for developers.
+ATTENTION: This document is only intended for developers.
 
 Tomboy (or any other OAuth consumer like Tomdroid) uses OAuth for authentication when doing cloud/server synchronisation. The necessary OAuth Urls are retrieved via the [root ApiRef call][api-root], and then used for the the OAuth 1.0a authentication/authorization steps.
 

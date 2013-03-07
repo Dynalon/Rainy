@@ -2,13 +2,23 @@ Build and run Rainy
 ===================
 
 ### 0. Install requirements:
-  * git
-  * mono (it is best to install mono-complete or similiar meta-package on your linux distro to get everything and avoid missing libraries)
+  * mono
   * sqlite3 (usually no need to install this, as it comes with most distros by default)
- 
-When building from source:
+  
+On a debian/ubuntu based system, you could install the above requirements with:
+
+	sudo apt-get install git mono-complete libsqlite3-0
+
+ATTENTION: It is advised to install the `mono-complete` or similiar meta-package on your linux distro to avoid missing libraries exceptions
+
+When building from source also install:
 
   * automake / autotools
+  * git
+
+```
+	sudo apt-get install build-essential automake git
+```
 
 ### 1a. Using a binary release
 
@@ -18,14 +28,15 @@ Fetch the latest release from <http://rainy.notesync.org/release/>. Unzip the fi
 
 	git clone https://github.com/Dynalon/Rainy.git
 
-	# will fetch any deps and compile rainy from source
-	# the resulting binaries will be in Rainy/bin/Debug/*
+	# will fetch any deps and compile rainy from source result will be compiled
+	# into ./release/Rainy.exe single packed .exe that can be run with mono
 	make
 
-	# optional: create a single, packed Rainy.exe for easy deployment
-	# which includes all other .dll dependencies as a self-sustained
-	# file which can then be found in ./release/Rainy.exe
-	make pack
+	# OPTIONAL: create a single, statically linked bundle for easy deployment
+	# which required no other dependencies except sqlite3 (so no mono is required
+	# to run, but executable will not be plattform independent).
+	# The executable can then be found in ./release/linux/
+	make linux_bundle 
 
 ### 2. Edit settings.conf
 
@@ -35,30 +46,33 @@ There is a sample settings.conf which needs to be edited, i.e. change username/p
 
 	mono Rainy.exe -c settings.conf
 
-
 If you want more verbose output (helpfull when supplying bug reports), you can change the loglevel by supplying the `-vvvv` parameter:
 
-	mono Rainy.exe -c settings.conf -vvvv
+	mono --debug Rainy.exe -c settings.conf -vvvv
 
-There is no daemon mode yet, but you can use and install `screen` on linux to run rainy in the background:
+is no daemon mode, but you can use and install `screen` on linux to run rainy in the background:
 
 	screen mono Rainy.exe -c settings.conf
 
-After you have started a screen session, you may detach it by typing CTL+A, then CTL+D
+After you have started a screen session, you may detach it by typing `CTRL+A`, then `CTRL+D`.
 
 Alternately, if you want to start Rainy on startup in detached mode, you can use:
 
 	screen -X rainy-session -d -m mono 'Rainy.exe -c settings.conf'
 
+or use `mono-service`:
+
+	mono-service Rainy.exe -c settings.conf 
+
 ### 4. First sync in Tomboy
 
 Now open up Tomboy (or another client, like [Tomdroid][tomdroid]), and point the synchronisation url to Rainy:
 
-	http://yourserver.com:8080/<username>/<password>/
+	https://yourserver.com:8080/<username>/<password>/
 
 For the default settings.conf, there is a user `johndoe` with password set to `none`. In this case the example url would be:
 
-	http://yourserver.com:8080/johndoe/none/
+	https://yourserver.com:8080/johndoe/none/
 
 Click "Connect to server"; a browser instance should fire up and telling you immediatelly that the Tomboy authorization was successfull. You can now close the browser and start the first sync in Tomboy.
 
