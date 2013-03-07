@@ -5,14 +5,12 @@ using System.IO;
 
 using log4net;
 
-using Rainy.OAuth;
 using JsonConfig;
 using Mono.Options;
 using Rainy.Db;
 using System.Diagnostics;
 using log4net.Appender;
 using Rainy.Interfaces;
-using System.Security.Cryptography.X509Certificates;
 using Mono.Unix;
 using Mono.Unix.Native;
 
@@ -115,6 +113,9 @@ namespace Rainy
 			DataPath = Config.Global.DataPath;
 			if (string.IsNullOrEmpty (DataPath)) {
 				DataPath = Directory.GetCurrentDirectory ();
+			} else {
+				if (!Directory.Exists (DataPath))
+					Directory.CreateDirectory (DataPath);
 			}
 
 			var sqlite_file = Path.Combine (DataPath, "rainy.db");
@@ -284,8 +285,13 @@ namespace Rainy
 			// We therefore copy the cert/pvk there every time, overwriting
 			// any previous setups.
 			string dirname = Environment.GetFolderPath (Environment.SpecialFolder.ApplicationData);
+
 			string path = Path.Combine (dirname, ".mono");
+			if (!Directory.Exists (path)) Directory.CreateDirectory (path);
+
 			path = Path.Combine (path, "httplistener");
+			if (!Directory.Exists (path)) Directory.CreateDirectory (path);
+
 			string port = new Uri(listen_url).Port.ToString ();
 			string cert_dst = Path.Combine (path, String.Format ("{0}.cer", port));
 			string pvk_dst = Path.Combine (path, String.Format ("{0}.pvk", port));
