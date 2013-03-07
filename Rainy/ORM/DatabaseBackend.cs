@@ -19,6 +19,9 @@ namespace Rainy
 		{
 			if (auth == null)
 				oauthHandler = new OAuthDatabaseHandler (DbAuthenticator);
+			else
+				oauthHandler = new OAuthDatabaseHandler (auth);
+
 			DbConfig.CreateSchema (reset);
 		}
 		// verifies a given user/password combination

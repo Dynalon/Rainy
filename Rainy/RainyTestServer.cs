@@ -54,13 +54,13 @@ namespace Rainy
 			else
 				backend = new RainyFileSystemBackend (tmpPath, debug_authenticator);
 
-			rainyServer = new RainyStandaloneServer (backend, RainyListenUrl);
+			rainyServer = new RainyStandaloneServer (backend, RainyListenUrl, test_server: true);
 
 			rainyServer.Start ();
 		}
 		public static void Stop ()
 		{
-			rainyServer.Stop ();
+			rainyServer.Dispose ();
 			//Directory.Delete (tmpPath, true);
 		}
 
