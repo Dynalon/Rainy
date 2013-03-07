@@ -69,6 +69,7 @@
     </Reference>
     <Reference Include="System.Data" />
     <Reference Include="System.Xml" />
+    <Reference Include="Mono.Security" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <ItemGroup>
@@ -101,9 +102,6 @@
     <Compile Include="WebService\OAuth\OAuthDatabaseHandler.cs" />
     <Compile Include="WebService\OAuth\OAuthHandlerBase.cs" />
     <Compile Include="WebService\Admin\Helper.cs" />
-    <Compile Include="WebService\Admin\AdminUiService.cs" />
-    <Compile Include="WebService\Admin\AdminService.cs" />
-    <Compile Include="WebService\Admin\StatusService.cs" />
     <Compile Include="WebService\Admin\AdminLogService.cs" />
     <Compile Include="WebService\UserService.cs" />
     <Compile Include="WebService\ApiService.cs" />
@@ -111,6 +109,7 @@
     <Compile Include="ORM\DbClasses.cs" />
     <Compile Include="ORM\DbStorage.cs" />
     <Compile Include="ORM\DatabaseBackend.cs" />
+    <Compile Include="makecert.cs" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="WebService\" />
@@ -121,16 +120,8 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="settings.conf" />
-  </ItemGroup>
-  <ItemGroup>
-    <EmbeddedResource Include="..\..\rainy-ui\dist\built.js">
-      <Link>WebService\Admin\UI\built.js</Link>
-    </EmbeddedResource>
-    <EmbeddedResource Include="..\..\rainy-ui\dist\admin.html">
-      <Link>WebService\Admin\UI\admin.html</Link>
-    </EmbeddedResource>
-    <EmbeddedResource Include="..\..\rainy-ui\dist\login.html">
-      <Link>WebService\Admin\UI\login.html</Link>
-    </EmbeddedResource>
+    <None Include="WebService\Admin\AdminUiService.cs" />
+    <None Include="WebService\Admin\AdminService.cs" />
+    <None Include="WebService\Admin\StatusService.cs" />
   </ItemGroup>
 </Project>

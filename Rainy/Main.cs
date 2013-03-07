@@ -25,6 +25,8 @@ namespace Rainy
 		// some Status/Diagnostics
 		public static DateTime Uptime;
 		public static long ServedRequests;
+		public static string DataPath;
+		protected static ILog logger;
 
 
 		protected static void SetupLogging (int loglevel)
@@ -44,12 +46,13 @@ namespace Rainy
 			}
 
 			log4net.Config.BasicConfigurator.Configure (appender);
-			LogManager.GetLogger("Logsystem").Debug ("logsystem initialized");
+			logger = LogManager.GetLogger("Main");
+			logger.Debug ("logsystem initialized");
 
 			if (loglevel >= 3) {
 				var appender2 = new log4net.Appender.FileAppender (appender.Layout, "./debug.log", true);
 				log4net.Config.BasicConfigurator.Configure (appender2);
-				LogManager.GetLogger("Logsystem").Debug ("Writing all log messages to file: debug.log");
+				logger.Debug ("Writing all log messages to file: debug.log");
 			}
 
 			/* ColoredConsoleAppender is win32 only. A managed version was introduced to log4net svn
@@ -75,7 +78,7 @@ namespace Rainy
 
 			int loglevel = 0;
 			bool show_help = false;
-			bool open_browser = true;
+			bool open_browser = false;
 
 			var p = new OptionSet () {
 				{ "c|config=", "use config file",
@@ -89,8 +92,8 @@ namespace Rainy
 				{ "pvk=",  "use private key for certSSL", 
 					(string file2) => pvk_file = file2 },
 
-				{ "b|nobrowser",  "do not open browser window upon start",
-					v => { if (v != null) open_browser = false; } },
+				//{ "b|nobrowser",  "do not open browser window upon start",
+				//	v => { if (v != null) open_browser = false; } },
 			};
 			p.Parse (args);
 
@@ -107,20 +110,27 @@ namespace Rainy
 			// set the configuration from the specified file
 			Config.Global = Config.ApplyJsonFromPath (config_file);
 
-			InstallCerts (cert_file, pvk_file);
-
-			string data_path = Config.Global.DataPath;
-			if (string.IsNullOrEmpty (data_path)) {
-				data_path = Directory.GetCurrentDirectory ();
+			DataPath = Config.Global.DataPath;
+			if (string.IsNullOrEmpty (DataPath)) {
+				DataPath = Directory.GetCurrentDirectory ();
 			}
-			var sqlite_file = Path.Combine (data_path, "rainy.db");
+
+			var sqlite_file = Path.Combine (DataPath, "rainy.db");
 			DbConfig.SetSqliteFile (sqlite_file);
 
 			SetupLogging (loglevel);
+			logger = LogManager.GetLogger ("Main");
 
 			string listen_url = Config.Global.ListenUrl;
+			if (string.IsNullOrEmpty (listen_url)) {
+				listen_url = "https://localhost:8080/";
+				logger.InfoFormat ("no ListenUrl set in the settings.conf, using the default: {0}",
+				                   listen_url);
+			}
 			// servicestack expects trailing slash, else error is thrown
 			if (!listen_url.EndsWith ("/")) listen_url += "/";
+
+			ConfigureSslCerts (listen_url, cert_file, pvk_file);
 
 			// determine and setup data backend
 			string backend = Config.Global.Backend;
@@ -133,12 +143,12 @@ namespace Rainy
 
 			if (backend == "sqlite") {
 
-				if (string.IsNullOrEmpty (Config.Global.AdminPassword)) {
+				/* if (string.IsNullOrEmpty (Config.Global.AdminPassword)) {
 					Console.WriteLine ("FATAL: Field 'AdminPassword' in the settings config may not " +
 					                   "be empty when using the sqlite backend");
 					return;
-				}
-				data_backend = new DatabaseBackend (data_path, reset: false);
+				} */
+				data_backend = new DatabaseBackend (DataPath, reset: false);
 			} else {
 
 				// simply use user/password list from config for authentication
@@ -154,7 +164,7 @@ namespace Rainy
 					return false;
 				};
 
-				data_backend = new RainyFileSystemBackend (data_path, config_authenticator);
+				data_backend = new RainyFileSystemBackend (DataPath, config_authenticator);
 			}
 
 			string admin_ui_url = listen_url.Replace ("*", "localhost");
@@ -177,42 +187,85 @@ namespace Rainy
 			}
 		}
 
-		// HttpListener can not be setup for SSL via API (neither in MS.NET nor
-		// mono). Mono requires for every port a .cer/.pvk pair to be placed
-		// 	$HOME/.config/mono/httplistener/<port>.cer
-		// 	$HOME/.config/mono/httplistener/<port>.pvk
-		//
-		// and then we can start listening to https://*:<port>
-		// We therefore copy the cert/pvk there every time, overwriting
-		// any previous setups.
-		public static void InstallCerts (string cert_file, string pvk_file)
+		public static void ConfigureSslCerts (string listen_url, string cert_file, string pvk_file)
 		{
-			if (!string.IsNullOrEmpty (cert_file)) {
-				if (string.IsNullOrEmpty (pvk_file)) {
-					Console.WriteLine ("Private key (pvk) must be supplied via --pvk parameter" +
-					                   "when a ssl certificate is to be used!");
-					Environment.Exit(-1);
+			bool ssl_enabled = listen_url.ToLower ().StartsWith ("https") ? true : false;
+			if (!ssl_enabled)
+				return;
+
+			// cert management requires mono
+			if (Type.GetType ("Mono.Runtime") == null) {
+				logger.Info ("SSL certification handling is only supported when using the" +
+				             "mono runtime. On Windows, use the httpcfg.exe tool to setup SSL");
+				return;
+			}
+
+			string default_ssl_cert_path = Path.Combine (DataPath, "ssl-cert.cer");
+			string default_ssl_privkey_path = Path.Combine (DataPath, "ssl-cert.pvk");
+
+			if (string.IsNullOrEmpty (cert_file)) {
+
+				// try to load a cert from the default location
+				if (!File.Exists (default_ssl_cert_path)) {
+					logger.Info ("No default SSL certificate found but SSL was enabled");
+
+					if (listen_url.Contains ("*")) {
+						logger.Fatal ("SSL certificate generation for wildcard * urls is not possible");
+						logger.Fatal ("Please generate certificates manually or remove wildcard from ListenUrl");
+						Environment.Exit (-1);
+					}
+
+					// create a ssl cert using the makecert tool
+					var listen_domain = new Uri (listen_url).DnsSafeHost;
+					logger.InfoFormat ("Creating a default self-signed certificate" +
+						" for domain {0} as {1}", listen_domain, default_ssl_cert_path);
+
+					var makecert_args = new string[] {
+						"-n", "CN=" + listen_domain,
+						"-sv", default_ssl_privkey_path,
+						default_ssl_cert_path
+					};
+					Mono.Tools.MakeCert.MakeCertMain (makecert_args);
+
+					if (!File.Exists (default_ssl_cert_path) || !File.Exists (default_ssl_privkey_path)) {
+						logger.Fatal ("SSL cert generation failed");
+						Environment.Exit (-1);
+					}
 				}
-				Console.WriteLine("cert: {0}, pvk: {1}",cert_file, pvk_file);
-				if (!File.Exists (cert_file)) {
+				// we got defaults, use them
+				cert_file = default_ssl_cert_path;
+				pvk_file = default_ssl_privkey_path;
+			}
+
+			// cmdline specified certs
+			if (!File.Exists (cert_file)) {
 					Console.WriteLine ("Certificate file {0} does not exist!", cert_file);
 					Environment.Exit(-1);
-				}
-				if (!File.Exists (pvk_file)) {
-					Console.WriteLine ("Private key file {0} does not exist!", pvk_file);
-					Environment.Exit(-1);
-				}
-				
-				string dirname = Environment.GetFolderPath (Environment.SpecialFolder.ApplicationData);
-				string path = Path.Combine (dirname, ".mono");
-				path = Path.Combine (path, "httplistener");
-				string port = "8080";
-				string cert_dst = Path.Combine (path, String.Format ("{0}.cer", port));
-				string pvk_dst = Path.Combine (path, String.Format ("{0}.pvk", port));
-				
-				File.Copy (cert_file, cert_dst, true);
-				File.Copy (pvk_file, pvk_dst, true);
 			}
+			if (!File.Exists (pvk_file)) {
+				Console.WriteLine ("Private key file {0} does not exist!", pvk_file);
+				Environment.Exit(-1);
+			}
+
+			logger.DebugFormat ("using SSL cert {0} with private key file {1}", cert_file, pvk_file);
+
+			// HttpListener can not be setup for SSL via API (neither in MS.NET nor
+			// mono). Mono requires for every port a .cer/.pvk pair to be placed
+			// 	$HOME/.config/mono/httplistener/<port>.cer
+			// 	$HOME/.config/mono/httplistener/<port>.pvk
+			//
+			// and then we can start listening to https://*:<port>
+			// We therefore copy the cert/pvk there every time, overwriting
+			// any previous setups.
+			string dirname = Environment.GetFolderPath (Environment.SpecialFolder.ApplicationData);
+			string path = Path.Combine (dirname, ".mono");
+			path = Path.Combine (path, "httplistener");
+			string port = new Uri(listen_url).Port.ToString ();
+			string cert_dst = Path.Combine (path, String.Format ("{0}.cer", port));
+			string pvk_dst = Path.Combine (path, String.Format ("{0}.pvk", port));
+
+			File.Copy (cert_file, cert_dst, true);
+			File.Copy (pvk_file, pvk_dst, true);
 		}
 	}
 }

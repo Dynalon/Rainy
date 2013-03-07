@@ -39,6 +39,7 @@ namespace Rainy.WebService.Admin
 				StatusCode = System.Net.HttpStatusCode.Unauthorized
 			};
 			// jQuery & Co. do not send the Authority header for options preflight
+
 			// so we need to accept OPTIONS requests without password
 			if (request.HttpMethod == "OPTIONS")
 				return;
