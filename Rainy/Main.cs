@@ -13,6 +13,8 @@ using System.Diagnostics;
 using log4net.Appender;
 using Rainy.Interfaces;
 using System.Security.Cryptography.X509Certificates;
+using Mono.Unix;
+using Mono.Unix.Native;
 
 namespace Rainy
 {
@@ -182,8 +184,32 @@ namespace Rainy
 					Process.Start (admin_ui_url);
 				}
 
-				Console.WriteLine ("Press RETURN to stop Rainy");
-				Console.ReadLine ();
+				if (Environment.OSVersion.Platform != PlatformID.Unix &&
+				    Environment.OSVersion.Platform != PlatformID.MacOSX) {
+					// we run on windows, can't wait for unix signals
+					Console.WriteLine ("Press return to stop Rainy");
+					Console.ReadLine ();
+					Environment.Exit(0);
+
+				} else {
+					// we run UNIX
+					UnixSignal [] signals = new UnixSignal[] {
+						new UnixSignal(Signum.SIGINT),
+						new UnixSignal(Signum.SIGTERM),
+					};
+
+					// Wait for a unix signal
+					for (bool exit = false; !exit; )
+					{
+						int id = UnixSignal.WaitAny(signals);
+
+						if (id >= 0 && id < signals.Length)
+						{
+							if (signals[id].IsSet) exit = true;
+							logger.Debug ("received signal, exiting");
+						}
+					}
+				}
 			}
 		}
 
