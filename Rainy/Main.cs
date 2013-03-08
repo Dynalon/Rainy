@@ -139,6 +139,18 @@ namespace Rainy
 			string backend = Config.Global.Backend;
 
 			IDataBackend data_backend;
+			// simply use user/password list from config for authentication
+			CredentialsVerifier config_authenticator = (username, password) => {
+				// call the authenticater callback
+				if (string.IsNullOrEmpty (username) || string.IsNullOrEmpty (password))
+				return false;
+
+				foreach (dynamic credentials in Config.Global.Users) {
+					if (credentials.Username == username && credentials.Password == password)
+						return true;
+				}
+				return false;
+			};
 			// by default we use the filesystem backend
 			if (string.IsNullOrEmpty (backend)) {
 				backend = "filesystem";
@@ -151,21 +163,10 @@ namespace Rainy
 					                   "be empty when using the sqlite backend");
 					return;
 				} */
-				data_backend = new DatabaseBackend (DataPath, reset: false);
+				data_backend = new DatabaseBackend (DataPath, config_authenticator);
 			} else {
 
-				// simply use user/password list from config for authentication
-				CredentialsVerifier config_authenticator = (username, password) => {
-					// call the authenticater callback
-					if (string.IsNullOrEmpty (username) || string.IsNullOrEmpty (password))
-					return false;
 
-					foreach (dynamic credentials in Config.Global.Users) {
-						if (credentials.Username == username && credentials.Password == password)
-							return true;
-					}
-					return false;
-				};
 
 				data_backend = new RainyFileSystemBackend (DataPath, config_authenticator);
 			}
@@ -217,6 +218,7 @@ namespace Rainy
 		public static void ConfigureSslCerts (string listen_url, string cert_file, string pvk_file)
 		{
 			bool ssl_enabled = listen_url.ToLower ().StartsWith ("https") ? true : false;
+			listen_url = listen_url.Replace ("*", "localhost");
 			if (!ssl_enabled)
 				return;
 
