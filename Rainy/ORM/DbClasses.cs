@@ -12,6 +12,14 @@ namespace Rainy.Db
 	public class DBNote : DTONote 
 	{
 		[PrimaryKey]
+		// Guid is not feasible for primary key as on an account move as user
+		// might duplicate notes across different accounts
+		public string CompoundPrimaryKey {
+			get {
+				return Username + "_" + Guid;
+			}
+		}
+
 		public new string Guid { get; set; }
 	
 		// to associate a note to a username
