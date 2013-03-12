@@ -51,7 +51,7 @@ namespace Rainy.Db
 		}
 		public void DeleteNote (Note note)
 		{
-			db.Delete<DBNote> (n => n.Guid == note.Guid);
+			db.Delete<DBNote> (n => Username == n.Username &&  n.Guid == note.Guid);
 		}
 		public void SetConfigVariable (string key, string value)
 		{
