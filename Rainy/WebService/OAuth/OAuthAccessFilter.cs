@@ -43,7 +43,6 @@ namespace Rainy.WebService.OAuth
 		
 			try {
 				Logger.Debug ("trying to acquire authorization");
-				Logger.Debug ("Received headers:" + request.Headers.Dump ());
 				RainyStandaloneServer.OAuth.Provider.AccessProtectedResourceRequest (context);
 			} catch {
 				Logger.DebugFormat ("failed to obtain authorization, oauth context is: {0}", context.Dump ());

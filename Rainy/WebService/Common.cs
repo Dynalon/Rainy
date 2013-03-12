@@ -4,6 +4,7 @@ using System;
 using ServiceStack.ServiceHost;
 using Rainy.WebService.OAuth;
 using ServiceStack.Text;
+using System.Linq;
 
 namespace Rainy.WebService
 {
@@ -16,10 +17,16 @@ namespace Rainy.WebService
 		}
 		public void RequestFilter (IHttpRequest req, IHttpResponse res, object requestDto)
 		{
-			if (requestDto is OAuthRequestTokenRequest)
+			if (requestDto is OAuthRequestTokenRequest) {
 				return;
-		
-			Logger.DebugFormat ("Received request at: {0}\nData received:\n{1}", req.RawUrl, requestDto.Dump ());
+			}
+			Logger.DebugFormat ("Received request at: {0}\nDeserialized data (JSV):\n{1}", req.RawUrl, requestDto.Dump ());
+
+			Logger.Debug ("Received request headers:\n");
+			foreach(var key in req.Headers.AllKeys) {
+				Logger.DebugFormat ("\t {0}: {1}", key, req.Headers[key]);
+			}
+
 		}
 		public IHasRequestFilter Copy ()
 		{
@@ -39,7 +46,7 @@ namespace Rainy.WebService
 		}
 		public void ResponseFilter (IHttpRequest req, IHttpResponse res, object responseDto)
 		{
-			Logger.Debug ("Sending response:\n" + responseDto.Dump ());
+			Logger.Debug ("Unserialized response data to send (JSV):\n" + responseDto.Dump ());
 		}
 		public IHasResponseFilter Copy ()
 		{

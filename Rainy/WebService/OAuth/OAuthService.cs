@@ -27,6 +27,8 @@ namespace Rainy.WebService.OAuth
 		public Stream RequestStream { get; set; }
 	}
 
+	[RequestLogFilter]
+	[ResponseLogFilter]
 	public class OAuthService : RainyServiceBase
 	{
 		public object Any (OAuthRequestTokenRequest request)
@@ -62,6 +64,8 @@ namespace Rainy.WebService.OAuth
 		public string Password { get; set; }
 	}
 
+	[RequestLogFilter]
+	[ResponseLogFilter]
 	public class OAuthAuthorizeService : RainyServiceBase
 	{
 		public object Any (OAuthAuthorizeRequest request)
@@ -128,6 +132,8 @@ namespace Rainy.WebService.OAuth
 	{
 	}
 
+	[RequestLogFilter]
+	[ResponseLogFilter]
 	public class OAuthAccessTokenService : RainyServiceBase
 	{
 		public object Any (OAuthAccessTokenRequest request)
