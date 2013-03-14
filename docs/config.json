@@ -1,10 +1,6 @@
-# This config file is only used for markdown.io 
+# This config file is only used for markdown.io
 # and not an essential part of Rainy.
 {
-    "Title": "Rainy Wiki",
-    "Css": [
-        "http://netdna.bootstrapcdn.com/twitter-bootstrap/2.1.1/css/bootstrap.min.css",
-        "http://assets.markdown.io/themes/bootstrap-assets/common.css"
-    ],
-    "StandaloneCss": true
+    "Title": "Rainy - Wiki",
+    "Theme": "united"
 }
