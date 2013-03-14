@@ -1,6 +1,13 @@
 Contribute
 ==========
 
+Support
+-------
+
+Rainy does not have it's own mailing list yet, but you can ask questions on the [Tomboy mailing list][tomboy-ml] - Rainy developers are subscribed and might help.
+
+  [tomboy-ml]: http://lists.beatniksoftware.com/listinfo.cgi/tomboy-list-beatniksoftware.com
+
 Test and report bugs
 --------------------
 
