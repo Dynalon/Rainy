@@ -15,7 +15,6 @@ Rainy is a free synchronization/cloud server intended for use with [Tomboy][tomb
   * uses the awesome [ServiceStack][servicestack] framework for providing the [Tomboy REST API][tomboyrest] and the [ServiceStack.ORMLite][ss-ormlite] O/R Mapper  for database access
   * licensed under the free [GNU AGPLv3 license][agplv3]
 
-  [this]: http://markdown.io/https://raw.github.com/Dynalon/Rainy/master/docs/README.md
   [tomboy]: http://projects.gnome.org/tomboy/
   [tomboylib]: https://github.com/trepidity/tomboy-library
   [tomdroid]: https://launchpad.net/tomdroid
@@ -32,7 +31,7 @@ Getting Started
 
 See the [Getting Started guide][gettingstarted] on how to get and setup Rainy.
 
-  [gettingstarted]: http://markdown.io/https://raw.github.com/Dynalon/Rainy/master/docs/GETTING_STARTED.md
+  [gettingstarted]: http://www.notesync.org/GETTING_STARTED.md
 
 
 Credits
