@@ -126,7 +126,7 @@ namespace Rainy
 
 			string listen_url = Config.Global.ListenUrl;
 			if (string.IsNullOrEmpty (listen_url)) {
-				listen_url = "https://localhost:8080/";
+				listen_url = "https://localhost:443/";
 				logger.InfoFormat ("no ListenUrl set in the settings.conf, using the default: {0}",
 				                   listen_url);
 			}
