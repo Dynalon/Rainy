@@ -5,6 +5,8 @@ Rainy currently runs on Linux and OS X. Windows may be supported, but more feedb
 
 The following instructions cover Linux setup only.
 
+  [sqlite]: http://www.sqlite.org
+
 Using a downloaded binary release
 ---------------------------------
 
