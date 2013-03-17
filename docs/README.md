@@ -33,6 +33,11 @@ See the [Getting Started guide][gettingstarted] on how to get and setup Rainy.
 
   [gettingstarted]: http://www.notesync.org/GETTING_STARTED.md
 
+License
+-------
+
+Rainy is licensed under the free (as in freedom) GNU AGPLv3 license.
+[![](http://www.gnu.org/graphics/agplv3-155x51.png)](http://www.gnu.org/licenses/agpl-3.0.html)
 
 Credits
 -------
