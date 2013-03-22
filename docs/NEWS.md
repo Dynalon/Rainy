@@ -4,7 +4,7 @@ Follow @timodoerr for all rainy-related announcements!
 [gimmick:twitterfollow](@timodoerr) &nbsp; [gimmick:FacebookLike ( layout: 'buttoncount') ](http://www.facebook.com/pages/Rainy-note-sync-server-for-Tomboy/116321368557123) &nbsp; <script type="text/javascript" src="https://apis.google.com/js/plusone.js"></script> <g:plusone size="medium" href="http://www.notesync.org"></g:plusone>
 * * *
 
-## New webiste, new release!
+## New website, new release!
 ###### March, 15. 2013
 
 I commited some changes to the website today. Most notable change (besides the switch to the [bootswatch united theme][united]) is this _news_ section. I intend to use it to put news about Rainy releases and important information on the website, apart of [my blog][blog].
