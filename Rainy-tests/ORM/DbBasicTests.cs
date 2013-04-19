@@ -38,6 +38,7 @@ namespace Rainy.Db
 			// check for equalness
 			Assert.AreEqual (db_old.Title, db_new.Title);
 			Assert.AreEqual (db_old.Text, db_new.Text);
+			Assert.AreEqual (db_old.Tags, db_new.Tags);
 			
 			Assert.AreEqual (db_old.ChangeDate, db_new.ChangeDate);
 			

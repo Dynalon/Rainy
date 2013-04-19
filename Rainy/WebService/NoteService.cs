@@ -5,6 +5,7 @@ using ServiceStack.Common;
 using ServiceStack.ServiceHost;
 using Tomboy;
 using Rainy.Interfaces;
+using Tomboy.Sync.DTO;
 
 namespace Rainy.WebService
 {
@@ -17,8 +18,7 @@ namespace Rainy.WebService
 			var stored_notes = note_repo.Engine.GetNotes ();
 			
 			foreach (var kvp in stored_notes) {
-				var note = new Tomboy.Sync.DTO.DTONote ();
-				note.PopulateWith (kvp.Value);
+				var note = kvp.Value.ToDTONote ();
 
 				// if we have a sync revision, set it	
 				if (note_repo.Manifest.NoteRevisions.Keys.Contains (note.Guid)) {
@@ -103,9 +103,8 @@ namespace Rainy.WebService
 					//	throw new Exception ("Sync revisions differ by more than one, sth went wrong");
 
 					foreach (var dto_note in request.Notes) {
-						var note = new Note ("note://tomboy/" + dto_note.Guid);
 						// map from the DTO 
-						note.PopulateWith (dto_note);
+						var note = dto_note.ToTomboyNote ();
 
 						if (dto_note.Command == "delete") {
 							note_repo.Engine.DeleteNote (note);
