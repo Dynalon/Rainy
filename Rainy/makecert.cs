@@ -7,6 +7,7 @@
 // (C) 2003 Motus Technologies Inc. (http://www.motus.com)
 // Copyright (C) 2004-2005 Novell, Inc (http://www.novell.com)
 //
+// Released under BSD license.
 
 using System;
 using System.Collections;
