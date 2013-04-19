@@ -65,8 +65,10 @@ namespace Rainy.OAuth
 			inspectors.Add(new NonceStoreInspector (NonceStore));
 			inspectors.Add(new OAuth10AInspector (TokenStore));
 
-			// request tokens may only be 1 hour old
-			inspectors.Add(new TimestampRangeInspector (new TimeSpan (1, 0, 0)));
+			// request tokens may only be 36 hour old
+			// HACK this will compare client & server times. if the client time is of
+			// by more than 36 ours, the request will fail totally
+			inspectors.Add(new TimestampRangeInspector (new TimeSpan (36, 0, 0)));
 				
 				// TODO signature validation currently fails
 				// don't know if it makes sense to enable this since this 
