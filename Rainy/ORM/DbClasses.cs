@@ -6,6 +6,7 @@ using System.Data;
 using Rainy.OAuth.SimpleStore;
 using System;
 using DevDefined.OAuth.Storage.Basic;
+using Rainy.UserManagement;
 
 namespace Rainy.Db
 {
@@ -26,18 +27,12 @@ namespace Rainy.Db
 		public string Username { get; set; }
 	}
 	
-	public class DBUser
+	public class DBUser : DTOUser
 	{
 		[PrimaryKey]
 		public string Username { get; set; }
 
-		public string Password { get; set; }
-
 		public SyncManifest Manifest { get; set; }
-
-		public string EmailAddress { get; set; }
-
-		public string AdditionalData { get; set; }
 
 		public DBUser ()
 		{

@@ -1,17 +1,18 @@
 using System;
 using NUnit.Framework;
 using Tomboy.Sync.DTO;
+using Rainy.Tests;
 
-namespace Rainy
+namespace Rainy.Tests
 {
-	public class RainyTestServerTests : RainyTestBase
+	public class TestServerTests : TestBase
 	{
 		[Test]
 		public void CheckApiRef ()
 		{
-			var response = RainyTestServer.GetRootApiRef ();
+			var response = testServer.GetRootApiRef ();
 
-			var rainy_listen_url = RainyTestServer.RainyListenUrl;
+			var rainy_listen_url = testServer.RainyListenUrl;
 			Assert.AreEqual ("1.0", response.ApiVersion);
 
 			// check the OAuth urls
@@ -28,7 +29,7 @@ namespace Rainy
 		[Test]
 		public void GetUser ()
 		{
-			var user_response = RainyTestServer.GetUserInfo ();
+			var user_response = testServer.GetUserInfo ();
 
 			Assert.AreEqual (user_response.Username, "johndoe");
 			Assert.AreEqual (user_response.LatestSyncRevision, -1);

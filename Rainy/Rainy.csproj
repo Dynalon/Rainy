@@ -103,7 +103,6 @@
     <Compile Include="WebService\OAuth\OAuthDatabaseHandler.cs" />
     <Compile Include="WebService\OAuth\OAuthHandlerBase.cs" />
     <Compile Include="WebService\Admin\Helper.cs" />
-    <Compile Include="WebService\Admin\AdminLogService.cs" />
     <Compile Include="WebService\UserService.cs" />
     <Compile Include="WebService\ApiService.cs" />
     <Compile Include="WebService\ServiceContracts.cs" />
@@ -111,6 +110,7 @@
     <Compile Include="ORM\DbStorage.cs" />
     <Compile Include="ORM\DatabaseBackend.cs" />
     <Compile Include="makecert.cs" />
+    <Compile Include="WebService\Admin\DtoClasses.cs" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="WebService\" />
@@ -122,7 +122,8 @@
   <ItemGroup>
     <None Include="settings.conf" />
     <None Include="WebService\Admin\AdminUiService.cs" />
-    <None Include="WebService\Admin\AdminService.cs" />
     <None Include="WebService\Admin\StatusService.cs" />
+    <None Include="WebService\Admin\AdminLogService.cs" />
+    <None Include="WebService\Admin\AdminService.cs" />
   </ItemGroup>
 </Project>

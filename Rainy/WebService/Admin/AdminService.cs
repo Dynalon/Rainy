@@ -8,19 +8,21 @@ using System.Net;
 using System.Collections.Generic;
 using ServiceStack.ServiceInterface;
 using ServiceStack.ServiceInterface.Cors;
+using Rainy.UserManagement;
+using System.Linq;
 
 namespace Rainy.WebService.Admin
 {
 	[AdminPasswordRequired]
 	[Route("/api/admin/user/","POST, PUT, DELETE, OPTIONS")]
 	[Route("/api/admin/user/{Username}","GET, OPTIONS")]
-	public class UserRequest : DBUser, IReturn<DBUser>
+	public class UserRequest : DTOUser, IReturn<DTOUser>
 	{
 	}
 
 	[AdminPasswordRequired]
 	[Route("/api/admin/alluser/","GET, OPTIONS")]
-	public class AllUserRequest : IReturn<List<DBUser>>
+	public class AllUserRequest : IReturn<List<DTOUser>>
 	{
 	}
 
@@ -40,18 +42,19 @@ namespace Rainy.WebService.Admin
 		}
 
 		// gets a list of all users
-		public List<DBUser> Get (AllUserRequest req)
+		public List<DTOUser> Get (AllUserRequest req)
 		{
-			var all_user = new List<DBUser> ();
+			List<DTOUser> all_user;
 
 			using (var conn = DbConfig.GetConnection ()) {
-				all_user = conn.Select<DBUser> ();
+				all_user = conn.Select<DBUser> ()
+					.ToList<DTOUser> ();
 			}
 
 			return all_user;
 		}
 
-		public DBUser Get (UserRequest req)
+		public DTOUser Get (UserRequest req)
 		{
 			DBUser found_user;
 
@@ -60,7 +63,7 @@ namespace Rainy.WebService.Admin
 			}
 
 			if (found_user == null) throw new Exception ("User not found!");
-			return found_user;
+			return (DTOUser) found_user;
 		}
 
 		// TODO see if we can directly use DBUser
@@ -68,8 +71,7 @@ namespace Rainy.WebService.Admin
 		public object Put (UserRequest updated_user)
 		{
 			var user = new DBUser ();
-			updated_user.Manifest = null;
-			// TODO don't touch the SyncManifest when updating the user
+			// TODO make explicit mapping
 			user.PopulateWith (updated_user);
 
 			using (var conn = DbConfig.GetConnection ()) {
@@ -114,6 +116,7 @@ namespace Rainy.WebService.Admin
 		public object Post (UserRequest user)
 		{
 			var new_user = new DBUser ();
+			// TODO explicit mapping
 			new_user.PopulateWith (user);
 
 			// TODO move into RequestFilter
@@ -123,7 +126,6 @@ namespace Rainy.WebService.Admin
 			// TODO move into RequestFilter
 			if (! (user.Username.IsOnlySafeChars ()
 			    && user.Password.IsOnlySafeChars ()
-				&& user.AdditionalData.IsOnlySafeChars ()
 				&& user.EmailAddress.Replace ("@", "").IsOnlySafeChars ())) {
 
 				throw new ArgumentException ("found unsafe/unallowed characters");

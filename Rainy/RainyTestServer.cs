@@ -14,25 +14,25 @@ using Rainy.Interfaces;
 
 namespace Rainy
 {
-
 	// simple server that can be used from within unit tests
-	public static class RainyTestServer
+	// TODO make non-static
+	public class RainyTestServer
 	{
-		public static string TEST_USER = "johndoe";
-		public static string TEST_PASS = "none";
-		public static string RainyListenUrl = "http://127.0.0.1:8080/";
+		public string TEST_USER = "johndoe";
+		public string TEST_PASS = "none";
+		public string RainyListenUrl = "http://127.0.0.1:8080/";
 
-		public static string BaseUri {
+		public string BaseUri {
 			// i.e. http://127.0.0.1:8080/johndoe/none/
 			get {
 				return RainyListenUrl + TEST_USER + "/" + TEST_PASS + "/";
 			}
 		}
 
-		private static RainyStandaloneServer rainyServer;
-		private static string tmpPath;
+		private RainyStandaloneServer rainyServer;
+		private string tmpPath;
 
-		public static void StartNewServer (string use_backend = "sqlite")
+		public void Start (string use_backend = "sqlite")
 		{
 			tmpPath = "/tmp/rainy-test-data/";
 			if (Directory.Exists (tmpPath)) {
@@ -58,13 +58,13 @@ namespace Rainy
 
 			rainyServer.Start ();
 		}
-		public static void Stop ()
+		public void Stop ()
 		{
 			rainyServer.Dispose ();
 			//Directory.Delete (tmpPath, true);
 		}
 
-		public static JsonServiceClient GetJsonClient ()
+		public JsonServiceClient GetJsonClient ()
 		{
 			var rest_client = new JsonServiceClient ();
 			rest_client.SetAccessToken (GetAccessToken ());
@@ -72,14 +72,14 @@ namespace Rainy
 			return rest_client;
 		}
 
-		public static ApiResponse GetRootApiRef () 
+		public ApiResponse GetRootApiRef () 
 		{
 			var rest_client = new JsonServiceClient ();
 
 			return rest_client.Get<ApiResponse> (BaseUri + "/api/1.0/");
 		}
 
-		public static UserResponse GetUserInfo ()
+		public UserResponse GetUserInfo ()
 		{
 			var api_ref = GetRootApiRef ();
 			var user_service_url = api_ref.UserRef.ApiRef;
@@ -92,7 +92,7 @@ namespace Rainy
 		// this performs our main OAuth authentication, performing
 		// the request token retrieval, authorization, and exchange
 		// for an access token
-		public static IToken GetAccessToken ()
+		public IToken GetAccessToken ()
 		{
 			var consumerContext = new OAuthConsumerContext () {
 				ConsumerKey = "anyone"
