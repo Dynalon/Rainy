@@ -5,6 +5,7 @@ using System.IO;
 using System.Net;
 using DevDefined.OAuth.Storage.Basic;
 using Rainy.WebService;
+using System.Linq;
 
 namespace Rainy.WebService.OAuth
 {
@@ -57,7 +58,92 @@ namespace Rainy.WebService.OAuth
 		}
 	}
 
-	[Route("/oauth/authorize/{Username}/{Password}")]
+
+	// The authenticate server is NOT part of the Tomboy/Rainy/SNowy/OAuth standard but rather a helper
+	// service that we can call via JSON from Javascript to authenticate a user. The verifier
+	// we receive is our proof to the server that we authenticated successfully
+	[Route("/oauth/authenticate")]
+	public class OAuthAuthenticateRequest : IReturn<OAuthAuthenticateResponse>
+	{
+		public string Username { get; set; }
+		public string Password { get; set; }
+		public string RequestToken { get; set; }
+	}
+	public class OAuthAuthenticateResponse
+	{
+		public string Verifier { get; set; }
+		public string RedirectUrl { get; set; }
+	}
+	public class OAuthAuthenticateService : RainyServiceBase
+	{
+		// TODO options preflight for CORS
+		//public object Options ()
+
+		public object Get (OAuthAuthenticateRequest request)
+		{
+			// check if the user is authorized
+			if (!userIsAllowed (request.Username, request.Password)) {
+				// unauthorized
+				Logger.WarnFormat ("Failed to authenticate user {0}", request.Username);
+				Response.StatusCode = 403;
+				Response.StatusDescription ="Authorization failed";
+				Response.Write (
+					"<html><h1 style='margin-top: 1em'>Authorization failed for user "
+					+ "<b>" + request.Username + "</b>"
+					+ " (maybe wrong password?).</h1></html>"
+					);
+				Response.Close ();
+				return null;
+			}
+			// authentication successful
+			Logger.InfoFormat ("Successfully authorized user: {0}", request.Username);
+
+			return TokenExchangeAfterAuthentication (request.Username, request.Password, request.RequestToken);
+		}
+		public object TokenExchangeAfterAuthentication (string username, string password, string token)
+		{
+			var response = new OAuthAuthenticateResponse ();
+
+			// TODO surround with try/catch and present 403 or 400 if token is unknown/invalid
+			var request_token = Rainy.RainyStandaloneServer.OAuth.RequestTokens.GetToken (token);
+
+			// the verifier is important, it is proof that the user successfully authorized
+			// the verifier is later tested by the OAuth10aInspector to macht
+			request_token.Verifier = Guid.NewGuid ().ToString ();
+			request_token.AccessDenied = false;
+
+			request_token.AccessToken = new AccessToken () {
+				ConsumerKey = request_token.ConsumerKey,
+				Realm = request_token.Realm,
+				Token = Guid.NewGuid ().ToString (),
+				TokenSecret = Guid.NewGuid ().ToString (),
+				UserName = username,
+				ExpiryDate = DateTime.Now.AddYears (99)
+			};
+
+			RainyStandaloneServer.OAuth.RequestTokens.SaveToken (request_token);
+			Logger.DebugFormat ("created an access token for user {0}: {1}", username, token);
+	
+			// redirect to the provded callback
+			var redirect_url = request_token.CallbackUrl + "?oauth_verifier=" + request_token.Verifier
+				+ "&oauth_token=" + request_token.Token;
+		
+			response.RedirectUrl = redirect_url;
+
+			// the browser/gateway page should take the RedirectUrl and access it
+			// note that the redirect url points to a tomboy listener, or tomdroid listener (tomdroid://...)
+			return response;
+		}
+
+		protected bool userIsAllowed (string username, string password)
+		{
+			return RainyStandaloneServer.OAuth.Authenticator (username, password);
+		}
+	}
+
+
+	[Route("/oauth/authorize/")]
+	[Route("/oauth/authorize/{Username}/{Password}/")]
 	public class OAuthAuthorizeRequest : IReturnVoid
 	{
 		public string Username { get; set; }
@@ -70,61 +156,27 @@ namespace Rainy.WebService.OAuth
 	{
 		public object Any (OAuthAuthorizeRequest request)
 		{
-			// keep this line to inspect the Request in monodevelop's debugger 
-			// really helps debugging API calls
-			var servicestack_http_request = Request;
+			if (!string.IsNullOrEmpty (request.Username) &&
+			    !string.IsNullOrEmpty (request.Password)) {
 
-			// TODO the OAuth spec allows other ways of specifying the parameters besides the query string
-			// (i.e. the authorization header, form-encoded POST values, etc. We have to handle those 
-			// in the future.
-			var original_request = (HttpListenerRequest)Request.OriginalRequest;
-			var context = new OAuthContextBuilder ().FromUri (Request.HttpMethod, original_request.Url);
-
-			// check if the user is authorized
-			// TODO this is just a basic hack to enable authorization
-			if (!userIsAllowed (request.Username, request.Password)) {
-				// unauthorized
-				Logger.WarnFormat ("Failed to authorize user {0}", request.Username);
-				Response.StatusCode = 403;
-				Response.StatusDescription ="Authorization failed";
-				Response.Write (
-					"<html><h1 style='margin-top: 1em'>Authorization failed for user "
-					+ "<b>" + request.Username + "</b>"
-					+ " (maybe wrong password?).</h1></html>"
+				// unattended authentication, immediately perform token exchange
+				// and use data from the querystring
+				var auth_service = new OAuthAuthenticateService ();
+				var resp = (OAuthAuthenticateResponse) auth_service.TokenExchangeAfterAuthentication (
+					request.Username,
+					request.Password,
+					Request.QueryString["oauth_token"]
 				);
-				Response.Close ();
+				Response.Redirect (resp.RedirectUrl);
 				return null;
+			} else {
+				TextReader reader = new StreamReader ("/Users/td/gateway.html");
+				string resp = reader.ReadToEnd ();
+				reader.Close ();
+				return resp;
 			}
-			// authorization succeeded, continue
-			Logger.InfoFormat ("Successfully authorized user: {0}", request.Username);
-
-			var request_token = Rainy.RainyStandaloneServer.OAuth.RequestTokens.GetToken (context.Token);
-			request_token.Verifier = Guid.NewGuid ().ToString ();
-			request_token.AccessDenied = false;
-
-			request_token.AccessToken = new AccessToken () {
-				ConsumerKey = request_token.ConsumerKey,
-				Realm = request_token.Realm,
-				Token = Guid.NewGuid ().ToString (),
-				TokenSecret = Guid.NewGuid ().ToString (),
-				UserName = request.Username,
-				ExpiryDate = DateTime.Now.AddYears (99)
-			};
-		
-			RainyStandaloneServer.OAuth.RequestTokens.SaveToken (request_token);
-			Logger.DebugFormat ("created an access token for user {0}: {1}", request.Username, request_token);
-
-			// redirect to the provded callback
-			var redirect_url = request_token.CallbackUrl + "?oauth_verifier=" + request_token.Verifier + "&oauth_token=" + request_token.Token;
-			Logger.DebugFormat ("redirecting user to consumer at: {1}", request.Username, redirect_url);
-			Response.Redirect (redirect_url);
-			return null;
 		}
-		protected bool userIsAllowed (string username, string password)
-		{
-			return RainyStandaloneServer.OAuth.Authenticator (username, password);
 
-		}
 	}
 
 	[Route("/oauth/access_token")]

@@ -111,6 +111,7 @@
     <Compile Include="ORM\DatabaseBackend.cs" />
     <Compile Include="makecert.cs" />
     <Compile Include="WebService\Admin\DtoClasses.cs" />
+    <Compile Include="WebService\Admin\AdminService.cs" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="WebService\" />
@@ -124,6 +125,5 @@
     <None Include="WebService\Admin\AdminUiService.cs" />
     <None Include="WebService\Admin\StatusService.cs" />
     <None Include="WebService\Admin\AdminLogService.cs" />
-    <None Include="WebService\Admin\AdminService.cs" />
   </ItemGroup>
 </Project>

@@ -4,8 +4,10 @@ using Rainy.WebService.OAuth;
 
 namespace Rainy.WebService
 {
-	// TODO Username/Password should not be use in the Route in the ApiRequest service
+
+	[Route("/api/1.0/")]
 	[Route("/{Username}/{Password}/api/1.0/")]
+	// TODO check if we can remove the DataContract attributes
 	[DataContract]
 	public class ApiRequest : Tomboy.Sync.DTO.ApiRequest, IReturn<Tomboy.Sync.DTO.ApiResponse>
 	{

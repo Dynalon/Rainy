@@ -6,6 +6,9 @@ using Rainy.UserManagement;
 using System.Collections.Generic;
 using Tomboy.Sync.DTO;
 using Tomboy.Sync;
+using Tomboy.Sync.Web;
+using Tomboy.Sync.Filesystem;
+using Tomboy;
 
 namespace Rainy.Tests
 {
@@ -37,6 +40,17 @@ namespace Rainy.Tests
 			// add sample notes
 			sample_notes = AbstractSyncServerTests.GetSomeSampleNotes ()
 				.Select (n => n.ToDTONote ()).ToList ();
+
+			var syncServer = new WebSyncServer (testServer.RainyListenUrl, testServer.GetAccessToken ());
+
+			var storage = new DiskStorage ();
+			var tmpPath = "/tmp/sync1";
+			storage.SetPath (tmpPath);
+			var engine = new Engine (storage);
+			var syncClient = new FilesystemSyncClient (engine, new SyncManifest ());
+
+			var syncManager = new Tomboy.Sync.SyncManager (syncClient, syncServer);
+			syncManager.DoSync ();
 
 			sampleNotes[user.Username] = sample_notes;
 

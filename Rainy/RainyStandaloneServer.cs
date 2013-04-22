@@ -27,7 +27,9 @@ namespace Rainy
 
 		private bool testServer = false;
 
-		public RainyStandaloneServer (Rainy.Interfaces.IDataBackend backend, string listen_url, bool test_server = false)
+		public RainyStandaloneServer (Rainy.Interfaces.IDataBackend backend,
+		                              string listen_url,
+		                              bool test_server = false)
 		{
 			ListenUrl = listen_url;
 			logger = LogManager.GetLogger (this.GetType ());

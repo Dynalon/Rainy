@@ -50,7 +50,7 @@ namespace Rainy
 
 			IDataBackend backend;
 			if (use_backend == "sqlite")
-				backend = new DatabaseBackend (tmpPath, auth: debug_authenticator, reset: true);
+				backend = new DatabaseBackend (tmpPath, reset: true);
 			else
 				backend = new RainyFileSystemBackend (tmpPath, debug_authenticator);
 
