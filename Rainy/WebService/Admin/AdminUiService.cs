@@ -8,10 +8,7 @@ using System.Net;
 namespace Rainy.WebService.Admin
 {
 
-	[Route("/admin","GET")]
-	[Route("/admin/{Filename}","GET")]
-	[Route("/login","GET")]
-	[Route("/login/{Filename}","GET")]
+	[Route("/static/{Filename}","GET")]
 	public class ContentRequest: IReturn<string>
 	{
 		public string Filename { get; set; }

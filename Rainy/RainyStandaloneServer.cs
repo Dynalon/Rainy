@@ -71,6 +71,14 @@ namespace Rainy
 		{
 			testServer = test_server;
 		}
+		public IHttpHandler CheckAndCreateStaticHttpHandler (IHttpRequest req)
+		{
+			var uri = new Uri (req.AbsoluteUri);
+			if (uri.PathAndQuery.StartsWithIgnoreCase ("/srv/")) {
+				return new HttpHandler ();
+			}
+			return null;
+		}
 		public override void Configure (Funq.Container container)
 		{
 			JsConfig.DateHandler = JsonDateHandler.ISO8601;
@@ -86,6 +94,9 @@ namespace Rainy
 				// so we force application/json
 				DefaultContentType = ContentType.Json,
 
+				RawHttpHandlers = { 
+					CheckAndCreateStaticHttpHandler,
+				},
 				// enable cors
 				GlobalResponseHeaders = {
 					{ "Access-Control-Allow-Origin", "*" },
