@@ -3,7 +3,7 @@ using DevDefined.OAuth.Consumer;
 using DevDefined.OAuth.Framework;
 using NUnit.Framework;
 using ServiceStack.ServiceClient.Web;
-using Tomboy.Sync.DTO;
+using Tomboy.Sync.Web.DTO;
 
 namespace Rainy.Tests.OAuth
 {

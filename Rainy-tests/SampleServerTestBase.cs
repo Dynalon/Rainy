@@ -4,7 +4,7 @@ using System.Linq;
 using ServiceStack.ServiceClient.Web;
 using Rainy.UserManagement;
 using System.Collections.Generic;
-using Tomboy.Sync.DTO;
+using Tomboy.Sync.Web.DTO;
 using Tomboy.Sync;
 using Tomboy.Sync.Web;
 using Tomboy.Sync.Filesystem;

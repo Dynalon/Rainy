@@ -1,6 +1,6 @@
 using System;
 using NUnit.Framework;
-using Tomboy.Sync.DTO;
+using Tomboy.Sync.Web.DTO;
 using Rainy.Tests;
 
 namespace Rainy.Tests

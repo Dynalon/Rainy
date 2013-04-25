@@ -2,6 +2,7 @@ using System;
 using System.Net;
 using Rainy.OAuth;
 using System.Linq;
+using DTO = Tomboy.Sync.Web.DTO;
 
 namespace Rainy.WebService
 {
@@ -35,12 +36,12 @@ namespace Rainy.WebService
 			}
 
 			Logger.Debug ("ApiRequest received");
-			var response = new Tomboy.Sync.DTO.ApiResponse ();
+			var response = new DTO.ApiResponse ();
 			var baseUri = ((HttpListenerRequest)this.Request.OriginalRequest).Url;
 			string baseUrl = baseUri.Scheme + "://" + baseUri.Authority + "/";
 
 			// should only be set if authenticated
-			response.UserRef = new Tomboy.Sync.DTO.ContentRef () {
+			response.UserRef = new DTO.ContentRef () {
 				ApiRef = baseUrl + "api/1.0/" + username,
 				Href = baseUrl + username
 			};

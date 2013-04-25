@@ -37,11 +37,10 @@
     <Reference Include="System.Core" />
     <Reference Include="System.Web" />
     <Reference Include="System.Web.Abstractions" />
-    <Reference Include="log4net">
-      <HintPath>..\lib\log4net.dll</HintPath>
-    </Reference>
     <Reference Include="Microsoft.CSharp" />
-    <Reference Include="Mono.Data.Sqlite" />
+    <Reference Include="Mono.Data.Sqlite">
+      <HintPath>..\lib\ServiceStack.OrmLite.Sqlite.Mono.3.9.43\lib\net35\Mono.Data.Sqlite.dll</HintPath>
+    </Reference>
     <Reference Include="nunit.framework, Version=2.4.8.0, Culture=neutral, PublicKeyToken=96d09a1eb7f44a77">
       <Private>False</Private>
     </Reference>
@@ -49,26 +48,29 @@
     <Reference Include="System.Xml" />
     <Reference Include="Mono.Security" />
     <Reference Include="Mono.Posix" />
-    <Reference Include="ServiceStack.Common">
-      <HintPath>..\lib\ServiceStack\ServiceStack.Common.dll</HintPath>
-    </Reference>
-    <Reference Include="ServiceStack.Interfaces">
-      <HintPath>..\lib\ServiceStack\ServiceStack.Interfaces.dll</HintPath>
-    </Reference>
-    <Reference Include="ServiceStack.OrmLite.Sqlite">
-      <HintPath>..\lib\ServiceStack\ServiceStack.OrmLite.Sqlite.dll</HintPath>
-    </Reference>
-    <Reference Include="ServiceStack.OrmLite">
-      <HintPath>..\lib\ServiceStack\ServiceStack.OrmLite.dll</HintPath>
-    </Reference>
     <Reference Include="ServiceStack.ServiceInterface">
-      <HintPath>..\lib\ServiceStack\ServiceStack.ServiceInterface.dll</HintPath>
+      <HintPath>..\lib\ServiceStack.3.9.43\lib\net35\ServiceStack.ServiceInterface.dll</HintPath>
     </Reference>
     <Reference Include="ServiceStack">
-      <HintPath>..\lib\ServiceStack\ServiceStack.dll</HintPath>
+      <HintPath>..\lib\ServiceStack.3.9.43\lib\net35\ServiceStack.dll</HintPath>
+    </Reference>
+    <Reference Include="ServiceStack.Common">
+      <HintPath>..\lib\ServiceStack.Common.3.9.43\lib\net35\ServiceStack.Common.dll</HintPath>
+    </Reference>
+    <Reference Include="ServiceStack.Interfaces">
+      <HintPath>..\lib\ServiceStack.Common.3.9.43\lib\net35\ServiceStack.Interfaces.dll</HintPath>
+    </Reference>
+    <Reference Include="ServiceStack.OrmLite">
+      <HintPath>..\lib\ServiceStack.OrmLite.Sqlite.Mono.3.9.43\lib\net35\ServiceStack.OrmLite.dll</HintPath>
+    </Reference>
+    <Reference Include="log4net">
+      <HintPath>..\lib\log4net.dll</HintPath>
     </Reference>
     <Reference Include="ServiceStack.Text">
-      <HintPath>..\tomboy-library\Tomboy-library\Libs\ServiceStack\ServiceStack.Text.dll</HintPath>
+      <HintPath>..\lib\ServiceStack.Text.3.9.43\lib\net35\ServiceStack.Text.dll</HintPath>
+    </Reference>
+    <Reference Include="ServiceStack.OrmLite.Sqlite">
+      <HintPath>..\lib\ServiceStack.OrmLite.Sqlite.Mono.3.9.43\lib\net35\ServiceStack.OrmLite.Sqlite.dll</HintPath>
     </Reference>
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
@@ -80,6 +82,14 @@
     <ProjectReference Include="..\JsonConfig\JsonConfig\JsonConfig.csproj">
       <Project>{10095092-E1E5-441F-9380-B6329F3CFEB4}</Project>
       <Name>JsonConfig</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\tomboy-library-websync\DevDefined.OAuth\src\DevDefined.OAuth\DevDefined.OAuth.csproj">
+      <Project>{61B700B6-3911-4CEF-8751-7F42CA765068}</Project>
+      <Name>DevDefined.OAuth</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\tomboy-library-websync\tomboy-library-websync.csproj">
+      <Project>{BA3396DF-4D7E-45C0-9BF1-3F52FE6FFA92}</Project>
+      <Name>tomboy-library-websync</Name>
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>

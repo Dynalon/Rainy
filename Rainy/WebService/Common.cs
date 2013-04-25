@@ -3,8 +3,8 @@ using log4net;
 using System;
 using ServiceStack.ServiceHost;
 using Rainy.WebService.OAuth;
-using ServiceStack.Text;
 using System.Linq;
+using ServiceStack.Text;
 
 namespace Rainy.WebService
 {

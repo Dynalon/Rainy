@@ -5,16 +5,18 @@ using ServiceStack.Common;
 using ServiceStack.ServiceHost;
 using Tomboy;
 using Rainy.Interfaces;
-using Tomboy.Sync.DTO;
+using Tomboy.Sync.Web.DTO;
+using DTO = Tomboy.Sync.Web.DTO;
+
 
 namespace Rainy.WebService
 {
 	public class NotesService : RainyServiceBase
 	{
 		protected static IDataBackend DataBackend;
-		protected static Tomboy.Sync.DTO.GetNotesResponse GetStoredNotes (INoteRepository note_repo)
+		protected static DTO.GetNotesResponse GetStoredNotes (INoteRepository note_repo)
 		{
-			var notes = new List<Tomboy.Sync.DTO.DTONote> ();
+			var notes = new List<DTO.DTONote> ();
 			var stored_notes = note_repo.Engine.GetNotes ();
 			
 			foreach (var kvp in stored_notes) {
@@ -28,7 +30,7 @@ namespace Rainy.WebService
 				notes.Add (note);
 			}
 			
-			var return_notes = new Tomboy.Sync.DTO.GetNotesResponse ();
+			var return_notes = new DTO.GetNotesResponse ();
 			return_notes.Notes = notes;
 			return_notes.LatestSyncRevision = note_repo.Manifest.LastSyncRevision;
 

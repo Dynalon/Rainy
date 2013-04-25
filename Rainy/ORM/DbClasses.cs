@@ -1,4 +1,4 @@
-using Tomboy.Sync.DTO;
+using Tomboy.Sync.Web.DTO;
 using ServiceStack.DataAnnotations;
 using Tomboy.Sync;
 using ServiceStack.OrmLite;

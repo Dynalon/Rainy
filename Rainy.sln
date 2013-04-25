@@ -13,6 +13,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Rainy-tests", "Rainy-tests\
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "tomboy-library-websync", "tomboy-library-websync\tomboy-library-websync.csproj", "{BA3396DF-4D7E-45C0-9BF1-3F52FE6FFA92}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DevDefined.OAuth", "tomboy-library-websync\DevDefined.OAuth\src\DevDefined.OAuth\DevDefined.OAuth.csproj", "{61B700B6-3911-4CEF-8751-7F42CA765068}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|x86 = Debug|x86
@@ -36,6 +38,12 @@ Global
 		{29E069BB-47ED-4E03-92F8-35754D22F600}.Default|Any CPU.ActiveCfg = Debug|Any CPU
 		{29E069BB-47ED-4E03-92F8-35754D22F600}.Default|Any CPU.Build.0 = Debug|Any CPU
 		{29E069BB-47ED-4E03-92F8-35754D22F600}.Release|x86.ActiveCfg = Release|Any CPU
+		{61B700B6-3911-4CEF-8751-7F42CA765068}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{61B700B6-3911-4CEF-8751-7F42CA765068}.Debug|x86.Build.0 = Debug|Any CPU
+		{61B700B6-3911-4CEF-8751-7F42CA765068}.Default|Any CPU.ActiveCfg = Debug|Any CPU
+		{61B700B6-3911-4CEF-8751-7F42CA765068}.Default|Any CPU.Build.0 = Debug|Any CPU
+		{61B700B6-3911-4CEF-8751-7F42CA765068}.Release|x86.ActiveCfg = Release|Any CPU
+		{61B700B6-3911-4CEF-8751-7F42CA765068}.Release|x86.Build.0 = Release|Any CPU
 		{7BB12286-1E31-4CBE-9C07-9E66D4AF0336}.Debug|x86.ActiveCfg = Debug|x86
 		{7BB12286-1E31-4CBE-9C07-9E66D4AF0336}.Debug|x86.Build.0 = Debug|x86
 		{7BB12286-1E31-4CBE-9C07-9E66D4AF0336}.Default|Any CPU.ActiveCfg = Debug|x86

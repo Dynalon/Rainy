@@ -22,7 +22,7 @@ namespace Rainy.WebService.OAuth
 		}
 	}
 
-	[Route("oauth/request_token")]
+	[Route("/oauth/request_token")]
 	public class OAuthRequestTokenRequest : IReturnVoid, IRequiresRequestStream
 	{
 		public Stream RequestStream { get; set; }

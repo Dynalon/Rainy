@@ -1,28 +1,31 @@
 using NUnit.Framework;
 using Tomboy.Sync.Web;
 
-namespace Rainy.Tests.WebSync
+namespace Rainy.Tests
 {
+
 	[TestFixture]
-	public class WebSyncServerTests : Tomboy.Sync.AbstractSyncServerTests 
+	public class WebSyncServerTests : Tomboy.Sync.AbstractSyncManagerTests
 	{
 		protected RainyTestServer testServer;
-
 		[SetUp]
-		public void SetUp ()
+		public new void SetUp ()
 		{
-			CreateSomeSampleNotes ();
-
 			testServer = new RainyTestServer ();
 			testServer.Start ();
+
 			syncServer = new WebSyncServer (testServer.BaseUri, testServer.GetAccessToken ());
 		}
 
 		[TearDown]
-		public void TearDown ()
+		public new void TearDown ()
 		{
 			testServer.Stop ();
 		}
-	}
 
+		protected override void ClearServer (bool reset = false)
+		{
+			return;
+		}
+	}
 }

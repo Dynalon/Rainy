@@ -1,5 +1,6 @@
 using System;
 using System.Net;
+using DTO = Tomboy.Sync.Web.DTO;
 
 namespace Rainy.WebService
 {
@@ -8,7 +9,7 @@ namespace Rainy.WebService
 	{
 		public object Get (UserRequest request)
 		{
-			var u = new Tomboy.Sync.DTO.UserResponse ();
+			var u = new DTO.UserResponse ();
 			try {
 				var baseUri = ((HttpListenerRequest)this.Request.OriginalRequest).Url;
 				string baseUrl = baseUri.Scheme + "://" + baseUri.Authority + "/";
@@ -17,7 +18,7 @@ namespace Rainy.WebService
 				u.Firstname = "Not";
 				u.Lastname = "Important";
 
-				u.NotesRef = new Tomboy.Sync.DTO.ContentRef () {
+				u.NotesRef = new DTO.ContentRef () {
 				ApiRef = baseUrl + "/api/1.0/" + request.Username + "/notes",
 				Href = baseUrl + "/api/1.0/" + request.Username + "/notes"
 			};

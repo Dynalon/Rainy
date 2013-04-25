@@ -40,11 +40,8 @@ build:
 
 	# Fetching Rainy's submodules
 	@git submodule init
-	@git submodule update
+	@git submodule update --recursive
 
-	# Fetching tomboy-library's submodules
-	@cd tomboy-library/ && git submodule init && git submodule update && cd ..
-	
 	$(XBUILD) $(XBUILD_ARGS) Rainy.sln
 
 release: clean pack

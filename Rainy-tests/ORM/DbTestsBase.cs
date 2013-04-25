@@ -1,5 +1,5 @@
 using System;
-using Tomboy.Sync.DTO;
+using Tomboy.Sync.Web.DTO;
 using NUnit.Framework;
 using System.Data;
 using ServiceStack.OrmLite;

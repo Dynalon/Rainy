@@ -4,7 +4,7 @@ using DevDefined.OAuth.Consumer;
 using DevDefined.OAuth.Framework;
 using System.Net;
 using System.Linq;
-using Tomboy.Sync.DTO;
+using Tomboy.Sync.Web.DTO;
 using Rainy.OAuth;
 using System.IO;
 using Tomboy.Sync.Web;

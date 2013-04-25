@@ -4,7 +4,7 @@ using System;
 using System.Data;
 using System.Collections.Generic;
 using System.Linq;
-using Tomboy.Sync.DTO;
+using Tomboy.Sync.Web.DTO;
 
 namespace Rainy.Db
 {
