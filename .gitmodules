@@ -6,4 +6,4 @@
 	url = https://github.com/Dynalon/JsonConfig.git
 [submodule "tomboy-library-websync"]
 	path = tomboy-library-websync
-	url = git@github.com:Dynalon/tomboy-library-websync.git
+	url = https://github.com/Dynalon/tomboy-library-websync.git
