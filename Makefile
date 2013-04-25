@@ -39,8 +39,7 @@ build:
 ##pkg-config --atleast-version=$(MIN_MONO_VERSION) mono; if [ $$? != "0" ]; then $(error "mono >=2.10.9 is required");
 
 	# Fetching Rainy's submodules
-	@git submodule init
-	@git submodule update --recursive
+	@git submodule update --init --recursive
 
 	$(XBUILD) $(XBUILD_ARGS) Rainy.sln
 
