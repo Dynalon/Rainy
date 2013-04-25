@@ -3,9 +3,10 @@
 //
 // Authors:
 //	Gonzalo Paniagua Javier (gonzalo@ximian.com)
+//  Timo Dörr (timo@latecrew.de)
 //
 // (C) 2002 Ximian, Inc (http://www.ximian.com)
-//
+// (C) 2013 Timo Dörr
 
 //
 // Permission is hereby granted, free of charge, to any person obtaining
@@ -45,8 +46,6 @@ namespace ServiceStack.WebHost.Endpoints.Support
 {
 	class StaticFileHandler : IHttpHandler, IServiceStackHttpHandler
 	{
-		private static readonly ILog log = LogManager.GetLogger(typeof (StaticFileHandler));
-
 		public void ProcessRequest(HttpContext context)
 		{
 			ProcessRequest(

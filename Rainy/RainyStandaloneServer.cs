@@ -75,7 +75,7 @@ namespace Rainy
 		{
 			var uri = new Uri (req.AbsoluteUri);
 			if (uri.PathAndQuery.StartsWithIgnoreCase ("/srv/")) {
-				return new HttpHandler ();
+				return null;
 			}
 			return null;
 		}
