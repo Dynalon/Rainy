@@ -130,6 +130,5 @@
     <None Include="WebService\Admin\AdminUiService.cs" />
     <None Include="WebService\Admin\StatusService.cs" />
     <None Include="WebService\Admin\AdminLogService.cs" />
-    <None Include="StaticFileHandler.cs" />
   </ItemGroup>
 </Project>
