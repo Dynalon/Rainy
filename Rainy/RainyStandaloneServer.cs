@@ -10,6 +10,8 @@ using ServiceStack.Text;
 using ServiceStack.WebHost.Endpoints.Extensions;
 using ServiceStack.ServiceHost;
 using System.Web;
+using System.IO;
+using System.Net;
 
 namespace Rainy
 {
@@ -88,6 +90,23 @@ namespace Rainy
 			// which is fatal when running with unit tests, so don't call the 
 			// SetConfig when running as a testserver
 			if (testServer) return;
+
+			ResponseFilters.Add((httpReq, httpRes, dto) =>
+			                                       {
+				using (var ms = new MemoryStream())
+				{
+					EndpointHost.ContentTypeFilter.SerializeToStream(
+						new SerializationContext(httpReq.ResponseContentType), dto, ms);
+					
+					var bytes = ms.ToArray();
+					
+					var listenerResponse = (HttpListenerResponse)httpRes.OriginalResponse;
+					listenerResponse.SendChunked = false;
+					listenerResponse.ContentLength64 = bytes.Length;
+					listenerResponse.OutputStream.Write(bytes, 0, bytes.Length);
+					httpRes.EndServiceStackRequest();
+				}
+			});
 
 			SetConfig (new EndpointHostConfig {
 				// not all tomboy clients send the correct content-type
