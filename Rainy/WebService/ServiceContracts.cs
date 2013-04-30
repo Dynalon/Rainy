@@ -6,8 +6,8 @@ using DTO = Tomboy.Sync.Web.DTO;
 namespace Rainy.WebService
 {
 
-	[Route("/api/1.0/")]
-	[Route("/{Username}/{Password}/api/1.0/")]
+	[Route("/api/1.0/", "GET")]
+	[Route("/{Username}/{Password}/api/1.0/", "GET")]
 	// TODO check if we can remove the DataContract attributes
 	[DataContract]
 	public class ApiRequest : DTO.ApiRequest, IReturn<DTO.ApiResponse>
@@ -18,7 +18,7 @@ namespace Rainy.WebService
 		public string Password { get; set; }
 	}
 
-	[Route("/api/1.0/{Username}/")]
+	[Route("/api/1.0/{Username}/", "GET")]
 	[OAuthRequired]
 	[DataContract]
 	public class UserRequest : IReturn<DTO.UserResponse>

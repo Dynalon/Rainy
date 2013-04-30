@@ -14,6 +14,7 @@ using System.Linq;
 namespace Rainy.WebService.Admin
 {
 	[AdminPasswordRequired]
+	[Api("Administration API")]
 	[Route("/api/admin/user/","POST, PUT, DELETE, OPTIONS")]
 	[Route("/api/admin/user/{Username}","GET, OPTIONS")]
 	public class UserRequest : DTOUser, IReturn<DTOUser>
@@ -21,6 +22,7 @@ namespace Rainy.WebService.Admin
 	}
 
 	[AdminPasswordRequired]
+	[Api("Administration API")]
 	[Route("/api/admin/alluser/","GET, OPTIONS")]
 	public class AllUserRequest : IReturn<List<DTOUser>>
 	{

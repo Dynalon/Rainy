@@ -72,6 +72,9 @@
     <Reference Include="ServiceStack.Interfaces">
       <HintPath>..\lib\ServiceStack.Common.3.9.43\lib\net35\ServiceStack.Interfaces.dll</HintPath>
     </Reference>
+    <Reference Include="ServiceStack.Api.Swagger">
+      <HintPath>..\lib\ServiceStack.Api.Swagger.3.9.43\lib\net35\ServiceStack.Api.Swagger.dll</HintPath>
+    </Reference>
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <ItemGroup>
