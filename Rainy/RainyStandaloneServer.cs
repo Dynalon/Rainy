@@ -95,6 +95,8 @@ namespace Rainy
 			                                       {
 				using (var ms = new MemoryStream())
 				{
+					httpRes.ContentType = "application/json";
+
 					EndpointHost.ContentTypeFilter.SerializeToStream(
 						new SerializationContext(httpReq.ResponseContentType), dto, ms);
 					
