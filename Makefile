@@ -2,7 +2,6 @@ RELEASEVER=0.2.3
 ZIPDIR=rainy-$(RELEASEVER)
 BINDIR=$(shell pwd)/Rainy/bin/Debug
 RELEASEDIR=$(shell pwd)/release
-TMPDIR=$(shell pwd)/.temp
 
 MONO=$(shell which mono)
 XBUILD=$(shell which xbuild)
@@ -59,7 +58,6 @@ clean:
 	rm -rf Rainy/obj/*
 	rm -rf $(ZIPDIR)
 	rm -rf $(ZIPDIR).zip
-	rm -rf $(TMPDIR)
 	rm -rf $(BINDIR)/*
 	rm -rf $(RELEASEDIR)/*.exe
 	rm -rf $(RELEASEDIR)/*.mdb
