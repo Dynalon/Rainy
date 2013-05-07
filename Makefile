@@ -2,7 +2,7 @@ RELEASEVER=0.2.3
 ZIPDIR=rainy-$(RELEASEVER)
 BINDIR=$(shell pwd)/Rainy/bin/Debug
 RELEASEDIR=$(shell pwd)/release
-TMPDIR=$(shell pwd)/.tmp
+TMPDIR=$(shell pwd)/.temp
 
 MONO=$(shell which mono)
 XBUILD=$(shell which xbuild)
