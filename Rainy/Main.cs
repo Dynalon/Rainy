@@ -2,7 +2,6 @@ using System;
 using System.Threading;
 using System.Collections.Generic;
 using System.IO;
-
 using log4net;
 
 using JsonConfig;
