@@ -55,18 +55,23 @@ namespace Rainy.Db
 		[Test]
 		public void StoreSomeNotes ()
 		{
-			string username = "test";
 			var sample_notes = GetSampleNotes ();
 
-			using (var store = new DbStorage (username)) {
+			using (var store = new DbStorage (testUser)) {
 				sample_notes.ForEach (n => store.SaveNote (n));
 			}
 			// now check if we have stored that notes
-			using (var store = new DbStorage (username)) {
+			using (var store = new DbStorage (testUser)) {
 				var stored_notes = store.GetNotes ().Values.ToList ();
 
 				Assert.AreEqual (sample_notes.Count, stored_notes.Count);
 				stored_notes.ForEach(n => Assert.Contains (n, sample_notes));
+
+				// check that the dates are still the same
+				stored_notes.ForEach(n => {
+					var sample_note = sample_notes.First(sn => sn.Guid == n.Guid);
+					Assert.AreEqual (n.ChangeDate, sample_note.ChangeDate);
+				});
 
 			}
 		}
@@ -76,7 +81,7 @@ namespace Rainy.Db
 		{
 			StoreSomeNotes ();
 
-			using (var store = new DbStorage ("test")) {
+			using (var store = new DbStorage (testUser)) {
 				var stored_notes = store.GetNotes ().Values.ToList ();
 
 				var deleted_note = stored_notes[0];
@@ -94,6 +99,43 @@ namespace Rainy.Db
 				Assert.AreEqual (stored_notes.Count - 3, store.GetNotes ().Values.Count);
 				Assert.That (! store.GetNotes ().Values.Contains (deleted_note));
 			}
+		}
+
+		[Test]
+		public void DateUtcIsCorrectlyStored ()
+		{
+			DbStorage storage = new DbStorage(testUser);
+
+			var tomboy_note = new Note ();
+			tomboy_note.ChangeDate = new DateTime (2000, 1, 1, 0, 0, 0, DateTimeKind.Utc);
+			tomboy_note.CreateDate = tomboy_note.ChangeDate;
+			tomboy_note.MetadataChangeDate = tomboy_note.ChangeDate;
+
+			storage.SaveNote (tomboy_note);
+			var stored_note = storage.GetNotes ().Values.First ();
+
+			storage.Dispose ();
+
+			Assert.AreEqual (tomboy_note.ChangeDate, stored_note.ChangeDate.ToUniversalTime ());
+
+		}
+		[Test]
+		public void DateLocalIsCorrectlyStored ()
+		{
+			DbStorage storage = new DbStorage(testUser);
+			
+			var tomboy_note = new Note ();
+			tomboy_note.ChangeDate = new DateTime (2000, 1, 1, 0, 0, 0, DateTimeKind.Local);
+			tomboy_note.CreateDate = tomboy_note.ChangeDate;
+			tomboy_note.MetadataChangeDate = tomboy_note.ChangeDate;
+			
+			storage.SaveNote (tomboy_note);
+			var stored_note = storage.GetNotes ().Values.First ();
+			
+			storage.Dispose ();
+			
+			Assert.AreEqual (tomboy_note.ChangeDate, stored_note.ChangeDate.ToUniversalTime ());
+			
 		}
 	}
 

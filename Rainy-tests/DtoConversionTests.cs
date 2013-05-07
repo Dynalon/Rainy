@@ -59,9 +59,9 @@ namespace Rainy.Tests.WebSync
 			Assert.AreEqual (tomboy_note.Title, dto_note.Title);
 			Assert.AreEqual (tomboy_note.Text, dto_note.Text);
 			
-			Assert.AreEqual (tomboy_note.ChangeDate, DateTime.Parse (dto_note.ChangeDate));
-			Assert.AreEqual (tomboy_note.CreateDate, DateTime.Parse (dto_note.CreateDate));
-			Assert.AreEqual (tomboy_note.MetadataChangeDate, DateTime.Parse (dto_note.MetadataChangeDate));
+			Assert.AreEqual (tomboy_note.ChangeDate, DateTime.Parse (dto_note.ChangeDate).ToUniversalTime ());
+			Assert.AreEqual (tomboy_note.CreateDate, DateTime.Parse (dto_note.CreateDate).ToUniversalTime ());
+			Assert.AreEqual (tomboy_note.MetadataChangeDate, DateTime.Parse (dto_note.MetadataChangeDate).ToUniversalTime ());
 			
 			Assert.AreEqual (tomboy_note.Guid, dto_note.Guid);
 			
@@ -84,9 +84,9 @@ namespace Rainy.Tests.WebSync
 			Assert.AreEqual (tomboy_note.Title, dto_note.Title);
 			Assert.AreEqual (tomboy_note.Text, dto_note.Text);
 			
-			Assert.AreEqual (tomboy_note.ChangeDate, DateTime.Parse (dto_note.ChangeDate));
-			Assert.AreEqual (tomboy_note.CreateDate, DateTime.Parse (dto_note.CreateDate));
-			Assert.AreEqual (tomboy_note.MetadataChangeDate, DateTime.Parse (dto_note.MetadataChangeDate));
+			Assert.AreEqual (tomboy_note.ChangeDate, DateTime.Parse (dto_note.ChangeDate).ToUniversalTime ());
+			Assert.AreEqual (tomboy_note.CreateDate, DateTime.Parse (dto_note.CreateDate).ToUniversalTime ());
+			Assert.AreEqual (tomboy_note.MetadataChangeDate, DateTime.Parse (dto_note.MetadataChangeDate).ToUniversalTime ());
 			
 			var tag_intersection = dto_note.Tags.Intersect (tomboy_note.Tags.Keys);
 			Assert.AreEqual (dto_note.Tags.Count (), tag_intersection.Count ());
@@ -148,8 +148,7 @@ namespace Rainy.Tests.WebSync
 			
 			Assert.AreEqual (tn1.OpenOnStartup, tn2.OpenOnStartup);
 			
-			// TODO Tags
-			
+			Assert.AreEqual (tn1.Tags.Keys, tn2.Tags.Keys);
 			
 		}
 	}

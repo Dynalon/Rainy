@@ -146,13 +146,13 @@ namespace Rainy.Db
 			// make sure that inserted notes not yet commited can be
 			// retrieved via .Select
 
-			var sample_note = GetDBSampleNote (username: "user");
+			var sample_note = GetDBSampleNote ();
 
 			using (var conn = dbFactory.OpenDbConnection ()) {
 				using (var trans = conn.BeginTransaction ()) {
 					conn.Insert (sample_note);
 					// get the note before it was commited
-					var db_note = conn.Single <DBNote> ("Username = {0}", "user");
+					var db_note = conn.First<DBNote> (u => u.Username == testUser.Username);
 					Assert.That (!ReferenceEquals (db_note, sample_note));
 					Assert.AreEqual (sample_note.Guid, db_note.Guid);
 			
@@ -167,7 +167,7 @@ namespace Rainy.Db
 			// test if we can update a non-existing note
 			// (we assume we can't)
 
-			var sample_note = GetDBSampleNote (username: "test");
+			var sample_note = GetDBSampleNote ();
 
 			using (var conn = dbFactory.OpenDbConnection ()) {
 				conn.Update (sample_note);
@@ -184,14 +184,14 @@ namespace Rainy.Db
 		{
 			// test if it is ok to delete a note that does not exist
 
-			var sample_note = GetDBSampleNote (username: "test");
+			var sample_note = GetDBSampleNote ();
 			
 			using (var conn = dbFactory.OpenDbConnection ()) {
 				conn.Delete (sample_note);
 			}
 			
 			using (var conn = dbFactory.OpenDbConnection ()) {
-				var result = conn.Select<DBNote> ("Username = {0}", "test");
+				var result = conn.Select<DBNote> (u => u.Username == testUser.Username);
 				Assert.AreEqual (0, result.Count);
 			}
 		}
@@ -199,7 +199,7 @@ namespace Rainy.Db
 		[Test]
 		public void DeleteNonExistingNoteDoesNotCancelTransaction ()
 		{
-			var sample_note = GetDBSampleNote (username: "test");
+			var sample_note = GetDBSampleNote ();
 			
 			using (var conn = dbFactory.OpenDbConnection ()) {
 				using (var trans = conn.BeginTransaction ()) {

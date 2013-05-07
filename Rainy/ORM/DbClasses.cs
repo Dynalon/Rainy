@@ -7,6 +7,7 @@ using Rainy.OAuth.SimpleStore;
 using System;
 using DevDefined.OAuth.Storage.Basic;
 using Rainy.UserManagement;
+using System.Runtime.Serialization;
 
 namespace Rainy.Db
 {
@@ -83,33 +84,18 @@ namespace Rainy.Db
 			return dbFactory.OpenDbConnection ();
 		}
 
-		public static void CreateSchema (bool overwrite = false)
+		public static void CreateSchema ()
 		{
 			using (var conn = GetConnection ()) {
-				if (overwrite) {
-					conn.DropAndCreateTable <DBUser> ();
-					conn.DropAndCreateTable <DBNote> ();
-					conn.DropAndCreateTable <DBAccessToken> ();
-					// insert an empty test user
-					// TODO remove this and put into the testcases
-					conn.Insert (new DBUser () {
-						Username = "johndoe",
-						Manifest = new SyncManifest {
-							ServerId = Guid.NewGuid ().ToString ()
-						}
-					});
-				} else {
 					conn.CreateTableIfNotExists <DBUser> ();
 					conn.CreateTableIfNotExists <DBNote> ();
 					conn.CreateTableIfNotExists <DBAccessToken> ();
-				}
-
 			}
 		}
 	}
 	public static class DbClassConverter
 	{
-		public static DBNote ToDBNote (this DTONote dto)
+		public static DBNote ToDBNote (this DTONote dto, DBUser user, bool encrypt = false)
 		{
 			// ServiceStack's .PopulateWith is for some reasons
 			// ORDERS of magnitudes slower than manually copying
@@ -131,9 +117,11 @@ namespace Rainy.Db
 			db.OpenOnStartup = dto.OpenOnStartup;
 			db.Pinned = dto.Pinned;
 
-			return db;
+			db.Username = user.Username;
 
+			return db;
 		}
+
 		public static DTONote ToDTONote (this DBNote db)
 		{
 			var dto = new DTONote ();

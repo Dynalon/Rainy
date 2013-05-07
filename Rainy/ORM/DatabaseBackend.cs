@@ -15,14 +15,14 @@ namespace Rainy
 	{
 		OAuthHandlerBase oauthHandler;
 
-		public DatabaseBackend (string database_path, CredentialsVerifier auth = null, bool reset = false)
+		public DatabaseBackend (string database_path, CredentialsVerifier auth = null)
 		{
 			if (auth == null)
 				oauthHandler = new OAuthDatabaseHandler (DbAuthenticator);
 			else
 				oauthHandler = new OAuthDatabaseHandler (auth);
 
-			DbConfig.CreateSchema (reset);
+			DbConfig.CreateSchema ();
 		}
 		// verifies a given user/password combination
 		protected bool DbAuthenticator (string username, string password)
@@ -40,6 +40,13 @@ namespace Rainy
 		#region IDataBackend implementation
 		public INoteRepository GetNoteRepository (string username)
 		{
+			DBUser user = null;
+			using (var db = DbConfig.GetConnection ()) {
+				user = db.Select<DBUser> (u => u.Username == username)[0];
+				// TODO why doesn't ormlite raise this error?
+				if (user == null)
+					throw new ArgumentException(username);
+			}
 			var rep = new DatabaseNoteRepository (username);
 			return rep;
 		}
@@ -55,34 +62,21 @@ namespace Rainy
 	// maybe move into DatabaseBackend as nested class
 	public class DatabaseNoteRepository : Rainy.Interfaces.INoteRepository
 	{
-
-		private readonly string username;
 		private DbStorage storage;
-		private string manifestPath;
-
 		private Engine engine;
-		private SyncManifest manifest;
 		private IDbConnection dbConnection;
 		private DBUser dbUser;
 
 		public DatabaseNoteRepository (string username)
 		{
-			username = username;
-
 			dbConnection = DbConfig.GetConnection ();
-			storage = new DbStorage (username);
+			dbUser = dbConnection.First<DBUser> (u => u.Username == username);
+		
+			storage = new DbStorage (dbUser);
 			engine = new Engine (storage);
-
-			var db_user = dbConnection.Select <DBUser> ("Username = {0}", username);
-			if (db_user.Count == 0) {
-				dbUser = new DBUser () { Username = username };
-			}
-			else
-				dbUser = db_user[0];
 
 			if (dbUser.Manifest == null || string.IsNullOrEmpty (dbUser.Manifest.ServerId)) {
 				// the user may not yet have synced
-				dbUser.Manifest = new SyncManifest ();
 				dbUser.Manifest.ServerId = Guid.NewGuid ().ToString ();
 			}
 		}

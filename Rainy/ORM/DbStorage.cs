@@ -10,14 +10,14 @@ namespace Rainy.Db
 {
 	public class DbStorage : IStorage, IDisposable
 	{
-		public readonly string Username;
+		public readonly DBUser User;
 		private IDbConnection db;
 		private IDbTransaction trans;
 
-		public DbStorage (string username)
+		public DbStorage (DBUser user)
 		{
 			this.db = DbConfig.GetConnection ();
-			this.Username = username;
+			this.User = user;
 
 			// start everything as a transaction
 			trans = db.BeginTransaction ();
@@ -26,7 +26,8 @@ namespace Rainy.Db
 		#region IStorage implementation
 		public Dictionary<string, Note> GetNotes ()
 		{
-			var notes = db.Select<DBNote> (dbn => dbn.Username == this.Username);
+			var notes = db.Select<DBNote> (dbn => dbn.Username == User.Username);
+
 			// TODO remove the double copying
 			var dict = notes.ToDictionary (n => n.Guid, n => n.ToDTONote ().ToTomboyNote ());
 			return dict;
@@ -40,18 +41,18 @@ namespace Rainy.Db
 		}
 		public void SaveNote (Note note)
 		{
-			var dbNote = note.ToDTONote ().ToDBNote ();
-			dbNote.Username = Username;
+			var dbNote = note.ToDTONote ().ToDBNote (User);
 
 			// unforunately, we can't know if that note already exist
 			// so we delete any previous incarnations of that note and
 			// re-insert
-			db.Delete<DBNote> (n => n.Username == Username && n.Guid == dbNote.Guid);
+			db.Delete<DBNote> (n => n.CompoundPrimaryKey == dbNote.CompoundPrimaryKey);
 			db.Insert (dbNote);
 		}
 		public void DeleteNote (Note note)
 		{
-			db.Delete<DBNote> (n => Username == n.Username &&  n.Guid == note.Guid);
+			var dbNote = note.ToDTONote ().ToDBNote (User);
+			db.Delete<DBNote> (n => n.CompoundPrimaryKey == dbNote.CompoundPrimaryKey);
 		}
 		public void SetConfigVariable (string key, string value)
 		{

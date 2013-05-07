@@ -1,5 +1,7 @@
 using NUnit.Framework;
 using Tomboy.Sync.Web;
+using Rainy.Db;
+using ServiceStack.OrmLite;
 
 namespace Rainy.Tests
 {
@@ -8,6 +10,7 @@ namespace Rainy.Tests
 	public class WebSyncServerTests : Tomboy.Sync.AbstractSyncManagerTests
 	{
 		protected RainyTestServer testServer;
+		protected DBUser testUser;
 		[SetUp]
 		public new void SetUp ()
 		{

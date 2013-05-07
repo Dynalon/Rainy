@@ -19,9 +19,9 @@ namespace Rainy.WebService
 				u.Lastname = "Important";
 
 				u.NotesRef = new DTO.ContentRef () {
-				ApiRef = baseUrl + "/api/1.0/" + request.Username + "/notes",
-				Href = baseUrl + "/api/1.0/" + request.Username + "/notes"
-			};
+					ApiRef = baseUrl + "/api/1.0/" + request.Username + "/notes",
+					Href = baseUrl + "/api/1.0/" + request.Username + "/notes"
+				};
 				using (var note_repo = GetNotes (request.Username)) {
 					u.LatestSyncRevision = note_repo.Manifest.LastSyncRevision;
 					u.CurrentSyncGuid = note_repo.Manifest.ServerId;

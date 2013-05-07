@@ -11,6 +11,7 @@ namespace Rainy.Db
 	public class DbTestsBase
 	{
 		protected OrmLiteConnectionFactory dbFactory;
+		protected DBUser testUser;
 		
 		[TestFixtureSetUp]
 		public void FixtureSetUp ()
@@ -28,11 +29,23 @@ namespace Rainy.Db
 		[SetUp]
 		public void SetUp ()
 		{
+			testUser = new DBUser () {
+				Username = "test"
+			};
 			// Start with empty tables in each test run
 			using (var c = dbFactory.OpenDbConnection ()) {
-				c.DropAndCreateTable <DBNote> ();
-				c.DropAndCreateTable <DBUser> ();
-				c.DropAndCreateTable <DBAccessToken> ();
+				using (var t = c.BeginTransaction ()) {
+					c.DropAndCreateTable <DBNote> ();
+					c.DropAndCreateTable <DBUser> ();
+					c.DropAndCreateTable <DBAccessToken> ();
+	
+					c.InsertParam<DBUser> (testUser);
+					t.Commit ();
+				}
+			}
+			using (var c = dbFactory.OpenDbConnection ()) {
+				DBUser user = c.First<DBUser> (u => u.Username == "test");
+				Console.WriteLine (user.Username);
 			}
 		}
 
@@ -55,13 +68,12 @@ namespace Rainy.Db
 				Guid = Guid.NewGuid ().ToString ()
 			};
 		}
-		protected DBNote GetDBSampleNote (string username = "test")
+		protected DBNote GetDBSampleNote ()
 		{
-			var db_note = GetDTOSampleNote ().ToDBNote ();
-			db_note.Username = username;
+			var db_note = GetDTOSampleNote ().ToDBNote (testUser);
 			return db_note;
 		}
-		protected List<DTONote> GetDTOSampleNotes (int num, string username = "test")
+		protected List<DTONote> GetDTOSampleNotes (int num)
 		{
 			var notes = new List<DTONote> ();
 
@@ -70,12 +82,12 @@ namespace Rainy.Db
 			}
 			return notes;
 		}
-		protected List<DBNote> GetDBSampleNotes (int num, string username = "test")
+		protected List<DBNote> GetDBSampleNotes (int num)
 		{
 			var notes = new List<DBNote> ();
 
 			for (int i=0; i < num; i++) {
-				notes.Add (GetDBSampleNote (username));
+				notes.Add (GetDBSampleNote ());
 			}
 
 			return notes;

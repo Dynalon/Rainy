@@ -11,6 +11,7 @@ using Tomboy.Sync.Web;
 using DevDefined.OAuth.Storage.Basic;
 using Rainy.Db;
 using Rainy.Interfaces;
+using ServiceStack.OrmLite;
 
 namespace Rainy
 {
@@ -18,7 +19,7 @@ namespace Rainy
 	// TODO make non-static
 	public class RainyTestServer
 	{
-		public string TEST_USER = "johndoe";
+		public string TEST_USER = "test";
 		public string TEST_PASS = "none";
 		public string RainyListenUrl = "http://127.0.0.1:8080/";
 
@@ -49,8 +50,12 @@ namespace Rainy
 			};
 
 			IDataBackend backend;
-			if (use_backend == "sqlite")
-				backend = new DatabaseBackend (tmpPath, reset: true);
+			if (use_backend == "sqlite") {
+				backend = new DatabaseBackend (tmpPath);
+				using (var c = DbConfig.GetConnection ()) {
+					c.Insert<DBUser>(new DBUser() { Username = TEST_USER });
+				}
+			}
 			else
 				backend = new RainyFileSystemBackend (tmpPath, debug_authenticator);
 
