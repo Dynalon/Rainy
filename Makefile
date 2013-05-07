@@ -38,9 +38,10 @@ build:
 ## this is not working?
 ##pkg-config --atleast-version=$(MIN_MONO_VERSION) mono; if [ $$? != "0" ]; then $(error "mono >=2.10.9 is required");
 
+ifndef TEAMCITY
 	# Fetching Rainy's submodules
 	@git submodule update --init --recursive
-
+endif
 	$(XBUILD) $(XBUILD_ARGS) Rainy.sln
 
 release: clean pack
