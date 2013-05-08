@@ -13,6 +13,7 @@ using System.Web;
 using ServiceStack.Api.Swagger;
 using System.IO;
 using System.Net;
+using ServiceStack.ServiceInterface.Cors;
 
 namespace Rainy
 {
@@ -86,7 +87,6 @@ namespace Rainy
 		{
 			JsConfig.DateHandler = JsonDateHandler.ISO8601;
 
-			Plugins.Add(new SwaggerFeature ());
 
 			// BUG HACK TODO
 			// ServiceStack SetConfig somehow does not like beeing called twice 
@@ -94,7 +94,9 @@ namespace Rainy
 			// SetConfig when running as a testserver
 			if (testServer) return;
 
-			ResponseFilters.Add((httpReq, httpRes, dto) =>
+			Plugins.Add (new SwaggerFeature ());
+
+			/*ResponseFilters.Add((httpReq, httpRes, dto) =>
 			                                       {
 				using (var ms = new MemoryStream())
 				{
@@ -112,7 +114,7 @@ namespace Rainy
 					listenerResponse.OutputStream.Write(bytes, 0, bytes.Length);
 					httpRes.EndServiceStackRequest();
 				}
-			});
+			});*/
 
 			SetConfig (new EndpointHostConfig {
 				// not all tomboy clients send the correct content-type
@@ -135,8 +137,9 @@ namespace Rainy
 					// the Authority header must be whitelisted; it is sent be the rainy-ui
 					// for authentication
 					{ "Access-Control-Allow-Headers", "Content-Type, Authority" },
-				},
+				}, 
 			});
+			
 		}
 	}
 }

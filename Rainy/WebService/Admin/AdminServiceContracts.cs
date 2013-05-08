@@ -14,7 +14,7 @@ namespace Rainy.WebService.Management
 	public class UserRequest : DTOUser, IReturn<DTOUser>
 	{
 	}
-	
+
 	[AdminPasswordRequired]
 	[Route("/api/admin/alluser/","GET")]
 	public class AllUserRequest : IReturn<DTOUser[]>
@@ -36,9 +36,11 @@ namespace Rainy.WebService.Management
 	}
 
 	// email double-opt in verifiycation
+	[Api]
 	[Route("/api/user/signup/verify/{VerifySecret}/", "GET")]
 	public class VerifyUserRequest : IReturnVoid
 	{
+		[ApiMember(Description="The verification key that is sent by email")]
 		public string VerifySecret { get; set; }
 	}
 
