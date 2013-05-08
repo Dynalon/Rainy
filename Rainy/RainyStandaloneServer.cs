@@ -10,6 +10,7 @@ using ServiceStack.Text;
 using ServiceStack.WebHost.Endpoints.Extensions;
 using ServiceStack.ServiceHost;
 using System.Web;
+using ServiceStack.Api.Swagger;
 using System.IO;
 using System.Net;
 
@@ -85,6 +86,8 @@ namespace Rainy
 		{
 			JsConfig.DateHandler = JsonDateHandler.ISO8601;
 
+			Plugins.Add(new SwaggerFeature ());
+
 			// BUG HACK TODO
 			// ServiceStack SetConfig somehow does not like beeing called twice 
 			// which is fatal when running with unit tests, so don't call the 
@@ -103,6 +106,7 @@ namespace Rainy
 					var bytes = ms.ToArray();
 					
 					var listenerResponse = (HttpListenerResponse)httpRes.OriginalResponse;
+					httpRes.ContentType = "application/json";
 					listenerResponse.SendChunked = false;
 					listenerResponse.ContentLength64 = bytes.Length;
 					listenerResponse.OutputStream.Write(bytes, 0, bytes.Length);
@@ -115,9 +119,11 @@ namespace Rainy
 				// so we force application/json
 				DefaultContentType = ContentType.Json,
 
+
 				RawHttpHandlers = { 
 					CheckAndCreateStaticHttpHandler,
 				},
+
 				// enable cors
 				GlobalResponseHeaders = {
 					{ "Access-Control-Allow-Origin", "*" },
