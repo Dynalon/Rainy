@@ -57,18 +57,27 @@ namespace Rainy.WebService
 		}
 	}
 
-	[RequestLogFilter]
-	[ResponseLogFilter]
-	public abstract class RainyServiceBase : Service
+	public abstract class RainyNoteServiceBase : RainyServiceBase
 	{
+		public RainyNoteServiceBase () : base ()
+		{
+		}
 		protected Rainy.Interfaces.INoteRepository GetNotes (string username)
 		{
 			return RainyStandaloneServer.DataBackend.GetNoteRepository (username);
 		}
+
+	}
+
+	[RequestLogFilter]
+	[ResponseLogFilter]
+	public abstract class RainyServiceBase : Service
+	{
 		protected ILog Logger;
 		public RainyServiceBase ()
 		{
 			Logger = LogManager.GetLogger (GetType ());
 		}
 	}
+
 }

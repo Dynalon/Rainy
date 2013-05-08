@@ -10,23 +10,11 @@ using ServiceStack.ServiceInterface;
 using ServiceStack.ServiceInterface.Cors;
 using Rainy.UserManagement;
 using System.Linq;
+using Rainy.WebService.Admin;
 
-namespace Rainy.WebService.Admin
+namespace Rainy.WebService.Management.Admin
 {
-	[AdminPasswordRequired]
-	[Route("/api/admin/user/","POST, PUT, DELETE, OPTIONS")]
-	[Route("/api/admin/user/{Username}","GET, OPTIONS")]
-	public class UserRequest : DTOUser, IReturn<DTOUser>
-	{
-	}
-
-	[AdminPasswordRequired]
-	[Route("/api/admin/alluser/","GET, OPTIONS")]
-	public class AllUserRequest : IReturn<List<DTOUser>>
-	{
-	}
-
-	public class UserService : RainyServiceBase
+	public class UserService : RainyNoteServiceBase
 	{
 		public UserService () : base ()
 		{
@@ -42,16 +30,14 @@ namespace Rainy.WebService.Admin
 		}
 
 		// gets a list of all users
-		public List<DTOUser> Get (AllUserRequest req)
+		public DTOUser[] Get (AllUserRequest req)
 		{
-			List<DTOUser> all_user;
-
+			DTOUser[] all_user;
 			using (var conn = DbConfig.GetConnection ()) {
-				all_user = conn.Select<DBUser> ()
-					.ToList<DTOUser> ();
+				all_user = conn.Select<DBUser> ().ToArray<DTOUser> ();
+				return all_user;
 			}
 
-			return all_user;
 		}
 
 		public DTOUser Get (UserRequest req)

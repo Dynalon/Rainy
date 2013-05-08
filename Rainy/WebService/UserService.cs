@@ -5,7 +5,7 @@ using DTO = Tomboy.Sync.Web.DTO;
 namespace Rainy.WebService
 {
 
-	public class UserService : RainyServiceBase
+	public class UserService : RainyNoteServiceBase
 	{
 		public object Get (UserRequest request)
 		{

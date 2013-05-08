@@ -1,5 +1,6 @@
 using NUnit.Framework;
 using ServiceStack.ServiceClient.Web;
+using JsonConfig;
 
 namespace Rainy.Tests
 {
@@ -13,6 +14,8 @@ namespace Rainy.Tests
 		{
 			testServer = new RainyTestServer ();
 			testServer.Start ();
+
+			Config.Global = Config.ApplyJson (@"{ AdminPassword: '"+ adminPassword + "' }");
 		}
 		[TearDown]
 		public virtual void TearDown ()
@@ -24,7 +27,7 @@ namespace Rainy.Tests
 		{
 			var client = new JsonServiceClient (testServer.RainyListenUrl);
 			client.LocalHttpWebRequestFilter += (request) => {
-				request.Headers.Add ("Authorization", adminPassword);
+				request.Headers.Add ("Authority", adminPassword);
 			};
 
 			return client;

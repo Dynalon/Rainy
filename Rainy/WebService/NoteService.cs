@@ -11,7 +11,7 @@ using DTO = Tomboy.Sync.Web.DTO;
 
 namespace Rainy.WebService
 {
-	public class NotesService : RainyServiceBase
+	public class NotesService : RainyNoteServiceBase
 	{
 		protected static IDataBackend DataBackend;
 		protected static DTO.GetNotesResponse GetStoredNotes (INoteRepository note_repo)

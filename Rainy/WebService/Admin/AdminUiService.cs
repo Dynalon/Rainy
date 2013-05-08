@@ -14,7 +14,7 @@ namespace Rainy.WebService.Admin
 		public string Filename { get; set; }
 	}
 
-	public class AdminUiService : RainyServiceBase
+	public class AdminUiService : RainyNoteServiceBase
 	{
 		public AdminUiService () : base ()
 		{

@@ -30,7 +30,7 @@ namespace Rainy.WebService.OAuth
 
 	[RequestLogFilter]
 	[ResponseLogFilter]
-	public class OAuthService : RainyServiceBase
+	public class OAuthService : RainyNoteServiceBase
 	{
 		public object Any (OAuthRequestTokenRequest request)
 		{
@@ -74,7 +74,7 @@ namespace Rainy.WebService.OAuth
 		public string Verifier { get; set; }
 		public string RedirectUrl { get; set; }
 	}
-	public class OAuthAuthenticateService : RainyServiceBase
+	public class OAuthAuthenticateService : RainyNoteServiceBase
 	{
 		// TODO options preflight for CORS
 		//public object Options ()
@@ -152,7 +152,7 @@ namespace Rainy.WebService.OAuth
 
 	[RequestLogFilter]
 	[ResponseLogFilter]
-	public class OAuthAuthorizeService : RainyServiceBase
+	public class OAuthAuthorizeService : RainyNoteServiceBase
 	{
 		public object Any (OAuthAuthorizeRequest request)
 		{
@@ -186,7 +186,7 @@ namespace Rainy.WebService.OAuth
 
 	[RequestLogFilter]
 	[ResponseLogFilter]
-	public class OAuthAccessTokenService : RainyServiceBase
+	public class OAuthAccessTokenService : RainyNoteServiceBase
 	{
 		public object Any (OAuthAccessTokenRequest request)
 		{

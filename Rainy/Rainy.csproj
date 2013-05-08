@@ -117,6 +117,8 @@
     <Compile Include="makecert.cs" />
     <Compile Include="WebService\Admin\DtoClasses.cs" />
     <Compile Include="WebService\Admin\AdminService.cs" />
+    <Compile Include="WebService\Admin\AdminServiceContracts.cs" />
+    <Compile Include="WebService\Admin\Signup.cs" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="WebService\" />

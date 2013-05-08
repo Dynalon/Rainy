@@ -31,9 +31,16 @@ namespace Rainy.Db
 	public class DBUser : DTOUser
 	{
 		[PrimaryKey]
-		public string Username { get; set; }
+		public override string Username { get; set; }
 
 		public SyncManifest Manifest { get; set; }
+
+		// whether email verifcation has to take place
+		public bool IsVerified { get; set; } 
+		// the verification key 
+		public string VerifySecret { get; set; }
+
+		public bool IsActivated { get; set; }
 
 		public DBUser ()
 		{
@@ -83,13 +90,23 @@ namespace Rainy.Db
 			}
 			return dbFactory.OpenDbConnection ();
 		}
+		public static IDbTransaction GetTransaction ()
+		{
+			return GetConnection ().OpenTransaction ();
+		}
 
-		public static void CreateSchema ()
+		public static void CreateSchema (bool reset = false)
 		{
 			using (var conn = GetConnection ()) {
+				if (reset) {
+					conn.DropAndCreateTable <DBUser> ();
+					conn.DropAndCreateTable <DBNote> ();
+					conn.DropAndCreateTable <DBAccessToken> ();
+				} else {
 					conn.CreateTableIfNotExists <DBUser> ();
 					conn.CreateTableIfNotExists <DBNote> ();
 					conn.CreateTableIfNotExists <DBAccessToken> ();
+				}
 			}
 		}
 	}

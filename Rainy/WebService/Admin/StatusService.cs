@@ -13,7 +13,7 @@ namespace Rainy.WebService.Admin
 	{
 	}
 
-	public class StatusService : RainyServiceBase
+	public class StatusService : RainyNoteServiceBase
 	{
 		public StatusService () : base ()
 		{

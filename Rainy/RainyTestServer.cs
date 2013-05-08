@@ -36,9 +36,6 @@ namespace Rainy
 		public void Start (string use_backend = "sqlite")
 		{
 			tmpPath = "/tmp/rainy-test-data/";
-			if (Directory.Exists (tmpPath)) {
-				Directory.Delete (tmpPath, true);
-			}	
 			Directory.CreateDirectory (tmpPath);
 			DbConfig.SetSqliteFile (Path.Combine (tmpPath, "rainy-test.db"));
 			// tmpPath = Path.GetTempPath () + Path.GetRandomFileName ();
@@ -52,6 +49,7 @@ namespace Rainy
 			IDataBackend backend;
 			if (use_backend == "sqlite") {
 				backend = new DatabaseBackend (tmpPath);
+				DbConfig.CreateSchema(reset: true);
 				using (var c = DbConfig.GetConnection ()) {
 					c.Insert<DBUser>(new DBUser() { Username = TEST_USER });
 				}
@@ -66,7 +64,6 @@ namespace Rainy
 		public void Stop ()
 		{
 			rainyServer.Dispose ();
-			//Directory.Delete (tmpPath, true);
 		}
 
 		public JsonServiceClient GetJsonClient ()

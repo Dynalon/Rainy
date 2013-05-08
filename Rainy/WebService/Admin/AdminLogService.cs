@@ -11,7 +11,7 @@ namespace Rainy.WebService.Admin
 	{
 	}
 
-	public class AdminLogService : RainyServiceBase
+	public class AdminLogService : RainyNoteServiceBase
 	{
 		public AdminLogService () : base ()
 		{
