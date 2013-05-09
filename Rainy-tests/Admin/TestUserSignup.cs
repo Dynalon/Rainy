@@ -6,6 +6,7 @@ using Rainy.Db;
 using ServiceStack.OrmLite;
 using Rainy.WebService.Management;
 using System.Linq;
+using System.Net;
 
 namespace Rainy.Tests.Management
 {
@@ -60,6 +61,22 @@ namespace Rainy.Tests.Management
 				Assert.IsEmpty (db_user.VerifySecret);
 			}
 		}
+		[Test]
+		[ExpectedException(typeof(WebException))]
+		public void UnverifiedUserCannotAcquireAccessToken ()
+		{
+			var user = getTestUser ();
+			client.Post<DTOUser> ("/api/user/signup/new/", user);
+
+			testServer.Stop ();
+			testServer = new RainyTestServer (DatabaseBackend.DbAuthenticator);
+			testServer.Start ();
+
+			testServer.TEST_PASS = user.Password;
+			testServer.TEST_USER = user.Username;
+			testServer.GetAccessToken ();
+
+		}
 
 		[Test]
 		[ExpectedException(typeof(WebServiceException))]
@@ -108,7 +125,7 @@ namespace Rainy.Tests.Management
 		public void PendingUserForActivation ()
 		{
 			var user = getTestUser ();
-			adminClient.Post<DTOUser> ("/api/user/signup/new/", user);
+			client.Post<DTOUser> ("/api/user/signup/new/", user);
 			user.Username = "otheruser";
 			user.EmailAddress = "other@foo.com";
 			client.Post<DTOUser> ("/api/user/signup/new/", user);
@@ -117,6 +134,28 @@ namespace Rainy.Tests.Management
 //			Assert.AreEqual(2, pending.Length);
 			Assert.That (pending.ToList().Where(u => u.Username == "someuser").Count () == 1);
 			Assert.That (pending.ToList().Where(u => u.Username == "otheruser").Count () == 1);
+		}
+
+		[Test]
+		public void PendingUserSuccessfullyActivated ()
+		{
+			var user = getTestUser ();
+			client.Post<DTOUser> ("/api/user/signup/new/", user);
+		
+			// lookup activation key
+			var secret = "";
+			using (var db = DbConfig.GetConnection ()) {
+				var db_user = db.First<DBUser> (u => u.Username == user.Username);
+				secret = db_user.VerifySecret;
+				client.Get<VerifyUserRequest> ("/api/user/signup/verify/" + secret + "/");
+			}
+
+			adminClient.Post<ActivateUserRequest> ("/api/user/signup/activate/" + user.Username + "/", new object());
+
+			using (var db = DbConfig.GetConnection ()) {
+				var db_user = db.First<DBUser> (u => u.Username == user.Username);
+				Assert.IsTrue (db_user.IsActivated);
+			}
 		}
 	}
 }

@@ -25,16 +25,22 @@ namespace Rainy
 			DbConfig.CreateSchema ();
 		}
 		// verifies a given user/password combination
-		protected bool DbAuthenticator (string username, string password)
+		public static bool DbAuthenticator (string username, string password)
 		{
 			DBUser user = null;
 			using (var conn = DbConfig.GetConnection ()) {
 				user = conn.FirstOrDefault<DBUser> (u => u.Username == username && u.Password == password);
 			}
-			if (user != null)
-				return true;
-			else
+			if (user == null)
 				return false;
+
+			if (user.IsActivated == false)
+				return false;
+
+			if (user.IsVerified == false)
+				return false;
+
+			return true;
 		}
 
 		#region IDataBackend implementation
@@ -42,7 +48,7 @@ namespace Rainy
 		{
 			DBUser user = null;
 			using (var db = DbConfig.GetConnection ()) {
-				user = db.Select<DBUser> (u => u.Username == username)[0];
+				user = db.First<DBUser> (u => u.Username == username);
 				// TODO why doesn't ormlite raise this error?
 				if (user == null)
 					throw new ArgumentException(username);

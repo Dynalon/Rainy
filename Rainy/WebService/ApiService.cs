@@ -1,6 +1,5 @@
 using System;
 using System.Net;
-using Rainy.OAuth;
 using System.Linq;
 using DTO = Tomboy.Sync.Web.DTO;
 

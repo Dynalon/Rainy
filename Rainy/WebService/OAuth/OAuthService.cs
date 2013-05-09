@@ -6,6 +6,8 @@ using System.Net;
 using DevDefined.OAuth.Storage.Basic;
 using Rainy.WebService;
 using System.Linq;
+using ServiceStack.Common.Web;
+using Rainy.ErrorHandling;
 
 namespace Rainy.WebService.OAuth
 {
@@ -76,9 +78,6 @@ namespace Rainy.WebService.OAuth
 	}
 	public class OAuthAuthenticateService : RainyNoteServiceBase
 	{
-		// TODO options preflight for CORS
-		//public object Options ()
-
 		public object Get (OAuthAuthenticateRequest request)
 		{
 			// check if the user is authorized
@@ -161,6 +160,12 @@ namespace Rainy.WebService.OAuth
 
 				// unattended authentication, immediately perform token exchange
 				// and use data from the querystring
+
+				bool is_allowed = RainyStandaloneServer.OAuth.Authenticator (request.Username, request.Password);
+				if (!is_allowed) {
+					throw new UnauthorizedException ();
+				}
+				
 				var auth_service = new OAuthAuthenticateService ();
 				var resp = (OAuthAuthenticateResponse) auth_service.TokenExchangeAfterAuthentication (
 					request.Username,

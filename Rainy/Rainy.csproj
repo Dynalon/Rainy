@@ -122,6 +122,7 @@
     <Compile Include="WebService\Admin\AdminService.cs" />
     <Compile Include="WebService\Admin\AdminServiceContracts.cs" />
     <Compile Include="WebService\Admin\Signup.cs" />
+    <Compile Include="ErrorHandling.cs" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="WebService\" />

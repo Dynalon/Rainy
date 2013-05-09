@@ -16,6 +16,7 @@ using Rainy.Db;
 using Rainy.UserManagement;
 using Rainy.WebService.Admin;
 using Rainy.WebService.Management;
+using Rainy.ErrorHandling;
 
 
 namespace Rainy.WebService.Signup
@@ -41,20 +42,20 @@ namespace Rainy.WebService.Signup
 
 			// assert password is safe enough
 			if (!req.Password.IsSafeAsPassword ())
-				throw new WebServiceException ("Password is unsafe");
+				throw new ValidationException () {ErrorMessage = "Password is unsafe"};
 
 			// assert username is not already taken
 			using (var db = DbConfig.GetConnection ()) {
 				var user = db.FirstOrDefault<DBUser> (u => u.Username == req.Username);
 				if (user != null)
-					throw new WebServiceException ("A user by that name already exists");
+					throw new ConflictException () {ErrorMessage = "A user by that name already exists"};
 			}
 
 			// assert email is not already registered
 			using (var db = DbConfig.GetConnection ()) {
 				var user = db.FirstOrDefault<DBUser> (u => u.EmailAddress == req.EmailAddress);
 				if (user != null)
-					throw new WebServiceException ("The emailaddress is already registered");
+					throw new ConflictException () {ErrorMessage = "The emailaddress is already registered"};
 			}
 
 			// assert all required fields are filled

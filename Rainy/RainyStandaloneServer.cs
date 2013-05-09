@@ -14,6 +14,7 @@ using ServiceStack.Api.Swagger;
 using System.IO;
 using System.Net;
 using ServiceStack.ServiceInterface.Cors;
+using ServiceStack.ServiceInterface;
 
 namespace Rainy
 {
@@ -96,25 +97,9 @@ namespace Rainy
 
 			Plugins.Add (new SwaggerFeature ());
 
-			/*ResponseFilters.Add((httpReq, httpRes, dto) =>
-			                                       {
-				using (var ms = new MemoryStream())
-				{
-					httpRes.ContentType = "application/json";
-
-					EndpointHost.ContentTypeFilter.SerializeToStream(
-						new SerializationContext(httpReq.ResponseContentType), dto, ms);
-					
-					var bytes = ms.ToArray();
-					
-					var listenerResponse = (HttpListenerResponse)httpRes.OriginalResponse;
-					httpRes.ContentType = "application/json";
-					listenerResponse.SendChunked = false;
-					listenerResponse.ContentLength64 = bytes.Length;
-					listenerResponse.OutputStream.Write(bytes, 0, bytes.Length);
-					httpRes.EndServiceStackRequest();
-				}
-			});*/
+			// register our custom exception handling
+			this.ExceptionHandler = Rainy.ErrorHandling.ExceptionHandler.CustomExceptionHandler;
+			this.ServiceExceptionHandler = Rainy.ErrorHandling.ExceptionHandler.CustomServiceExceptionHandler;
 
 			SetConfig (new EndpointHostConfig {
 				// not all tomboy clients send the correct content-type

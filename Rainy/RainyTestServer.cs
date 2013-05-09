@@ -31,7 +31,22 @@ namespace Rainy
 		}
 
 		private RainyStandaloneServer rainyServer;
+		private CredentialsVerifier credentialsVerifier;
 		private string tmpPath;
+
+		public RainyTestServer (CredentialsVerifier verifier = null)
+		{
+			// for debugging, we only use a simple single user authentication 
+			if (verifier == null) {
+				credentialsVerifier = (user,pass) => {
+					if (user == TEST_USER  && pass == TEST_PASS) return true;
+					else return false;
+				};
+			}
+			else {
+				credentialsVerifier = verifier;
+			}
+		}
 
 		public void Start (string use_backend = "sqlite")
 		{
@@ -40,22 +55,16 @@ namespace Rainy
 			DbConfig.SetSqliteFile (Path.Combine (tmpPath, "rainy-test.db"));
 			// tmpPath = Path.GetTempPath () + Path.GetRandomFileName ();
 
-			// for debugging, we only use a simple single user authentication 
-			CredentialsVerifier debug_authenticator = (user,pass) => {
-				if (user == TEST_USER  && pass == TEST_PASS) return true;
-				else return false;
-			};
-
 			IDataBackend backend;
 			if (use_backend == "sqlite") {
-				backend = new DatabaseBackend (tmpPath);
+				backend = new DatabaseBackend (tmpPath, credentialsVerifier);
 				DbConfig.CreateSchema(reset: true);
 				using (var c = DbConfig.GetConnection ()) {
 					c.Insert<DBUser>(new DBUser() { Username = TEST_USER });
 				}
 			}
 			else
-				backend = new RainyFileSystemBackend (tmpPath, debug_authenticator);
+				backend = new RainyFileSystemBackend (tmpPath, credentialsVerifier);
 
 			rainyServer = new RainyStandaloneServer (backend, RainyListenUrl, test_server: true);
 
@@ -101,7 +110,7 @@ namespace Rainy
 			};
 
 			var restClient = new JsonServiceClient (BaseUri);
-			var api_ref = restClient.Get<ApiResponse> ("/api/1.0");
+			var api_ref = restClient.Get<ApiResponse> ("api/1.0");
 
 			var session = new OAuthSession (consumerContext, api_ref.OAuthRequestTokenUrl,
 			                                api_ref.OAuthAuthorizeUrl, api_ref.OAuthAccessTokenUrl);

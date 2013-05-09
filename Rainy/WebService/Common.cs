@@ -80,4 +80,21 @@ namespace Rainy.WebService
 		}
 	}
 
+
+	public static class ResponseShortcuts
+	{
+
+		public static void HttpCreated (this IHttpResponse response, IHttpRequest request, string location = null)
+		{
+			response.StatusCode = 204;
+			response.StatusDescription = "Created";
+			response.ContentType = request.ContentType;
+
+			if (!string.IsNullOrEmpty (location))
+				response.AddHeader ("Location", location);
+
+			response.End ();
+		}
+	}
+
 }
