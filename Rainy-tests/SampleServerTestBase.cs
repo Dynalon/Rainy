@@ -27,7 +27,7 @@ namespace Rainy.Tests
 			base.SetUp ();
 			DTOUser user;
 			List<DTONote> sample_notes;
-			JsonServiceClient authed_client, client = GetAdminServiceClient ();
+			JsonServiceClient client = GetAdminServiceClient ();
 
 			user = new DTOUser() {
 				Username = "johndoe",

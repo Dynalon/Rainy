@@ -72,11 +72,38 @@ namespace Rainy.Tests.Management
 			testServer = new RainyTestServer (DatabaseBackend.DbAuthenticator);
 			testServer.Start ();
 
-			testServer.TEST_PASS = user.Password;
 			testServer.TEST_USER = user.Username;
+			testServer.TEST_PASS = user.Password;
+
 			testServer.GetAccessToken ();
 
 		}
+
+		[Test]
+		[ExpectedException(typeof(WebException))]
+		public void UnactivatedUserCannotAcquireAccessToken ()
+		{
+			var user = getTestUser ();
+			client.Post<DTOUser> ("/api/user/signup/new/", user);
+
+			// lookup activation key
+			var secret = "";
+			using (var db = DbConfig.GetConnection ()) {
+				var db_user = db.First<DBUser> (u => u.Username == user.Username);
+				secret = db_user.VerifySecret;
+				client.Get<VerifyUserRequest> ("/api/user/signup/verify/" + secret + "/");
+			}
+
+			testServer.Stop ();
+			testServer = new RainyTestServer (DatabaseBackend.DbAuthenticator);
+			testServer.TEST_USER = user.Username;
+			testServer.TEST_PASS = user.Password;
+			testServer.Start ();
+
+			testServer.GetAccessToken ();
+
+		}
+
 
 		[Test]
 		[ExpectedException(typeof(WebServiceException))]

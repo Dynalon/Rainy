@@ -10,14 +10,6 @@ namespace Rainy.Db
 	[TestFixture()]
 	public class DbStorageTests : DbTestsBase
 	{
-		private IDbConnection dbConnection;
-
-		[SetUp]
-		public void SetUp ()
-		{
-			this.dbConnection = this.dbFactory.OpenDbConnection ();
-		}
-
 		protected List<Note> GetSampleNotes ()
 		{
 			var sample_notes = new List<Note> ();
