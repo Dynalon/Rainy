@@ -29,14 +29,34 @@ namespace Rainy
 
 		public RainyStandaloneServer (Rainy.Interfaces.IDataBackend backend, string listen_url, bool test_server = false)
 		{
-			ListenUrl = listen_url;
 			logger = LogManager.GetLogger (this.GetType ());
-			testServer = test_server;
 
+			// servicestack expects trailing slash, else error is thrown
+			if (!listen_url.EndsWith ("/")) listen_url += "/";
+
+			// TODOD BUG WORKAROUND
+			// if the ListenUrl has not an explicit port specified and using https
+			// the HttpListener will not bind to port 443 - this might be a mono bug
+			// in HttpListener
+			if (listen_url == "http://*/") {
+				ListenUrl = "http://*:80/";
+			} else if (listen_url == "https://*/") {
+				ListenUrl = "https://*:443/";
+			} else {
+				var uri = new Uri(listen_url);
+				if (uri.Scheme.ToLower () == "https" && !uri.Authority.Contains (":")) {
+					ListenUrl = "https://" + uri.Authority + ":443" + uri.PathAndQuery;
+				} else if (uri.Scheme.ToLower () == "http" && !uri.Authority.Contains (":")) {
+					ListenUrl = "http://" + uri.Authority + ":80" + uri.PathAndQuery;
+				} else {
+					ListenUrl = listen_url;
+				}
+			} // END WORKAROUND
+
+			testServer = test_server;
 			OAuth = backend.OAuth;
 
 			DataBackend = backend;
-
 		}
 		public void Start ()
 		{

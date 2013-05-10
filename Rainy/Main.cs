@@ -130,8 +130,7 @@ namespace Rainy
 				logger.InfoFormat ("no ListenUrl set in the settings.conf, using the default: {0}",
 				                   listen_url);
 			}
-			// servicestack expects trailing slash, else error is thrown
-			if (!listen_url.EndsWith ("/")) listen_url += "/";
+
 
 			ConfigureSslCerts (listen_url, cert_file, pvk_file);
 
