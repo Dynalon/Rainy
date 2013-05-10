@@ -11,6 +11,7 @@ using ServiceStack.ServiceInterface.Cors;
 using Rainy.UserManagement;
 using System.Linq;
 using Rainy.WebService.Admin;
+using Rainy.ErrorHandling;
 
 namespace Rainy.WebService.Management.Admin
 {
@@ -18,15 +19,6 @@ namespace Rainy.WebService.Management.Admin
 	{
 		public UserService () : base ()
 		{
-		}
-	
-		public HttpResult Options (UserRequest req)
-		{
-			return new HttpResult ();
-		}
-		public HttpResult Options (AllUserRequest req)
-		{
-			return new HttpResult ();
 		}
 
 		// gets a list of all users
@@ -48,7 +40,9 @@ namespace Rainy.WebService.Management.Admin
 				found_user = conn.FirstOrDefault<DBUser> ("Username = {0}", req.Username);
 			}
 
-			if (found_user == null) throw new Exception ("User not found!");
+			if (found_user == null)
+				throw new InvalidRequestDtoException (){ErrorMessage = "User not found!"};
+
 			return (DTOUser) found_user;
 		}
 
@@ -122,22 +116,12 @@ namespace Rainy.WebService.Management.Admin
 			new_user.Username = new_user.Username.ToLower ();
 
 			using (var conn = DbConfig.GetConnection ()) {
-				try {
-					var existing_user = conn.FirstOrDefault<DBUser> ("Username = {0}", new_user.Username);
-					if (existing_user != null)
-						throw new Exception ("A user by that name already exists");
+				var existing_user = conn.FirstOrDefault<DBUser> ("Username = {0}", new_user.Username);
+				if (existing_user != null)
+					throw new ConflictException (){ErrorMessage = "A user by that name already exists"};
 
-					conn.Insert<DBUser> (new_user);
-				} catch (Exception e) {
-					Logger.DebugFormat ("error inserting user {0} into the database, msg was {1}",
-					                    new_user.Username, e.Message);
-					return new HttpResult {
-						StatusCode = HttpStatusCode.Conflict,
-						StatusDescription = "Conflict! " + e.Message
-					};
-				}
+				conn.Insert<DBUser> (new_user);
 			}
-
 
 			return new HttpResult (new_user) {
 				StatusCode = HttpStatusCode.Created,

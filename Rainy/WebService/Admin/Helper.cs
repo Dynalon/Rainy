@@ -5,6 +5,7 @@ using log4net;
 using JsonConfig;
 using ServiceStack.Common.Web;
 using System.Text.RegularExpressions;
+using Rainy.ErrorHandling;
 
 namespace Rainy.WebService.Admin
 {
@@ -61,24 +62,13 @@ namespace Rainy.WebService.Admin
 
 		public void RequestFilter (IHttpRequest request, IHttpResponse response, object requestDto)
 		{
-			// jQuery & Co. do not send the Authority header for options preflight
-			// so we need to accept OPTIONS requests without password
-			if (request.HttpMethod == "OPTIONS") {
+			var authority_header = request.Headers ["Authority"];
+			if (!string.IsNullOrEmpty (authority_header) &&
+				authority_header == Config.Global.AdminPassword) {
+				// auth worked
 				return;
 			}
-
-			try {
-				var authority_header = request.Headers ["Authority"];
-				if (!string.IsNullOrEmpty (authority_header) &&
-				    authority_header == Config.Global.AdminPassword) {
-					// auth worked
-					return;
-				}
-			} catch (Exception e) {
-				Logger.Warn ("Admin authentication failed");
-			}
-			response.ReturnAuthRequired ();
-			return;
+			throw new UnauthorizedException () {ErrorMessage = "Wrong password"};
 		}
 	}
 }

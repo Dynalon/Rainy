@@ -1,13 +1,12 @@
 using System;
-using ServiceStack.ServiceHost;
-using DevDefined.OAuth.Framework;
 using System.IO;
 using System.Net;
+using DevDefined.OAuth.Framework;
 using DevDefined.OAuth.Storage.Basic;
-using Rainy.WebService;
-using System.Linq;
-using ServiceStack.Common.Web;
+using ServiceStack.ServiceHost;
+using ServiceStack.Text;
 using Rainy.ErrorHandling;
+using Rainy.WebService;
 
 namespace Rainy.WebService.OAuth
 {
@@ -24,17 +23,11 @@ namespace Rainy.WebService.OAuth
 		}
 	}
 
-	[Route("/oauth/request_token")]
-	public class OAuthRequestTokenRequest : IReturnVoid, IRequiresRequestStream
-	{
-		public Stream RequestStream { get; set; }
-	}
-
 	[RequestLogFilter]
 	[ResponseLogFilter]
-	public class OAuthService : RainyNoteServiceBase
+	public class OAuthRequestTokenService : RainyNoteServiceBase
 	{
-		public object Any (OAuthRequestTokenRequest request)
+		public object Get (OAuthRequestTokenRequest request)
 		{
 			// keep this line to inspect the Request in monodevelop's debugger 
 			// really helps debugging API calls
@@ -42,40 +35,23 @@ namespace Rainy.WebService.OAuth
 
 			HttpWebRequest original_request = ((HttpListenerRequest)Request.OriginalRequest).ToWebRequest ();
 
-			try {
-				IOAuthContext context = new OAuthContextBuilder ().FromWebRequest (original_request, request.RequestStream);
-				IToken token = RainyStandaloneServer.OAuth.Provider.GrantRequestToken (context);
-				Logger.DebugFormat ("granting request token {0} to consumer", token);
+			IOAuthContext context = new OAuthContextBuilder ().FromWebRequest (original_request, request.RequestStream);
+			IToken token = RainyStandaloneServer.OAuth.Provider.GrantRequestToken (context);
+			Logger.DebugFormat ("granting request token {0} to consumer", token);
+			Response.StatusCode = 200;
+			Response.Write (token.ToString ());
+			Response.End ();
 
-				Response.StatusCode = 200;
-				Response.Write (token.ToString ());
-			} catch (Exception e) {
-				Logger.ErrorFormat ("Caught exception: {0}", e.Message);
-				Response.StatusCode = 500;
-				Response.StatusDescription = e.Message;
-			} finally {
-				Response.Close ();
-			}
 			return null;
+		}
+		public object Post (OAuthRequestTokenRequest request)
+		{
+			// i.e. ConBoy only supported POST Auth which is valid accoding to the OAuth RFC, but not yet
+			// supported in Rainy
+			throw new RainyBaseException () {ErrorMessage = "Usage of POST for OAuth authorization is currently not supported. Use GET instead."};
 		}
 	}
 
-
-	// The authenticate server is NOT part of the Tomboy/Rainy/SNowy/OAuth standard but rather a helper
-	// service that we can call via JSON from Javascript to authenticate a user. The verifier
-	// we receive is our proof to the server that we authenticated successfully
-	[Route("/oauth/authenticate")]
-	public class OAuthAuthenticateRequest : IReturn<OAuthAuthenticateResponse>
-	{
-		public string Username { get; set; }
-		public string Password { get; set; }
-		public string RequestToken { get; set; }
-	}
-	public class OAuthAuthenticateResponse
-	{
-		public string Verifier { get; set; }
-		public string RedirectUrl { get; set; }
-	}
 	public class OAuthAuthenticateService : RainyNoteServiceBase
 	{
 		public object Get (OAuthAuthenticateRequest request)
@@ -99,6 +75,7 @@ namespace Rainy.WebService.OAuth
 
 			return TokenExchangeAfterAuthentication (request.Username, request.Password, request.RequestToken);
 		}
+
 		public object TokenExchangeAfterAuthentication (string username, string password, string token)
 		{
 			var response = new OAuthAuthenticateResponse ();
@@ -140,20 +117,11 @@ namespace Rainy.WebService.OAuth
 		}
 	}
 
-
-	[Route("/oauth/authorize/")]
-	[Route("/oauth/authorize/{Username}/{Password}/")]
-	public class OAuthAuthorizeRequest : IReturnVoid
-	{
-		public string Username { get; set; }
-		public string Password { get; set; }
-	}
-
 	[RequestLogFilter]
 	[ResponseLogFilter]
 	public class OAuthAuthorizeService : RainyNoteServiceBase
 	{
-		public object Any (OAuthAuthorizeRequest request)
+		public object Get (OAuthAuthorizeRequest request)
 		{
 			if (!string.IsNullOrEmpty (request.Username) &&
 			    !string.IsNullOrEmpty (request.Password)) {
@@ -181,19 +149,13 @@ namespace Rainy.WebService.OAuth
 				return resp;
 			}
 		}
-
-	}
-
-	[Route("/oauth/access_token")]
-	public class OAuthAccessTokenRequest : IReturnVoid
-	{
 	}
 
 	[RequestLogFilter]
 	[ResponseLogFilter]
 	public class OAuthAccessTokenService : RainyNoteServiceBase
 	{
-		public object Any (OAuthAccessTokenRequest request)
+		public object Get (OAuthAccessTokenRequest request)
 		{
 			// keep this line to inspect the Request in monodevelop's debugger 
 			// really helps debugging API calls
@@ -209,16 +171,12 @@ namespace Rainy.WebService.OAuth
 					.FromWebRequest (original_request, new MemoryStream ());
 				AccessToken access_token = (AccessToken) RainyStandaloneServer.OAuth.Provider.ExchangeRequestTokenForAccessToken (context);
 
-				Logger.DebugFormat ("permanently authorizting access token: {0}", access_token);
+				Logger.DebugFormat ("permanently authorizing access token: {0}", access_token);
 				RainyStandaloneServer.OAuth.AccessTokens.SaveToken (access_token);
 				Response.Write (access_token.ToString ());
-
+				Response.End ();
 			} catch (Exception e) {
-				Logger.ErrorFormat ("failed to exchange request token for access token, exception was: {0}", e.Message);
-				Response.StatusCode = 500;
-				Response.StatusDescription = e.Message;
-			} finally {
-				Response.Close ();
+				throw new UnauthorizedException (){ ErrorMessage = "failed to exchange request token for access token: {0}".Fmt(e.Message)};
 			}
 			return null;
 		}

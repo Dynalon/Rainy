@@ -7,6 +7,7 @@ using Tomboy;
 using Rainy.Interfaces;
 using Tomboy.Sync.Web.DTO;
 using DTO = Tomboy.Sync.Web.DTO;
+using Rainy.ErrorHandling;
 
 
 namespace Rainy.WebService
@@ -48,13 +49,13 @@ namespace Rainy.WebService
 					bool include_note_body = true; 
 					string include_notes = Request.GetParam ("include_notes");
 					if (!string.IsNullOrEmpty (include_notes) && !bool.TryParse (include_notes, out include_note_body))
-						throw new Exception ("unable to parse parameter include_notes to boolean");
+						throw new InvalidRequestDtoException () {ErrorMessage = "unable to parse parameter include_notes to boolean"};
 
 					// if since is given, we might only need to return a subset of notes
 					string since = Request.GetParam ("since");
 					long since_revision = -1;
 					if (!string.IsNullOrEmpty (since) && !long.TryParse (since, out since_revision))
-						throw new Exception ("unable to parse parameter since to long");
+						throw new InvalidRequestDtoException () {ErrorMessage = "unable to parse parameter since to long"};
 
 					// select only those notes that changed since last sync
 					// which means, only those notes that have a HIGHER revision as "since"

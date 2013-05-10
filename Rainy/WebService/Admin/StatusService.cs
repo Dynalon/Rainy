@@ -19,11 +19,6 @@ namespace Rainy.WebService.Admin
 		{
 		}
 
-		[EnableCors]
-		public HttpResult Options (StatusRequest req)
-		{
-			return new HttpResult ();
-		}
 		public Status Get (StatusRequest req)
 		{
 			var s = new Status ();

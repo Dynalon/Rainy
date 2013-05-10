@@ -30,7 +30,7 @@ namespace Rainy.WebService.Signup
 		public object Put (UpdateUserRequest req)
 		{
 			if (!string.IsNullOrEmpty(req.AdditionalData))
-				throw new WebServiceException ("Setting of AdditionalData not allowed");
+				throw new InvalidRequestDtoException () {ErrorMessage = "Setting of AdditionalData not allowed"};
 
 			throw new NotImplementedException();
 		}
