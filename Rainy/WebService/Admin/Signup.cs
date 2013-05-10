@@ -66,10 +66,7 @@ namespace Rainy.WebService.Signup
 			db_user.IsActivated = false;
 			db_user.IsVerified = false;
 
-			var random_bytes = Encoding.UTF8.GetBytes (Path.GetRandomFileName ());
-			HashAlgorithm algo = SHA1.Create ();
-			string hash = BitConverter.ToString (algo.ComputeHash (random_bytes));
-			db_user.VerifySecret = hash.Replace("-", "").ToLower ();
+			db_user.VerifySecret = Guid.NewGuid ().ToString ().Replace("-", "");
 
 			// write user to db
 			using (var db = DbConfig.GetConnection ()) {
