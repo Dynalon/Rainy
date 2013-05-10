@@ -15,6 +15,7 @@ using System.IO;
 using System.Net;
 using ServiceStack.ServiceInterface.Cors;
 using ServiceStack.ServiceInterface;
+using Rainy.Interfaces;
 
 namespace Rainy
 {
@@ -23,22 +24,16 @@ namespace Rainy
 		public readonly string ListenUrl;	
 
 		public static OAuthHandlerBase OAuth;
-		public static string Passkey;	
 
 		public static Rainy.Interfaces.IDataBackend DataBackend { get; private set; }
 		
 		private AppHost appHost;
 		private ILog logger;
 
-		private bool testServer = false;
-
-		public RainyStandaloneServer (Rainy.Interfaces.IDataBackend backend,
-		                              string listen_url,
-		                              bool test_server = false)
+		public RainyStandaloneServer (IDataBackend backend, string listen_url)
 		{
 			ListenUrl = listen_url;
 			logger = LogManager.GetLogger (this.GetType ());
-			testServer = test_server;
 
 			OAuth = backend.OAuth;
 
@@ -47,7 +42,7 @@ namespace Rainy
 		}
 		public void Start ()
 		{
-			appHost = new AppHost (testServer);
+			appHost = new AppHost ();
 			appHost.Init ();
 
 			logger.DebugFormat ("starting http listener at: {0}", ListenUrl);
@@ -67,14 +62,11 @@ namespace Rainy
 
 	public class AppHost : AppHostHttpListenerBase
 	{
-		bool testServer = false;
-
 		public AppHost () : base("Rainy", typeof(GetNotesRequest).Assembly)
 		{
 		}
 		public AppHost (bool test_server) : this ()
 		{
-			testServer = test_server;
 		}
 		public IHttpHandler CheckAndCreateStaticHttpHandler (IHttpRequest req)
 		{
@@ -88,24 +80,21 @@ namespace Rainy
 		{
 			JsConfig.DateHandler = JsonDateHandler.ISO8601;
 
-
-			// BUG HACK TODO
-			// ServiceStack SetConfig somehow does not like beeing called twice 
-			// which is fatal when running with unit tests, so don't call the 
-			// SetConfig when running as a testserver
-			if (testServer) return;
-
 			Plugins.Add (new SwaggerFeature ());
 
 			// register our custom exception handling
 			this.ExceptionHandler = Rainy.ErrorHandling.ExceptionHandler.CustomExceptionHandler;
 			this.ServiceExceptionHandler = Rainy.ErrorHandling.ExceptionHandler.CustomServiceExceptionHandler;
 
+			// BUG HACK
+			// GlobalResponseHeaders are not cleared between creating instances of a new config
+			// this will be fatal (duplicate key error) for unit tests so we clear the headers
+			EndpointHostConfig.Instance.GlobalResponseHeaders.Clear ();
+
 			SetConfig (new EndpointHostConfig {
 				// not all tomboy clients send the correct content-type
 				// so we force application/json
 				DefaultContentType = ContentType.Json,
-
 
 				RawHttpHandlers = { 
 					CheckAndCreateStaticHttpHandler,

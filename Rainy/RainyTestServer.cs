@@ -66,7 +66,7 @@ namespace Rainy
 			else
 				backend = new RainyFileSystemBackend (tmpPath, credentialsVerifier);
 
-			rainyServer = new RainyStandaloneServer (backend, RainyListenUrl, test_server: true);
+			rainyServer = new RainyStandaloneServer (backend, RainyListenUrl);
 
 			rainyServer.Start ();
 		}
