@@ -2,6 +2,7 @@ using System;
 using System.Net;
 using ServiceStack.ServiceHost;
 using ServiceStack.WebHost.Endpoints.Extensions;
+using log4net;
 
 namespace Rainy.ErrorHandling
 {
@@ -67,22 +68,28 @@ namespace Rainy.ErrorHandling
 		                                    object request_dto = null)
 		{
 			// log the exception
+			ILog logger = LogManager.GetLogger (typeof(ExceptionHandler));
+
 			// create appropriate response
 			if (e is UnauthorizedException) {
 				var ex = (UnauthorizedException) e;
+				logger.Debug (ex.ErrorMessage);
 				response.StatusCode = 401;
 				response.StatusDescription = "Unauthorized";
 				response.ContentType = request.ContentType;
 				// TODO provide JSON error objects
 			} else if (e is ValidationException) {
 				var ex = (ValidationException) e;
+				logger.Debug (ex.ErrorMessage);
 				response.StatusCode = 400;
 				response.StatusDescription = "Bad request. Detail:" + e.Message;
 			} else if (e is RainyBaseException) {
 				var ex = (RainyBaseException) e;
+				logger.Debug (ex.ErrorMessage);
 				response.StatusCode = 400;
 				response.StatusDescription = ex.ErrorMessage;
 			} else {
+				logger.Debug (e.Message);
 				response.StatusCode = 500;
 				response.StatusDescription = "Internal server error.";
 			}
