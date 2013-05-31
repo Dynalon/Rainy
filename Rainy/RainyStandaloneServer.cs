@@ -16,6 +16,7 @@ using System.Net;
 using ServiceStack.ServiceInterface.Cors;
 using ServiceStack.ServiceInterface;
 using Rainy.Interfaces;
+using Rainy.CustomHandler;
 
 namespace Rainy
 {
@@ -68,14 +69,6 @@ namespace Rainy
 		public AppHost (bool test_server) : this ()
 		{
 		}
-		public IHttpHandler CheckAndCreateStaticHttpHandler (IHttpRequest req)
-		{
-			var uri = new Uri (req.AbsoluteUri);
-			if (uri.PathAndQuery.StartsWithIgnoreCase ("/srv/")) {
-				return null;
-			}
-			return null;
-		}
 		public override void Configure (Funq.Container container)
 		{
 			JsConfig.DateHandler = JsonDateHandler.ISO8601;
@@ -85,6 +78,13 @@ namespace Rainy
 			// register our custom exception handling
 			this.ExceptionHandler = Rainy.ErrorHandling.ExceptionHandler.CustomExceptionHandler;
 			this.ServiceExceptionHandler = Rainy.ErrorHandling.ExceptionHandler.CustomServiceExceptionHandler;
+
+
+
+			var swagger_path = Path.Combine(Path.GetDirectoryName(this.GetType ().Assembly.Location), "../../swagger-ui/");
+			var swagger_handler = new FilesystemHandler ("/swagger-ui/", swagger_path);
+
+			var embedded_handler = new EmbeddedResourceHandler ("/srv/", this.GetType ().Assembly, "Rainy.WebService.Admin.UI");
 
 			// BUG HACK
 			// GlobalResponseHeaders are not cleared between creating instances of a new config
@@ -97,7 +97,8 @@ namespace Rainy
 				DefaultContentType = ContentType.Json,
 
 				RawHttpHandlers = { 
-					CheckAndCreateStaticHttpHandler,
+					swagger_handler.CheckAndProcess,
+					embedded_handler.CheckAndProcess
 				},
 
 				// enable cors

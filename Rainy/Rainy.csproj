@@ -130,6 +130,8 @@
     <Compile Include="ErrorHandling.cs" />
     <Compile Include="WebService\OAuth\OAuthServiceContracts.cs" />
     <Compile Include="WebService\OAuth\OAuthService.cs" />
+    <Compile Include="CustomHandler\EmbeddedResourceHandler.cs" />
+    <Compile Include="CustomHandler\FilesystemHandler.cs" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="WebService\" />
@@ -137,6 +139,7 @@
     <Folder Include="WebService\Admin\" />
     <Folder Include="WebService\Admin\UI\" />
     <Folder Include="ORM\" />
+    <Folder Include="CustomHandler\" />
   </ItemGroup>
   <ItemGroup>
     <None Include="settings.conf" />
