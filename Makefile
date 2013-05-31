@@ -39,7 +39,12 @@ ifndef TEAMCITY
 	@git submodule update --init --recursive
 endif
 
-build: checkout
+deps:
+	@nuget install -o packages Rainy/packages.config
+	@nuget install -o packages Rainy-tests/packages.config
+	@nuget install -o packages tomboy-library-websync/packages.config
+
+build: checkout deps
 
 ## this is not working?
 ##pkg-config --atleast-version=$(MIN_MONO_VERSION) mono; if [ $$? != "0" ]; then $(error "mono >=2.10.9 is required");
