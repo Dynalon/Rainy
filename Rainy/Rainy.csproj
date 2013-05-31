@@ -38,9 +38,6 @@
     <Reference Include="System.Web" />
     <Reference Include="System.Web.Abstractions" />
     <Reference Include="Microsoft.CSharp" />
-    <Reference Include="Mono.Data.Sqlite">
-      <HintPath>..\lib\ServiceStack.OrmLite.Sqlite.Mono.3.9.44\lib\net35\Mono.Data.Sqlite.dll</HintPath>
-    </Reference>
     <Reference Include="nunit.framework, Version=2.4.8.0, Culture=neutral, PublicKeyToken=96d09a1eb7f44a77">
       <Private>False</Private>
     </Reference>
@@ -51,29 +48,38 @@
     <Reference Include="log4net">
       <HintPath>..\lib\log4net.dll</HintPath>
     </Reference>
-    <Reference Include="ServiceStack.ServiceInterface">
-      <HintPath>..\lib\ServiceStack.3.9.44\lib\net35\ServiceStack.ServiceInterface.dll</HintPath>
-    </Reference>
-    <Reference Include="ServiceStack">
-      <HintPath>..\lib\ServiceStack.3.9.44\lib\net35\ServiceStack.dll</HintPath>
-    </Reference>
     <Reference Include="ServiceStack.Text">
-      <HintPath>..\lib\ServiceStack.Text.3.9.44\lib\net35\ServiceStack.Text.dll</HintPath>
-    </Reference>
-    <Reference Include="ServiceStack.OrmLite.Sqlite">
-      <HintPath>..\lib\ServiceStack.OrmLite.Sqlite.Mono.3.9.44\lib\net35\ServiceStack.OrmLite.Sqlite.dll</HintPath>
-    </Reference>
-    <Reference Include="ServiceStack.OrmLite">
-      <HintPath>..\lib\ServiceStack.OrmLite.Sqlite.Mono.3.9.44\lib\net35\ServiceStack.OrmLite.dll</HintPath>
+      <HintPath>..\packages\ServiceStack.Text.3.9.48\lib\net35\ServiceStack.Text.dll</HintPath>
     </Reference>
     <Reference Include="ServiceStack.Common">
-      <HintPath>..\lib\ServiceStack.Common.3.9.44\lib\net35\ServiceStack.Common.dll</HintPath>
+      <HintPath>..\packages\ServiceStack.Common.3.9.48\lib\net35\ServiceStack.Common.dll</HintPath>
     </Reference>
     <Reference Include="ServiceStack.Interfaces">
-      <HintPath>..\lib\ServiceStack.Common.3.9.44\lib\net35\ServiceStack.Interfaces.dll</HintPath>
+      <HintPath>..\packages\ServiceStack.Common.3.9.48\lib\net35\ServiceStack.Interfaces.dll</HintPath>
+    </Reference>
+    <Reference Include="ServiceStack.Redis">
+      <HintPath>..\packages\ServiceStack.Redis.3.9.48\lib\net35\ServiceStack.Redis.dll</HintPath>
+    </Reference>
+    <Reference Include="ServiceStack.OrmLite.SqlServer">
+      <HintPath>..\packages\ServiceStack.OrmLite.SqlServer.3.9.48\lib\ServiceStack.OrmLite.SqlServer.dll</HintPath>
+    </Reference>
+    <Reference Include="ServiceStack.ServiceInterface">
+      <HintPath>..\packages\ServiceStack.3.9.48\lib\net35\ServiceStack.ServiceInterface.dll</HintPath>
+    </Reference>
+    <Reference Include="ServiceStack">
+      <HintPath>..\packages\ServiceStack.3.9.48\lib\net35\ServiceStack.dll</HintPath>
     </Reference>
     <Reference Include="ServiceStack.Api.Swagger">
-      <HintPath>..\lib\ServiceStack.Api.Swagger.3.9.44\lib\net35\ServiceStack.Api.Swagger.dll</HintPath>
+      <HintPath>..\packages\ServiceStack.Api.Swagger.3.9.48\lib\net35\ServiceStack.Api.Swagger.dll</HintPath>
+    </Reference>
+    <Reference Include="Mono.Data.Sqlite">
+      <HintPath>..\packages\ServiceStack.OrmLite.Sqlite.Mono.3.9.48\lib\net40\Mono.Data.Sqlite.dll</HintPath>
+    </Reference>
+    <Reference Include="ServiceStack.OrmLite.Sqlite">
+      <HintPath>..\packages\ServiceStack.OrmLite.Sqlite.Mono.3.9.48\lib\net40\ServiceStack.OrmLite.Sqlite.dll</HintPath>
+    </Reference>
+    <Reference Include="ServiceStack.OrmLite">
+      <HintPath>..\packages\ServiceStack.OrmLite.Sqlite.Mono.3.9.48\lib\net40\ServiceStack.OrmLite.dll</HintPath>
     </Reference>
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
@@ -137,5 +143,28 @@
     <None Include="WebService\Admin\AdminUiService.cs" />
     <None Include="WebService\Admin\StatusService.cs" />
     <None Include="WebService\Admin\AdminLogService.cs" />
+    <None Include="packages.config" />
+    <None Include="swagger-ui\index.html" />
+    <None Include="swagger-ui\swagger-ui.js" />
+    <None Include="swagger-ui\swagger-ui.min.js" />
+    <None Include="swagger-ui\css\hightlight.default.css" />
+    <None Include="swagger-ui\css\screen.css" />
+    <None Include="swagger-ui\images\logo_small.png" />
+    <None Include="swagger-ui\images\pet_store_api.png" />
+    <None Include="swagger-ui\images\throbber.gif" />
+    <None Include="swagger-ui\images\wordnik_api.png" />
+    <None Include="swagger-ui\lib\backbone-min.js" />
+    <None Include="swagger-ui\lib\handlebars-1.0.rc.1.js" />
+    <None Include="swagger-ui\lib\highlight.7.3.pack.js" />
+    <None Include="swagger-ui\lib\jquery-1.8.0.min.js" />
+    <None Include="swagger-ui\lib\jquery.ba-bbq.min.js" />
+    <None Include="swagger-ui\lib\jquery.slideto.min.js" />
+    <None Include="swagger-ui\lib\jquery.wiggle.min.js" />
+    <None Include="swagger-ui\lib\swagger.js" />
+    <None Include="swagger-ui\lib\underscore-min.js" />
+    <None Include="sqlite\x64\sqlite3.dll" />
+    <None Include="sqlite\x86\sqlite3.def" />
+    <None Include="sqlite\x86\sqlite3.dll" />
+    <None Include="sqlite\x86\sqlite3.exe" />
   </ItemGroup>
 </Project>
