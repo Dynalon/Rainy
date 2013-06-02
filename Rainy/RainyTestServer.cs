@@ -1,17 +1,15 @@
 using System;
-using ServiceStack.ServiceClient.Web;
+using System.IO;
+using System.Linq;
+using System.Net;
 using DevDefined.OAuth.Consumer;
 using DevDefined.OAuth.Framework;
-using System.Net;
-using System.Linq;
-using Tomboy.Sync.Web.DTO;
-using Rainy.OAuth;
-using System.IO;
+using ServiceStack.OrmLite;
+using ServiceStack.ServiceClient.Web;
 using Tomboy.Sync.Web;
-using DevDefined.OAuth.Storage.Basic;
+using Tomboy.Sync.Web.DTO;
 using Rainy.Db;
 using Rainy.Interfaces;
-using ServiceStack.OrmLite;
 
 namespace Rainy
 {
@@ -86,8 +84,9 @@ namespace Rainy
 		public ApiResponse GetRootApiRef () 
 		{
 			var rest_client = new JsonServiceClient ();
+			var url = new Rainy.WebService.ApiRequest ().ToUrl("GET");
 
-			return rest_client.Get<ApiResponse> (BaseUri + "/api/1.0/");
+			return rest_client.Get<ApiResponse> (BaseUri + url);
 		}
 
 		public UserResponse GetUserInfo ()
@@ -109,8 +108,9 @@ namespace Rainy
 				ConsumerKey = "anyone"
 			};
 
-			var restClient = new JsonServiceClient (BaseUri);
-			var api_ref = restClient.Get<ApiResponse> ("api/1.0");
+			var rest_client = new JsonServiceClient (BaseUri);
+			var url = new Rainy.WebService.ApiRequest ().ToUrl("GET");
+			var api_ref = rest_client.Get<ApiResponse> (url);
 
 			var session = new OAuthSession (consumerContext, api_ref.OAuthRequestTokenUrl,
 			                                api_ref.OAuthAuthorizeUrl, api_ref.OAuthAccessTokenUrl);

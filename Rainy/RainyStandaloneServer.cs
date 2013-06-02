@@ -1,22 +1,14 @@
 using System;
-using ServiceStack.WebHost.Endpoints;
+using System.IO;
+using ServiceStack.Api.Swagger;
 using ServiceStack.Common.Web;
-
+using ServiceStack.Text;
+using ServiceStack.WebHost.Endpoints;
 using log4net;
-
+using Rainy.CustomHandler;
+using Rainy.Interfaces;
 using Rainy.OAuth;
 using Rainy.WebService;
-using ServiceStack.Text;
-using ServiceStack.WebHost.Endpoints.Extensions;
-using ServiceStack.ServiceHost;
-using System.Web;
-using ServiceStack.Api.Swagger;
-using System.IO;
-using System.Net;
-using ServiceStack.ServiceInterface.Cors;
-using ServiceStack.ServiceInterface;
-using Rainy.Interfaces;
-using Rainy.CustomHandler;
 
 namespace Rainy
 {

@@ -34,7 +34,8 @@ namespace Rainy.Tests
 				Password = "foobar",
 				AdditionalData = "Its just john"
 			};
-			client.Post<DTOUser> ("/api/admin/user/", user);
+			var user_url = new Rainy.WebService.Management.UserRequest ().ToUrl("POST");
+			client.Post<DTOUser> (user_url, user);
 			sampleUser.Add (user);
 
 			// add sample notes
@@ -60,7 +61,7 @@ namespace Rainy.Tests
 				Password = "barfoos",
 				AdditionalData = "Jane, Johns wife"
 			};
-			client.Post<DTOUser> ("/api/admin/user/", user);
+			client.Post<DTOUser> (user_url, user);
 			sampleUser.Add (user);
 			sampleNotes[user.Username] = AbstractSyncServerTests.GetSomeSampleNotes ()
 				.Select (n => n.ToDTONote ()).ToList ();

@@ -47,8 +47,9 @@ namespace Rainy.Tests.Management
 
 			// add some sample users to the server
 			var client = GetAdminServiceClient ();
+			var url = new UserRequest ().ToUrl("POST");
 			foreach (DTOUser user in GetSampleUser ()) {
-				client.Post<UserRequest> ("/api/admin/user/", user);
+				client.Post<UserRequest> (url, user);
 			}
 		}
 
@@ -56,9 +57,10 @@ namespace Rainy.Tests.Management
 		[ExpectedException(typeof(WebServiceException),ExpectedMessage="Unauthorized")]
 		public void UnauthorizedAccessFails ()
 		{
+			var alluser_url = new AllUserRequest ().ToUrl("GET");
 			var client = GetServiceClient ();
 			try {
-				client.Get<DTOUser[]> ("/api/admin/alluser/");
+				client.Get<DTOUser[]> (alluser_url);
 			} catch (WebServiceException e) {
 				Assert.AreEqual (401, e.StatusCode);
 				throw e;
@@ -72,10 +74,12 @@ namespace Rainy.Tests.Management
 			user.Username = "michael";
 			user.EmailAddress = "michael@knight.com";
 			user.AdditionalData = "Some more info about Michael";
-			
-			adminClient.Post<UserRequest> ("/api/admin/user/", user);
-			
-			var resp = adminClient.Get<DTOUser[]> ("/api/admin/user/michael");
+		
+			var user_url = new UserRequest ().ToUrl("POST");
+			adminClient.Post<UserRequest> (user_url, user);
+		
+			var user_get_url = new UserRequest () { Username = "michael" }.ToUrl("GET");
+			var resp = adminClient.Get<DTOUser[]> (user_get_url);
 
 			Assert.AreEqual (1, resp.Length);
 			Assert.AreEqual (user.Username, resp[0].Username);
@@ -86,10 +90,12 @@ namespace Rainy.Tests.Management
 		[Test]
 		public void DeleteUser ()
 		{
-			adminClient.Delete<UserRequest> ("/api/admin/user/johndoe");
+			var user_delete_url = new UserRequest () { Username = "johndoe" }.ToUrl ("DELETE");
+			adminClient.Delete<UserRequest> (user_delete_url);
 
 			// make sure johndoe is not in the list of our users
-			var allusers = adminClient.Get<DTOUser[]> ("/api/admin/alluser/");
+			var alluser_url = new AllUserRequest ().ToUrl ("GET");
+			var allusers = adminClient.Get<DTOUser[]> (alluser_url);
 
 			var list_of_johndoes = allusers.Where(u => u.Username == "johndoe").ToArray ();
 			Assert.AreEqual (0, list_of_johndoes.Count ());
@@ -107,9 +113,11 @@ namespace Rainy.Tests.Management
 				LastName = "Doeson"
 			};
 
-			adminClient.Put<UserRequest> ("/api/admin/user/", user);
+			var user_url = new UserRequest ().ToUrl ("PUT");
+			adminClient.Put<UserRequest> (user_url, user);
 
-			var all_users = adminClient.Get<DTOUser[]> ("/api/admin/alluser/");
+			var all_users_url = new AllUserRequest ().ToUrl ("GET");
+			var all_users = adminClient.Get<DTOUser[]> (all_users_url);
 
 			var johndoe = all_users.First (u => u.Username == "johndoe");
 			Assert.AreEqual (user.Username, johndoe.Username);
@@ -129,7 +137,8 @@ namespace Rainy.Tests.Management
 			var user = new DTOUser () {
 				Username = "foobar"
 			};
-			adminClient.Put<DTOUser> ("/api/admin/user/", user);
+			var user_url = new UserRequest ().ToUrl ("PUT");
+			adminClient.Put<DTOUser> (user_url, user);
 		}
 	}
 }
