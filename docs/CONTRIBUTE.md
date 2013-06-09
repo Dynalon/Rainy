@@ -28,7 +28,7 @@ If you want to implement a feature, it would be nice if you open up an issue on 
 Improve documentation and website
 ---------------------------------
 
-The documenation and website is included in the `docs` folder in the source code. Standard [Markdown][markdown] is used for formatting. To display the most recent docs from github as the website you are reading *right now*, the [markdown realtime renderer markdown.io][markdown.io] is used. This means that you can easily contribute to the documentation/website if you fork on github, edit the file in the docs folder, and send a pull-request. Changes to the website will take effect immediately after your pull-request is merged.
+The documenation and website is included in the `docs` folder in the source code. Standard [Markdown][markdown] is used for formatting. This means that you can easily contribute to the documentation/website if you fork on github, edit the file in the docs folder, and send a pull-request. Changes to the website will take effect immediately after your pull-request is merged.
 
 
 [gh-issue-tracker]: https://github.com/Dynalon/Rainy/issues
