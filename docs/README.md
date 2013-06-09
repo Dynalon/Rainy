@@ -28,7 +28,8 @@ Getting Started
 
 See the [Getting Started guide][gettingstarted] on how to get and setup Rainy.
 
-  [gettingstarted]: http://www.notesync.org/GETTING_STARTED.md
+
+  [gettingstarted]: http://www.notesync.org/#!GETTING_STARTED.md
 
 License
 -------
