@@ -90,7 +90,7 @@ There are currently some issues in Tomboy and Tomdroid that you should know of b
 * Tomdroid
   * The Tomdroid version in the Google Play store is outdated and syncing might not work
   * Syncing works best (two-way sync) when using at least version 0.7.2 from the [Tomdroid website][tomdroid]
-  * Due to [a bug][tomdroid-bug-1], the first time you sync in Tomdroid might not show any notes. Just create more notes in *Tomboy* and do multiple syncs with Tomboy. Then sync Tomdroid.
+
 
   [tomboy-bug]: https://bugzilla.gnome.org/show_bug.cgi?id=665679
   [tomdroid]: https://launchpad.net/tomdroid

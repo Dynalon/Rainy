@@ -1,6 +1,4 @@
-# This config file is only used for markdown.io
-# and not an essential part of Rainy.
 {
-    "Title": "<img src='rainy_logo.png'/>&nbsp;Rainy - Wiki",
-    "Theme": "united"
+	"useSideMenu": true,
+	"title": "<img src='rainy_logo.png'/>&nbsp;Rainy - Wiki"
 }

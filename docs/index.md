@@ -4,14 +4,30 @@ Follow @timodoerr for all rainy-related announcements!
 [gimmick:twitterfollow](@timodoerr) &nbsp; [gimmick:FacebookLike ( layout: 'buttoncount') ](http://www.facebook.com/pages/Rainy-note-sync-server-for-Tomboy/116321368557123) &nbsp; <script type="text/javascript" src="https://apis.google.com/js/plusone.js"></script> <g:plusone size="medium" href="http://www.notesync.org"></g:plusone>
 * * *
 
-## New website, new release!
+###### June, 2. 2013
+## Rainy accepted at Google Summer of Code 2013!
+
+I am glad to announce that I have been accepted as a [Google Summer of Code][gsoc] student to work on Rainy during this summer. The [Mono project][monoproject] is the mentoring organization that will help and mentor me in this enjoyable endeavour. As a result, there are several feature planned to be available by the end of the summer, see the [my original proposal][proposal] for the GSoC.
+
+If you want to track my progress on the project, checkout [my blog][myblog] and the [GitHub][github-rainy] project website regularly!
+
+
+  [myblog]: http://exceptionrethrown.wordpress.com
+  [gsoc]: https://developers.google.com/open-source/soc/
+  [proposal]: http://www.google-melange.com/gsoc/project/google/gsoc2013/dynalon/27001
+  [monoproject]: http://mono-project.com
+  [github-rainy]: httpw://github.com/Dynalon/Rainy
+
+- - -
+
 ###### March, 15. 2013
+## New website, new release!
 
 I commited some changes to the website today. Most notable change (besides the switch to the [bootswatch united theme][united]) is this _news_ section. I intend to use it to put news about Rainy releases and important information on the website, apart of [my blog][blog].
 
 Documentation was also updated, and includes now instructions of how to perform SSL setup.
 
-# Introducing the 0.2.X release
+## Introducing the 0.2.X release
 
 The 0.2.X release series brings the long-awaited SSL support. This means that connections are now finally encrypted, which makes rainy so much more usable and secure.
 

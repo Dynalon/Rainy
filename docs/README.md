@@ -1,8 +1,4 @@
-Rainy - simple note syncing server for Tomboy
-=============================================
-
-About
------
+## Rainy - simple note syncing server for Tomboy
 
 Rainy is a free synchronization/cloud server intended for use with [Tomboy][tomboy] and other Tomboy-like clients (like [Tomdroid][tomdroid]). Rainy can be easily hosted in your own private cloud, and gives you the control over your data and privacy.
 
@@ -14,6 +10,7 @@ Rainy is a free synchronization/cloud server intended for use with [Tomboy][tomb
   * re-uses the existing [tomboy-library][tomboylib], which is a C# library that should one day put in place into Tomboy, and could be used by other potential clients
   * uses the awesome [ServiceStack][servicestack] framework for providing the [Tomboy REST API][tomboyrest] and the [ServiceStack.ORMLite][ss-ormlite] O/R Mapper  for database access
   * licensed under the free [GNU AGPLv3 license][agplv3]
+
 
   [tomboy]: http://projects.gnome.org/tomboy/
   [tomboylib]: https://github.com/trepidity/tomboy-library
@@ -37,6 +34,7 @@ License
 -------
 
 Rainy is licensed under the free (as in freedom) GNU AGPLv3 license.
+
 [![](http://www.gnu.org/graphics/agplv3-155x51.png)](http://www.gnu.org/licenses/agpl-3.0.html)
 
 Credits

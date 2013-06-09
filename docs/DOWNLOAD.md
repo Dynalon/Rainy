@@ -1,6 +1,8 @@
 Download
 ========
 
+- - -
+
 Stable version
 --------------
 
@@ -12,6 +14,7 @@ Unstable version
 The unstable version is build from time to time from the latest git master and should not be used in production. Always do backups before using, if you lose notes, don't blame me or any of the developers, you've been warned.
 
 * Latest unstable: [rainy-v0.2.3.zip][dl-unstable]
+
 
   [dl-unstable]: http://rainy.notesync.org/release/rainy-0.2.3.zip
 
