@@ -12,9 +12,18 @@ using log4net.Appender;
 using Rainy.Interfaces;
 using Mono.Unix;
 using Mono.Unix.Native;
+using Rainy.Db.Config;
 
 namespace Rainy
 {
+	public static class Container
+	{
+		private static readonly Funq.Container instance = new Funq.Container ();
+		public static Funq.Container Instance {
+			get { return instance; }
+		}
+	}
+
 	public class MainClass
 	{
 		// HACK a dictionary holding usernames and their repos
@@ -116,10 +125,6 @@ namespace Rainy
 				if (!Directory.Exists (DataPath))
 					Directory.CreateDirectory (DataPath);
 			}
-
-			var sqlite_file = Path.Combine (DataPath, "rainy.db");
-			DbConfig.SetSqliteFile (sqlite_file);
-
 			SetupLogging (loglevel);
 			logger = LogManager.GetLogger ("Main");
 
@@ -150,24 +155,27 @@ namespace Rainy
 				}
 				return false;
 			};
+
+			var sqlite_file = Path.Combine (DataPath, "rainy.db");
+			Container.Instance.Register<SqliteConfig> (c => new SqliteConfig { File = sqlite_file });
+			Container.Instance.Register<PostgreConfig> (new PostgreConfig { Username = "td", Password = "foobar" });
+
 			// by default we use the filesystem backend
 			if (string.IsNullOrEmpty (backend)) {
 				backend = "filesystem";
 			}
 
-			if (backend == "sqlite") {
+			if (backend == "sqlite" || backend == "postgre") {
 
 				/* if (string.IsNullOrEmpty (Config.Global.AdminPassword)) {
 					Console.WriteLine ("FATAL: Field 'AdminPassword' in the settings config may not " +
 					                   "be empty when using the sqlite backend");
 					return;
 				} */
-				data_backend = new DatabaseBackend (DataPath, config_authenticator);
-			} else {
+				Container.Instance.Register<IDataBackend> (c => new DatabaseBackend (config_authenticator));
 
-
-
-				data_backend = new RainyFileSystemBackend (DataPath, config_authenticator);
+			} else if (backend == "filesystem") {
+				Container.Instance.Register<IDataBackend> (c => new RainyFileSystemBackend (DataPath, config_authenticator));
 			}
 
 			string admin_ui_url = listen_url.Replace ("*", "localhost");
@@ -176,7 +184,7 @@ namespace Rainy
 				admin_ui_url += "admin/#?admin_pw=" + Config.Global.AdminPassword;
 			}
 
-			using (var listener = new RainyStandaloneServer (data_backend, listen_url)) {
+			using (var listener = new RainyStandaloneServer (listen_url)) {
 
 				listener.Start ();
 				Uptime = DateTime.UtcNow;

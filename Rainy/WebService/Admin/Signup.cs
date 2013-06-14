@@ -45,15 +45,14 @@ namespace Rainy.WebService.Signup
 				throw new ValidationException () {ErrorMessage = "Password is unsafe"};
 
 			// assert username is not already taken
-			using (var db = DbConfig.GetConnection ()) {
+			var factory = Rainy.Container.Instance.Resolve<IDbConnectionFactory> ();
+			using (var db = factory.OpenDbConnection ()) {
 				var user = db.FirstOrDefault<DBUser> (u => u.Username == req.Username);
 				if (user != null)
 					throw new ConflictException () {ErrorMessage = "A user by that name already exists"};
-			}
 
-			// assert email is not already registered
-			using (var db = DbConfig.GetConnection ()) {
-				var user = db.FirstOrDefault<DBUser> (u => u.EmailAddress == req.EmailAddress);
+				// assert email is not already registered
+				user = db.FirstOrDefault<DBUser> (u => u.EmailAddress == req.EmailAddress);
 				if (user != null)
 					throw new ConflictException () {ErrorMessage = "The emailaddress is already registered"};
 			}
@@ -69,7 +68,8 @@ namespace Rainy.WebService.Signup
 			db_user.VerifySecret = Guid.NewGuid ().ToString ().Replace("-", "");
 
 			// write user to db
-			using (var db = DbConfig.GetConnection ()) {
+			factory = Rainy.Container.Instance.Resolve<IDbConnectionFactory> ();
+			using (var db = factory.OpenDbConnection ()) {
 				db.Insert<DBUser> (db_user);
 			}
 
@@ -82,7 +82,8 @@ namespace Rainy.WebService.Signup
 		public object Get (VerifyUserRequest req)
 		{
 			// get user for the activation key
-			using (var db = DbConfig.GetConnection ()) {
+			var factory = Rainy.Container.Instance.Resolve<IDbConnectionFactory> ();
+			using (var db = factory.OpenDbConnection ()) {
 				var user = db.First<DBUser> (u => u.VerifySecret == req.VerifySecret);
 
 				if (user == null) return new HttpResult () {
@@ -100,7 +101,8 @@ namespace Rainy.WebService.Signup
 
 		public object Post (ActivateUserRequest req)
 		{
-			using (var db = DbConfig.GetConnection ()) {
+			var factory = Rainy.Container.Instance.Resolve<IDbConnectionFactory> ();
+			using (var db = factory.OpenDbConnection ()) {
 				var user = db.First<DBUser> (u => u.Username == req.Username);
 				user.IsActivated = true;
 				db.Save (user);
@@ -112,7 +114,8 @@ namespace Rainy.WebService.Signup
 
 		public object Get (PendingActivationsRequest req)
 		{
-			using (var db = DbConfig.GetConnection ()) {
+			var factory = Rainy.Container.Instance.Resolve<IDbConnectionFactory> ();
+			using (var db = factory.OpenDbConnection ()) {
 				var users = db.Select<DBUser> (u => u.IsActivated == false);
 				return users.ToArray<DTOUser>();
 			}

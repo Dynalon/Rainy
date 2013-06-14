@@ -8,27 +8,55 @@ using ServiceStack.OrmLite;
 using Tomboy;
 using Tomboy.Sync;
 using Rainy.Interfaces;
+using ServiceStack.WebHost.Endpoints;
 
 namespace Rainy
 {
-	public class DatabaseBackend : IDataBackend
+	public class DbAccessObject
+	{
+		protected IDbConnectionFactory connFactory;
+		public DbAccessObject ()
+		{
+			this.connFactory = Container.Instance.Resolve<IDbConnectionFactory> ();
+		}
+	}
+
+	public class DatabaseBackend : DbAccessObject, IDataBackend
 	{
 		OAuthHandlerBase oauthHandler;
 
-		public DatabaseBackend (string database_path, CredentialsVerifier auth = null)
+		public DatabaseBackend (CredentialsVerifier auth = null) : base ()
 		{
 			if (auth == null)
 				oauthHandler = new OAuthDatabaseHandler (DbAuthenticator);
 			else
 				oauthHandler = new OAuthDatabaseHandler (auth);
 
-			DbConfig.CreateSchema ();
+			CreateSchema ();
 		}
+
+		public static void CreateSchema (bool reset = false)
+		{
+			var factory = Rainy.Container.Instance.Resolve<IDbConnectionFactory> ();
+			using (var db = factory.OpenDbConnection ()) {
+				if (reset) {
+					db.DropAndCreateTable <DBUser> ();
+					db.DropAndCreateTable <DBNote> ();
+					db.DropAndCreateTable <DBAccessToken> ();
+				} else {
+					db.CreateTableIfNotExists <DBUser> ();
+					db.CreateTableIfNotExists <DBNote> ();
+					db.CreateTableIfNotExists <DBAccessToken> ();
+				}
+			}
+		}
+
 		// verifies a given user/password combination
 		public static bool DbAuthenticator (string username, string password)
 		{
 			DBUser user = null;
-			using (var conn = DbConfig.GetConnection ()) {
+			var factory = Rainy.Container.Instance.Resolve<IDbConnectionFactory> ();
+			using (var conn = factory.OpenDbConnection ()) {
 				user = conn.FirstOrDefault<DBUser> (u => u.Username == username && u.Password == password);
 			}
 			if (user == null)
@@ -47,7 +75,7 @@ namespace Rainy
 		public INoteRepository GetNoteRepository (string username)
 		{
 			DBUser user = null;
-			using (var db = DbConfig.GetConnection ()) {
+			using (var db = connFactory.OpenDbConnection ()) {
 				user = db.First<DBUser> (u => u.Username == username);
 				// TODO why doesn't ormlite raise this error?
 				if (user == null)
@@ -66,18 +94,18 @@ namespace Rainy
 	}
 
 	// maybe move into DatabaseBackend as nested class
-	public class DatabaseNoteRepository : Rainy.Interfaces.INoteRepository
+	public class DatabaseNoteRepository : DbAccessObject, Rainy.Interfaces.INoteRepository
 	{
 		private DbStorage storage;
 		private Engine engine;
-		private IDbConnection dbConnection;
 		private DBUser dbUser;
 
 		public DatabaseNoteRepository (string username)
 		{
-			dbConnection = DbConfig.GetConnection ();
-			dbUser = dbConnection.First<DBUser> (u => u.Username == username);
-		
+			using (var db = connFactory.OpenDbConnection ()) {
+				dbUser = db.First<DBUser> (u => u.Username == username);
+			}
+
 			storage = new DbStorage (dbUser);
 			engine = new Engine (storage);
 
@@ -93,14 +121,13 @@ namespace Rainy
 			storage.Dispose ();
 
 			// write back the user
-
-			using (var trans = dbConnection.BeginTransaction ()) {
-				dbConnection.Delete (dbUser);
-				dbConnection.Insert (dbUser);
-				trans.Commit ();
+			using (var db = connFactory.OpenDbConnection ()) {
+				using (var trans = db.OpenTransaction ()) {
+					db.Delete (dbUser);
+					db.Insert (dbUser);
+					trans.Commit ();
+				}
 			}
-
-			dbConnection.Dispose ();
 		}
 		#endregion
 		#region INoteRepository implementation

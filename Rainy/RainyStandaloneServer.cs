@@ -9,6 +9,9 @@ using Rainy.CustomHandler;
 using Rainy.Interfaces;
 using Rainy.OAuth;
 using Rainy.WebService;
+using ServiceStack.OrmLite.PostgreSQL;
+using ServiceStack.OrmLite;
+using Rainy.Db;
 
 namespace Rainy
 {
@@ -23,19 +26,18 @@ namespace Rainy
 		private AppHost appHost;
 		private ILog logger;
 
-		public RainyStandaloneServer (IDataBackend backend, string listen_url)
+		public RainyStandaloneServer (string listen_url)
 		{
+			appHost = new AppHost ();
+
 			ListenUrl = listen_url;
 			logger = LogManager.GetLogger (this.GetType ());
 
-			OAuth = backend.OAuth;
-
-			DataBackend = backend;
-
+			DataBackend = Container.Instance.Resolve<IDataBackend> ();
+			OAuth = DataBackend.OAuth;
 		}
 		public void Start ()
 		{
-			appHost = new AppHost ();
 			appHost.Init ();
 
 			logger.DebugFormat ("starting http listener at: {0}", ListenUrl);
@@ -45,11 +47,11 @@ namespace Rainy
 		public void Stop ()
 		{
 			appHost.Stop ();
-			appHost.Dispose ();
 		}
 		public void Dispose ()
 		{
 			Stop ();
+			appHost.Dispose ();
 		}
 	}
 
@@ -61,8 +63,15 @@ namespace Rainy
 		public AppHost (bool test_server) : this ()
 		{
 		}
+
 		public override void Configure (Funq.Container container)
 		{
+			var factory = Rainy.Container.Instance.Resolve<IDbConnectionFactory> ();
+			using (var db = factory.OpenDbConnection ()) {
+				db.DropAndCreateTable<DBNote> ();
+				db.InsertParam<DBNote> (new DBNote { MetadataChangeDate = DateTime.Now.ToString () });
+			}
+
 			JsConfig.DateHandler = JsonDateHandler.ISO8601;
 
 			Plugins.Add (new SwaggerFeature ());
@@ -70,7 +79,6 @@ namespace Rainy
 			// register our custom exception handling
 			this.ExceptionHandler = Rainy.ErrorHandling.ExceptionHandler.CustomExceptionHandler;
 			this.ServiceExceptionHandler = Rainy.ErrorHandling.ExceptionHandler.CustomServiceExceptionHandler;
-
 
 
 			var swagger_path = Path.Combine(Path.GetDirectoryName(this.GetType ().Assembly.Location), "../../swagger-ui/");

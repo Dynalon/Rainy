@@ -54,7 +54,7 @@ namespace Rainy.Db
 		public new string Token { get; set; }
 	}
 
-	public static class DbConfig
+	/*public static class DbConfig
 	{
 		private static bool isInitialized = false;
 		private static string sqliteFile = "rainy.db";
@@ -109,7 +109,7 @@ namespace Rainy.Db
 				}
 			}
 		}
-	}
+	}*/
 	public static class DbClassConverter
 	{
 		public static DBNote ToDBNote (this DTONote dto, DBUser user, bool encrypt = false)

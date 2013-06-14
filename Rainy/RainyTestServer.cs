@@ -10,6 +10,7 @@ using Tomboy.Sync.Web;
 using Tomboy.Sync.Web.DTO;
 using Rainy.Db;
 using Rainy.Interfaces;
+using Rainy.Db.Config;
 
 namespace Rainy
 {
@@ -50,21 +51,26 @@ namespace Rainy
 		{
 			tmpPath = "/tmp/rainy-test-data/";
 			Directory.CreateDirectory (tmpPath);
-			DbConfig.SetSqliteFile (Path.Combine (tmpPath, "rainy-test.db"));
+			var file = Path.Combine(tmpPath, "rainy-test.db");
+			var conf = new SqliteConfig { File = file };
+			Rainy.Container.Instance.Register<SqliteConfig> (conf);
+			Rainy.Container.Instance.Register<IDbConnectionFactory> (new OrmLiteConnectionFactory (conf.ConnectionString, SqliteDialect.Provider));
 			// tmpPath = Path.GetTempPath () + Path.GetRandomFileName ();
 
 			IDataBackend backend;
 			if (use_backend == "sqlite") {
-				backend = new DatabaseBackend (tmpPath, credentialsVerifier);
-				DbConfig.CreateSchema(reset: true);
-				using (var c = DbConfig.GetConnection ()) {
+				backend = new DatabaseBackend (credentialsVerifier);
+				Rainy.Container.Instance.Register<IDataBackend> (backend);
+				DatabaseBackend.CreateSchema(reset: true);
+				var factory = Rainy.Container.Instance.Resolve<IDbConnectionFactory> ();
+				using (var c = factory.OpenDbConnection ()) {
 					c.Insert<DBUser>(new DBUser() { Username = TEST_USER });
 				}
 			}
 			else
 				backend = new RainyFileSystemBackend (tmpPath, credentialsVerifier);
 
-			rainyServer = new RainyStandaloneServer (backend, RainyListenUrl);
+			rainyServer = new RainyStandaloneServer (RainyListenUrl);
 
 			rainyServer.Start ();
 		}

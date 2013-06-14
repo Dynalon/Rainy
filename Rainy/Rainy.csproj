@@ -81,6 +81,12 @@
     <Reference Include="ServiceStack.Api.Swagger">
       <HintPath>..\packages\ServiceStack.Api.Swagger.3.9.48\lib\net35\ServiceStack.Api.Swagger.dll</HintPath>
     </Reference>
+    <Reference Include="Npgsql">
+      <HintPath>..\lib\Npgsql.dll</HintPath>
+    </Reference>
+    <Reference Include="ServiceStack.OrmLite.PostgreSQL">
+      <HintPath>..\packages\ServiceStack.OrmLite.PostgreSQL.3.9.48\lib\ServiceStack.OrmLite.PostgreSQL.dll</HintPath>
+    </Reference>
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <ItemGroup>
@@ -132,6 +138,7 @@
     <Compile Include="WebService\OAuth\OAuthService.cs" />
     <Compile Include="CustomHandler\EmbeddedResourceHandler.cs" />
     <Compile Include="CustomHandler\FilesystemHandler.cs" />
+    <Compile Include="ORM\DbConfig.cs" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="WebService\" />

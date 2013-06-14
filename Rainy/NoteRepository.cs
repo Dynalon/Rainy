@@ -25,7 +25,7 @@ namespace Rainy
 			oauthHandler = new OAuthDatabaseHandler (auth);
 
 			// TODO move this into the oauth stuff
-			DbConfig.CreateSchema ();
+			//DbConfig.CreateSchema ();
 
 			this.notesBasePath = Path.Combine (data_path, "notes");
 			if (!Directory.Exists (notesBasePath)) {

@@ -50,12 +50,13 @@ namespace Rainy.Tests.Management
 
 			// lookup activation key
 			var secret = "";
-			using (var db = DbConfig.GetConnection ()) {
+			var factory = Rainy.Container.Instance.Resolve<IDbConnectionFactory> ();
+			using (var db = factory.OpenDbConnection ()) {
 				var db_user = db.First<DBUser> (u => u.Username == user.Username);
 				secret = db_user.VerifySecret;
 				client.Get<VerifyUserRequest> ("/api/user/signup/verify/" + secret + "/");
 			}
-			using (var db = DbConfig.GetConnection ()) {
+			using (var db = factory.OpenDbConnection ()) {
 				var db_user = db.First<DBUser> (u => u.Username == user.Username);
 				Assert.IsTrue (db_user.IsVerified);
 				Assert.IsEmpty (db_user.VerifySecret);
@@ -88,11 +89,11 @@ namespace Rainy.Tests.Management
 
 			// lookup activation key
 			var secret = "";
-			using (var db = DbConfig.GetConnection ()) {
+			using (var db = factory.OpenDbConnection ()) {
 				var db_user = db.First<DBUser> (u => u.Username == user.Username);
 				secret = db_user.VerifySecret;
-				client.Get<VerifyUserRequest> ("/api/user/signup/verify/" + secret + "/");
 			}
+			client.Get<VerifyUserRequest> ("/api/user/signup/verify/" + secret + "/");
 
 			testServer.Stop ();
 			testServer = new RainyTestServer (DatabaseBackend.DbAuthenticator);
@@ -171,15 +172,15 @@ namespace Rainy.Tests.Management
 		
 			// lookup activation key
 			var secret = "";
-			using (var db = DbConfig.GetConnection ()) {
+			using (var db = factory.OpenDbConnection ()) {
 				var db_user = db.First<DBUser> (u => u.Username == user.Username);
 				secret = db_user.VerifySecret;
-				client.Get<VerifyUserRequest> ("/api/user/signup/verify/" + secret + "/");
 			}
+			client.Get<VerifyUserRequest> ("/api/user/signup/verify/" + secret + "/");
 
 			adminClient.Post<ActivateUserRequest> ("/api/user/signup/activate/" + user.Username + "/", new object());
 
-			using (var db = DbConfig.GetConnection ()) {
+			using (var db = factory.OpenDbConnection ()) {
 				var db_user = db.First<DBUser> (u => u.Username == user.Username);
 				Assert.IsTrue (db_user.IsActivated);
 			}

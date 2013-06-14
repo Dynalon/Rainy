@@ -5,6 +5,7 @@ using System.Data;
 using ServiceStack.OrmLite;
 using System.Collections.Generic;
 using System.IO;
+using Rainy.Db.Config;
 
 namespace Rainy.Db
 {
@@ -16,13 +17,14 @@ namespace Rainy.Db
 		[TestFixtureSetUp]
 		public void FixtureSetUp ()
 		{
-			DbConfig.SetSqliteFile ("/tmp/rainy-test-data/rainy-test.db");
+			var conf = new SqliteConfig { File = "/tmp/rainy-test-data/rainy-test.db" };
+			Rainy.Container.Instance.Register<IDbConnectionFactory> (new OrmLiteConnectionFactory (conf.ConnectionString, SqliteDialect.Provider));
 			// remove the rainy-test.db file if it exists
-			if (File.Exists (DbConfig.SqliteFile)) {
-				File.Delete (DbConfig.SqliteFile);
+			if (File.Exists (conf.File)) {
+				File.Delete (conf.File);
 			}
 
-			dbFactory = new OrmLiteConnectionFactory (DbConfig.ConnectionString, SqliteDialect.Provider);
+			dbFactory = new OrmLiteConnectionFactory (conf.ConnectionString, SqliteDialect.Provider);
 
 		}
 		

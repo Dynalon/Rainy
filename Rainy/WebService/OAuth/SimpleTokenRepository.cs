@@ -32,12 +32,12 @@ namespace Rainy.OAuth
 		}
 	}
 
-	public class DbAccessTokenRepository<T> : ITokenRepository<T>
+	public class DbAccessTokenRepository<T> : DbAccessObject, ITokenRepository<T>
 		where T: AccessToken
 	{
 		public T GetToken (string token)
 		{
-			using (var conn = DbConfig.GetConnection ()) {
+			using (var conn = connFactory.OpenDbConnection ()) {
 				DBAccessToken t;
 				t = conn.First<DBAccessToken> ("Token = {0}", token);
 				return (T) t.ToAccessToken();
@@ -45,7 +45,7 @@ namespace Rainy.OAuth
 		}
 		public void SaveToken (T token)
 		{
-			using (var conn = DbConfig.GetConnection ()) {
+			using (var conn = connFactory.OpenDbConnection ()) {
 				using (var trans = conn.BeginTransaction ()) {
 					// first delete the token
 					conn.Delete (token.ToDBAccessToken ());

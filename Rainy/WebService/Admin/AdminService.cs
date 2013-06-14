@@ -25,7 +25,8 @@ namespace Rainy.WebService.Management.Admin
 		public DTOUser[] Get (AllUserRequest req)
 		{
 			DTOUser[] all_user;
-			using (var conn = DbConfig.GetConnection ()) {
+			var factory = Rainy.Container.Instance.Resolve<IDbConnectionFactory> ();
+			using (var conn = factory.OpenDbConnection ()) {
 				all_user = conn.Select<DBUser> ().ToArray<DTOUser> ();
 				return all_user;
 			}
@@ -36,7 +37,8 @@ namespace Rainy.WebService.Management.Admin
 		{
 			DBUser found_user;
 
-			using (var conn = DbConfig.GetConnection ()) {
+			var factory = Rainy.Container.Instance.Resolve<IDbConnectionFactory> ();
+			using (var conn = factory.OpenDbConnection ()) {
 				found_user = conn.FirstOrDefault<DBUser> ("Username = {0}", req.Username);
 			}
 
@@ -54,7 +56,8 @@ namespace Rainy.WebService.Management.Admin
 			// TODO make explicit mapping
 			user.PopulateWith (updated_user);
 
-			using (var conn = DbConfig.GetConnection ()) {
+			var factory = Rainy.Container.Instance.Resolve<IDbConnectionFactory> ();
+			using (var conn = factory.OpenDbConnection ()) {
 				var stored_user = conn.FirstOrDefault<DBUser>("Username = {0}", user.Username);
 
 				if (stored_user == null) {
@@ -115,7 +118,8 @@ namespace Rainy.WebService.Management.Admin
 			// lowercase the username
 			new_user.Username = new_user.Username.ToLower ();
 
-			using (var conn = DbConfig.GetConnection ()) {
+			var factory = Rainy.Container.Instance.Resolve<IDbConnectionFactory> ();
+			using (var conn = factory.OpenDbConnection ()) {
 				var existing_user = conn.FirstOrDefault<DBUser> ("Username = {0}", new_user.Username);
 				if (existing_user != null)
 					throw new ConflictException (){ErrorMessage = "A user by that name already exists"};
@@ -143,7 +147,8 @@ namespace Rainy.WebService.Management.Admin
 		/// </summary>
 		public object Delete (UserRequest user)
 		{
-			using (var conn = DbConfig.GetConnection ()) {
+			var factory = Rainy.Container.Instance.Resolve<IDbConnectionFactory> ();
+			using (var conn = factory.OpenDbConnection ()) {
 				using (var trans = conn.BeginTransaction ()) {
 
 					try {

@@ -8,7 +8,7 @@ using Tomboy.Sync.Web.DTO;
 
 namespace Rainy.Db
 {
-	public class DbStorage : IStorage, IDisposable
+	public class DbStorage : DbAccessObject, IStorage, IDisposable
 	{
 		public readonly DBUser User;
 		private IDbConnection db;
@@ -16,8 +16,10 @@ namespace Rainy.Db
 
 		public DbStorage (DBUser user)
 		{
-			this.db = DbConfig.GetConnection ();
 			this.User = user;
+			var factory = Rainy.Container.Instance.Resolve<IDbConnectionFactory> ();
+			db = factory.OpenDbConnection ();
+
 
 			// start everything as a transaction
 			trans = db.BeginTransaction ();

@@ -1,5 +1,6 @@
 using System;
 using NUnit.Framework;
+using Rainy.Db.Config;
 
 namespace Rainy.Db
 {
@@ -12,7 +13,8 @@ namespace Rainy.Db
 		[Test]
 		public void ReadWriteManifest ()
 		{
-			var data_backend = new DatabaseBackend ("/tmp/rainy-test-data/rainy-test.db", auth);
+			var conf = new SqliteConfig { File = "/tmp/rainy-test-data/rainy-test.db" };
+			var data_backend = new DatabaseBackend (auth);
 
 			var server_id = Guid.NewGuid ().ToString ();
 			using (var repo = data_backend.GetNoteRepository (testUser.Username)) {
