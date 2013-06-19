@@ -30,22 +30,15 @@ namespace Rainy
 			if (factory == null)
 				throw new ArgumentNullException ("factory");
 
-			Console.WriteLine("****");
-			Console.WriteLine("****");
-			Console.WriteLine("****");
-			Console.WriteLine("****");
 			connFactory = factory;
 		}
 
 		public bool VerifyCredentials (string username, string password)
 		{
-			Console.WriteLine("$$$$");
 			DBUser user = null;
-			Console.WriteLine ("username: {0}, password: {1}", username, password);
 			using (var conn = connFactory.OpenDbConnection ()) {
 				user = conn.FirstOrDefault<DBUser> (u => u.Username == username && u.Password == password);
 			}
-			Console.WriteLine (user);
 			if (user == null)
 				return false;
 
