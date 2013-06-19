@@ -15,50 +15,37 @@ namespace Rainy
 	public class DbAccessObject
 	{
 		protected IDbConnectionFactory connFactory;
-		public DbAccessObject ()
+		public DbAccessObject (IDbConnectionFactory factory)
 		{
-			this.connFactory = Container.Instance.Resolve<IDbConnectionFactory> ();
+			connFactory = factory;
 		}
 	}
 
-	public class DatabaseBackend : DbAccessObject, IDataBackend
+	public class DbAuthenticator : IAuthenticator
 	{
-		OAuthHandlerBase oauthHandler;
+		private IDbConnectionFactory connFactory;
 
-		public DatabaseBackend (CredentialsVerifier auth = null) : base ()
+		public DbAuthenticator (IDbConnectionFactory factory)
 		{
-			if (auth == null)
-				oauthHandler = new OAuthDatabaseHandler (DbAuthenticator);
-			else
-				oauthHandler = new OAuthDatabaseHandler (auth);
+			if (factory == null)
+				throw new ArgumentNullException ("factory");
 
-			CreateSchema ();
+			Console.WriteLine("****");
+			Console.WriteLine("****");
+			Console.WriteLine("****");
+			Console.WriteLine("****");
+			connFactory = factory;
 		}
 
-		public static void CreateSchema (bool reset = false)
+		public bool VerifyCredentials (string username, string password)
 		{
-			var factory = Rainy.Container.Instance.Resolve<IDbConnectionFactory> ();
-			using (var db = factory.OpenDbConnection ()) {
-				if (reset) {
-					db.DropAndCreateTable <DBUser> ();
-					db.DropAndCreateTable <DBNote> ();
-					db.DropAndCreateTable <DBAccessToken> ();
-				} else {
-					db.CreateTableIfNotExists <DBUser> ();
-					db.CreateTableIfNotExists <DBNote> ();
-					db.CreateTableIfNotExists <DBAccessToken> ();
-				}
-			}
-		}
-
-		// verifies a given user/password combination
-		public static bool DbAuthenticator (string username, string password)
-		{
+			Console.WriteLine("$$$$");
 			DBUser user = null;
-			var factory = Rainy.Container.Instance.Resolve<IDbConnectionFactory> ();
-			using (var conn = factory.OpenDbConnection ()) {
+			Console.WriteLine ("username: {0}, password: {1}", username, password);
+			using (var conn = connFactory.OpenDbConnection ()) {
 				user = conn.FirstOrDefault<DBUser> (u => u.Username == username && u.Password == password);
 			}
+			Console.WriteLine (user);
 			if (user == null)
 				return false;
 
@@ -69,7 +56,54 @@ namespace Rainy
 				return false;
 
 			return true;
+
 		}
+
+	}
+
+	public class DatabaseBackend : DbAccessObject, IDataBackend
+	{
+		OAuthHandlerBase oauthHandler;
+
+		public DatabaseBackend (IDbConnectionFactory factory, IAuthenticator auth) : base (factory)
+		{
+			oauthHandler = new OAuthDatabaseHandler (factory, auth);
+
+			CreateSchema (factory);
+		}
+
+		public static void CreateSchema (IDbConnectionFactory connFactory, bool reset = false)
+		{
+			if (connFactory == null)
+				throw new ArgumentNullException ("connFactory");
+
+			using (var db = connFactory.OpenDbConnection ()) {
+				if (reset) {
+					// postgresql ormlite workaround, see issue
+					var ormfac = connFactory as OrmLiteConnectionFactory;
+					if (ormfac.DialectProvider == PostgreSqlDialect.Provider) {
+						var cmd = db.CreateCommand ();
+						cmd.CommandText = "DROP SCHEMA PUBLIC CASCADE;";
+						cmd.ExecuteNonQuery ();
+						cmd = db.CreateCommand ();
+						cmd.CommandText = "CREATE SCHEMA public AUTHORIZATION td";
+						cmd.ExecuteNonQuery ();
+						db.CreateTableIfNotExists <DBUser> ();
+						db.CreateTableIfNotExists <DBNote> ();
+						db.CreateTableIfNotExists <DBAccessToken> ();
+					} else {
+						db.DropAndCreateTable <DBUser> ();
+						db.DropAndCreateTable <DBNote> ();
+						db.DropAndCreateTable <DBAccessToken> ();
+					}
+				} else {
+					db.CreateTableIfNotExists <DBUser> ();
+					db.CreateTableIfNotExists <DBNote> ();
+					db.CreateTableIfNotExists <DBAccessToken> ();
+				}
+			}
+		}
+
 
 		#region IDataBackend implementation
 		public INoteRepository GetNoteRepository (string username)
@@ -81,7 +115,7 @@ namespace Rainy
 				if (user == null)
 					throw new ArgumentException(username);
 			}
-			var rep = new DatabaseNoteRepository (username);
+			var rep = new DatabaseNoteRepository (this.connFactory, username);
 			return rep;
 		}
 		public OAuthHandlerBase OAuth {
@@ -100,13 +134,13 @@ namespace Rainy
 		private Engine engine;
 		private DBUser dbUser;
 
-		public DatabaseNoteRepository (string username)
+		public DatabaseNoteRepository (IDbConnectionFactory factory, string username) : base (factory)
 		{
 			using (var db = connFactory.OpenDbConnection ()) {
 				dbUser = db.First<DBUser> (u => u.Username == username);
 			}
 
-			storage = new DbStorage (dbUser);
+			storage = new DbStorage (factory, dbUser);
 			engine = new Engine (storage);
 
 			if (dbUser.Manifest == null || string.IsNullOrEmpty (dbUser.Manifest.ServerId)) {

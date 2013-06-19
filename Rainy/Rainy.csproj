@@ -117,7 +117,6 @@
     <Compile Include="RainyStandaloneServer.cs" />
     <Compile Include="NoteRepository.cs" />
     <Compile Include="Interfaces.cs" />
-    <Compile Include="RainyTestServer.cs" />
     <Compile Include="WebService\OAuth\SimpleTokenRepository.cs" />
     <Compile Include="WebService\OAuth\OAuthDatabaseHandler.cs" />
     <Compile Include="WebService\OAuth\OAuthHandlerBase.cs" />
@@ -139,6 +138,8 @@
     <Compile Include="CustomHandler\EmbeddedResourceHandler.cs" />
     <Compile Include="CustomHandler\FilesystemHandler.cs" />
     <Compile Include="ORM\DbConfig.cs" />
+    <Compile Include="AppHost.cs" />
+    <Compile Include="RainyTestServer.cs" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="WebService\" />

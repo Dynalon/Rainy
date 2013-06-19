@@ -56,6 +56,12 @@
     <Reference Include="ServiceStack">
       <HintPath>..\packages\ServiceStack.3.9.48\lib\net35\ServiceStack.dll</HintPath>
     </Reference>
+    <Reference Include="ServiceStack.OrmLite.PostgreSQL">
+      <HintPath>..\packages\ServiceStack.OrmLite.PostgreSQL.3.9.48\lib\ServiceStack.OrmLite.PostgreSQL.dll</HintPath>
+    </Reference>
+    <Reference Include="Npgsql">
+      <HintPath>..\lib\Npgsql.dll</HintPath>
+    </Reference>
   </ItemGroup>
   <ItemGroup>
     <Compile Include="OAuthTests.cs" />
@@ -64,13 +70,10 @@
     <Compile Include="ORM\DbTestsBase.cs" />
     <Compile Include="ORM\DbStorageTests.cs" />
     <Compile Include="ORM\DatabaseBackendTests.cs" />
-    <Compile Include="SampleServerTestBase.cs" />
     <Compile Include="TestServerTests.cs" />
     <Compile Include="TestBase.cs" />
     <Compile Include="DtoConversionTests.cs" />
-    <Compile Include="WebSyncServerTests.cs" />
     <Compile Include="Admin\TestUserManagement.cs" />
-    <Compile Include="Admin\TestUserSignup.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <ItemGroup>
@@ -106,5 +109,7 @@
   <ItemGroup>
     <None Include="UbuntuOneWebSyncServerTests.cs" />
     <None Include="packages.config" />
+    <None Include="Admin\TestUserSignup.cs" />
+    <None Include="WebSyncServerTests.cs" />
   </ItemGroup>
 </Project>

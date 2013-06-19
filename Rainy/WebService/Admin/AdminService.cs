@@ -12,21 +12,23 @@ using Rainy.UserManagement;
 using System.Linq;
 using Rainy.WebService.Admin;
 using Rainy.ErrorHandling;
+using Rainy.Interfaces;
 
 namespace Rainy.WebService.Management.Admin
 {
 	public class UserService : RainyNoteServiceBase
 	{
-		public UserService () : base ()
+		private IDbConnectionFactory connFactory;
+		public UserService (IDataBackend backend, IDbConnectionFactory factory) : base (backend)
 		{
+			connFactory = factory;
 		}
 
 		// gets a list of all users
 		public DTOUser[] Get (AllUserRequest req)
 		{
 			DTOUser[] all_user;
-			var factory = Rainy.Container.Instance.Resolve<IDbConnectionFactory> ();
-			using (var conn = factory.OpenDbConnection ()) {
+			using (var conn = connFactory.OpenDbConnection ()) {
 				all_user = conn.Select<DBUser> ().ToArray<DTOUser> ();
 				return all_user;
 			}
@@ -37,8 +39,7 @@ namespace Rainy.WebService.Management.Admin
 		{
 			DBUser found_user;
 
-			var factory = Rainy.Container.Instance.Resolve<IDbConnectionFactory> ();
-			using (var conn = factory.OpenDbConnection ()) {
+			using (var conn = connFactory.OpenDbConnection ()) {
 				found_user = conn.FirstOrDefault<DBUser> ("Username = {0}", req.Username);
 			}
 
@@ -56,8 +57,7 @@ namespace Rainy.WebService.Management.Admin
 			// TODO make explicit mapping
 			user.PopulateWith (updated_user);
 
-			var factory = Rainy.Container.Instance.Resolve<IDbConnectionFactory> ();
-			using (var conn = factory.OpenDbConnection ()) {
+			using (var conn = connFactory.OpenDbConnection ()) {
 				var stored_user = conn.FirstOrDefault<DBUser>("Username = {0}", user.Username);
 
 				if (stored_user == null) {
@@ -118,8 +118,7 @@ namespace Rainy.WebService.Management.Admin
 			// lowercase the username
 			new_user.Username = new_user.Username.ToLower ();
 
-			var factory = Rainy.Container.Instance.Resolve<IDbConnectionFactory> ();
-			using (var conn = factory.OpenDbConnection ()) {
+			using (var conn = connFactory.OpenDbConnection ()) {
 				var existing_user = conn.FirstOrDefault<DBUser> ("Username = {0}", new_user.Username);
 				if (existing_user != null)
 					throw new ConflictException (){ErrorMessage = "A user by that name already exists"};
@@ -147,8 +146,7 @@ namespace Rainy.WebService.Management.Admin
 		/// </summary>
 		public object Delete (UserRequest user)
 		{
-			var factory = Rainy.Container.Instance.Resolve<IDbConnectionFactory> ();
-			using (var conn = factory.OpenDbConnection ()) {
+			using (var conn = connFactory.OpenDbConnection ()) {
 				using (var trans = conn.BeginTransaction ()) {
 
 					try {

@@ -49,11 +49,11 @@ namespace Rainy.Db
 		{
 			var sample_notes = GetSampleNotes ();
 
-			using (var store = new DbStorage (testUser)) {
+			using (var store = new DbStorage (factory, testUser)) {
 				sample_notes.ForEach (n => store.SaveNote (n));
 			}
 			// now check if we have stored that notes
-			using (var store = new DbStorage (testUser)) {
+			using (var store = new DbStorage (factory, testUser)) {
 				var stored_notes = store.GetNotes ().Values.ToList ();
 
 				Assert.AreEqual (sample_notes.Count, stored_notes.Count);
@@ -73,7 +73,7 @@ namespace Rainy.Db
 		{
 			StoreSomeNotes ();
 
-			using (var store = new DbStorage (testUser)) {
+			using (var store = new DbStorage (factory, testUser)) {
 				var stored_notes = store.GetNotes ().Values.ToList ();
 
 				var deleted_note = stored_notes[0];
@@ -96,7 +96,7 @@ namespace Rainy.Db
 		[Test]
 		public void DateUtcIsCorrectlyStored ()
 		{
-			DbStorage storage = new DbStorage(testUser);
+			DbStorage storage = new DbStorage(factory, testUser);
 
 			var tomboy_note = new Note ();
 			tomboy_note.ChangeDate = new DateTime (2000, 1, 1, 0, 0, 0, DateTimeKind.Utc);
@@ -114,7 +114,7 @@ namespace Rainy.Db
 		[Test]
 		public void DateLocalIsCorrectlyStored ()
 		{
-			DbStorage storage = new DbStorage(testUser);
+			DbStorage storage = new DbStorage(factory, testUser);
 			
 			var tomboy_note = new Note ();
 			tomboy_note.ChangeDate = new DateTime (2000, 1, 1, 0, 0, 0, DateTimeKind.Local);

@@ -5,6 +5,7 @@ using ServiceStack.ServiceHost;
 using Rainy.WebService.OAuth;
 using System.Linq;
 using ServiceStack.Text;
+using Rainy.Interfaces;
 
 namespace Rainy.WebService
 {
@@ -59,14 +60,15 @@ namespace Rainy.WebService
 
 	public abstract class RainyNoteServiceBase : RainyServiceBase
 	{
-		public RainyNoteServiceBase () : base ()
+		protected IDataBackend dataBackend;
+		public RainyNoteServiceBase (IDataBackend backend) : base ()
 		{
+			this.dataBackend = backend;
 		}
 		protected Rainy.Interfaces.INoteRepository GetNotes (string username)
 		{
-			return RainyStandaloneServer.DataBackend.GetNoteRepository (username);
+			return dataBackend.GetNoteRepository (username);
 		}
-
 	}
 
 	[RequestLogFilter]

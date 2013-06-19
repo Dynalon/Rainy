@@ -13,17 +13,11 @@ using Rainy.Interfaces;
 using Mono.Unix;
 using Mono.Unix.Native;
 using Rainy.Db.Config;
+using ServiceStack.OrmLite;
+using Rainy.OAuth;
 
 namespace Rainy
 {
-	public static class Container
-	{
-		private static readonly Funq.Container instance = new Funq.Container ();
-		public static Funq.Container Instance {
-			get { return instance; }
-		}
-	}
-
 	public class MainClass
 	{
 		// HACK a dictionary holding usernames and their repos
@@ -78,6 +72,84 @@ namespace Rainy
 			appender.AddMapping(colors);	
 			*/	
 		}
+
+		// This is the "Composition Root" in the IoC pattern that wires all
+		// our objects/implementations up, based on a given configuration.
+		// config sanity checks SHOULD NOT go here
+
+		private static void ComposeObjectGraph(Funq.Container container)
+		{
+			var config = Config.Global;
+
+			container.Register<SqliteConfig> (c => new SqliteConfig {
+				File = Path.Combine (config.DataPath, "rainy.db")
+			});
+
+			container.Register<PostgreConfig> (c => {
+				dynamic txt_conf = config.Postgre;
+				var psql_conf = new PostgreConfig ();
+				if (!string.IsNullOrEmpty (txt_conf.Username)) psql_conf.Username = txt_conf.Username;
+				if (!string.IsNullOrEmpty (txt_conf.Password)) psql_conf.Password = txt_conf.Password;
+				if (!string.IsNullOrEmpty (txt_conf.Database)) psql_conf.Database = txt_conf.Database;
+				if (!string.IsNullOrEmpty (txt_conf.Host)) psql_conf.Host = txt_conf.Host;
+				if (txt_conf.Port) psql_conf.Port = txt_conf.Port;
+
+				return psql_conf;
+			});
+
+			if (config.Backend == "xml") {
+
+				// use username/password pairs from the config file
+				container.Register<IAuthenticator> (c => {
+					return new ConfigFileAuthenticator(config.User);
+				});
+
+				// we store notes in XML files in the DataPath
+				container.Register<IDataBackend> (c => {
+					var auth = c.Resolve<IAuthenticator> ();
+					var factory = c.Resolve<IDbConnectionFactory> ();
+					return new FileSystemBackend (config.DataPath, factory, auth, false);
+				});
+
+			} else {
+				// database based backends
+				switch ((string) config.Backend) {
+					case "sqlite":
+					container.Register<IDbConnectionFactory> (c => {
+						var connection_string = container.Resolve<SqliteConfig> ().ConnectionString;
+						return new OrmLiteConnectionFactory (connection_string, SqliteDialect.Provider);
+					});
+					break;
+					case "postgre":
+					container.Register<IDbConnectionFactory> (c => {
+						var connection_string = container.Resolve<PostgreConfig> ().ConnectionString;
+						return new OrmLiteConnectionFactory (connection_string, PostgreSqlDialect.Provider);
+					});
+					break;
+				}
+
+				container.Register<IAuthenticator> (c => {
+					var factory = c.Resolve<IDbConnectionFactory> ();
+					var dbauth = new DbAuthenticator (factory);
+					return dbauth;
+				});
+
+				container.Register<IDataBackend> (c => {
+					var factory = c.Resolve<IDbConnectionFactory> ();
+					var auth = c.Resolve<IAuthenticator> ();
+					return new DatabaseBackend (factory, auth);
+				});
+
+				container.Register<OAuthHandlerBase> (c => {
+					var auth = c.Resolve<IAuthenticator> ();
+					var factory = c.Resolve<IDbConnectionFactory> ();
+					var handler = new OAuthDatabaseHandler (factory, auth);
+					return handler;
+				});
+			}
+
+		}
+
 		public static void Main (string[] args)
 		{
 			// parse command line arguments
@@ -139,43 +211,11 @@ namespace Rainy
 
 			ConfigureSslCerts (listen_url, cert_file, pvk_file);
 
-			// determine and setup data backend
-			string backend = Config.Global.Backend;
-
-			IDataBackend data_backend;
-			// simply use user/password list from config for authentication
-			CredentialsVerifier config_authenticator = (username, password) => {
-				// call the authenticater callback
-				if (string.IsNullOrEmpty (username) || string.IsNullOrEmpty (password))
-				return false;
-
-				foreach (dynamic credentials in Config.Global.Users) {
-					if (credentials.Username == username && credentials.Password == password)
-						return true;
-				}
-				return false;
-			};
-
 			var sqlite_file = Path.Combine (DataPath, "rainy.db");
-			Container.Instance.Register<SqliteConfig> (c => new SqliteConfig { File = sqlite_file });
-			Container.Instance.Register<PostgreConfig> (new PostgreConfig { Username = "td", Password = "foobar" });
 
 			// by default we use the filesystem backend
-			if (string.IsNullOrEmpty (backend)) {
-				backend = "filesystem";
-			}
-
-			if (backend == "sqlite" || backend == "postgre") {
-
-				/* if (string.IsNullOrEmpty (Config.Global.AdminPassword)) {
-					Console.WriteLine ("FATAL: Field 'AdminPassword' in the settings config may not " +
-					                   "be empty when using the sqlite backend");
-					return;
-				} */
-				Container.Instance.Register<IDataBackend> (c => new DatabaseBackend (config_authenticator));
-
-			} else if (backend == "filesystem") {
-				Container.Instance.Register<IDataBackend> (c => new RainyFileSystemBackend (DataPath, config_authenticator));
+			if (string.IsNullOrEmpty (Config.Global.Backend)) {
+				Config.Global.Backend = "filesystem";
 			}
 
 			string admin_ui_url = listen_url.Replace ("*", "localhost");
@@ -184,7 +224,9 @@ namespace Rainy
 				admin_ui_url += "admin/#?admin_pw=" + Config.Global.AdminPassword;
 			}
 
-			using (var listener = new RainyStandaloneServer (listen_url)) {
+			ComposeObjectGraphDelegate object_graph_composer = ComposeObjectGraph;
+
+			using (var listener = new RainyStandaloneServer (Config.Global.ListenUrl, object_graph_composer)) {
 
 				listener.Start ();
 				Uptime = DateTime.UtcNow;
@@ -221,6 +263,7 @@ namespace Rainy
 				}
 			}
 		}
+
 
 		public static void ConfigureSslCerts (string listen_url, string cert_file, string pvk_file)
 		{

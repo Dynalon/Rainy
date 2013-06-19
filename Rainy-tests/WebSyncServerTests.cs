@@ -9,7 +9,6 @@ namespace Rainy.Tests
 	[TestFixture]
 	public class WebSyncServerTests : Tomboy.Sync.AbstractSyncManagerTests
 	{
-		protected RainyTestServer testServer;
 		protected DBUser testUser;
 		[SetUp]
 		public new void SetUp ()

@@ -31,7 +31,7 @@ namespace Rainy.Tests
 		{
 			var user_response = testServer.GetUserInfo ();
 
-			Assert.AreEqual (user_response.Username, testServer.TEST_USER);
+			Assert.AreEqual (user_response.Username, RainyTestServer.TEST_USER);
 			Assert.AreEqual (user_response.LatestSyncRevision, -1);
 
 			Assert.That (Uri.IsWellFormedUriString (user_response.NotesRef.ApiRef, UriKind.Absolute));

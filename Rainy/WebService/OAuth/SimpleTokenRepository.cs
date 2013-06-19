@@ -35,6 +35,9 @@ namespace Rainy.OAuth
 	public class DbAccessTokenRepository<T> : DbAccessObject, ITokenRepository<T>
 		where T: AccessToken
 	{
+		public DbAccessTokenRepository (IDbConnectionFactory factory) : base (factory)
+		{
+		}
 		public T GetToken (string token)
 		{
 			using (var conn = connFactory.OpenDbConnection ()) {

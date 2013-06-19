@@ -1,12 +1,16 @@
 using System;
 using System.Net;
 using DTO = Tomboy.Sync.Web.DTO;
+using Rainy.Interfaces;
 
 namespace Rainy.WebService
 {
 
 	public class UserService : RainyNoteServiceBase
 	{
+		public UserService (IDataBackend backend) : base (backend)
+		{
+		}
 		public object Get (UserRequest request)
 		{
 			var u = new DTO.UserResponse ();

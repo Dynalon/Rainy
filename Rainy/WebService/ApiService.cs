@@ -2,13 +2,17 @@ using System;
 using System.Net;
 using System.Linq;
 using DTO = Tomboy.Sync.Web.DTO;
+using Rainy.Interfaces;
+using Rainy.OAuth;
 
 namespace Rainy.WebService
 {
 	public class ApiService : RainyNoteServiceBase
 	{
-		public ApiService () : base ()
+		protected OAuthHandlerBase oauthHandler;
+		public ApiService (IDataBackend backend, OAuthHandlerBase oauthHandler) : base (backend)
 		{
+			this.oauthHandler = oauthHandler;
 		}
 		public object Get (ApiRequest request)
 		{
@@ -30,7 +34,7 @@ namespace Rainy.WebService
 				var splits = auth_header.Split (new string[] { "oauth_token=\"" }, StringSplitOptions.None);
 				var next_quote = splits[1].IndexOf("\"");
 				var token_string = splits[1].Substring(0, next_quote);
-				var token = RainyStandaloneServer.OAuth.AccessTokens.GetToken (token_string);
+				var token = oauthHandler.AccessTokens.GetToken (token_string);
 				username = token.UserName;
 			}
 

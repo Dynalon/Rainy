@@ -6,6 +6,8 @@ using JsonConfig;
 using ServiceStack.Common.Web;
 using System.Text.RegularExpressions;
 using Rainy.ErrorHandling;
+using ServiceStack.WebHost.Endpoints;
+using Rainy.Interfaces;
 
 namespace Rainy.WebService.Admin
 {
@@ -62,13 +64,14 @@ namespace Rainy.WebService.Admin
 
 		public void RequestFilter (IHttpRequest request, IHttpResponse response, object requestDto)
 		{
+			var admin_auther = EndpointHost.Container.Resolve<IAdminAuthenticator> ();
 			var authority_header = request.Headers ["Authority"];
 			if (!string.IsNullOrEmpty (authority_header) &&
-				authority_header == Config.Global.AdminPassword) {
+				admin_auther.VerifyAdminPassword (authority_header)) {
 				// auth worked
 				return;
 			}
-			throw new UnauthorizedException () {ErrorMessage = "Wrong password"};
+			throw new UnauthorizedException () {ErrorMessage = "Wrong admin password"};
 		}
 	}
 }

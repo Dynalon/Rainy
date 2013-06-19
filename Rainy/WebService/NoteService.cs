@@ -14,7 +14,10 @@ namespace Rainy.WebService
 {
 	public class NotesService : RainyNoteServiceBase
 	{
-		protected static IDataBackend DataBackend;
+		public NotesService (IDataBackend backend) : base (backend)
+		{
+
+		}
 		protected static DTO.GetNotesResponse GetStoredNotes (INoteRepository note_repo)
 		{
 			var notes = new List<DTO.DTONote> ();

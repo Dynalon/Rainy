@@ -14,16 +14,16 @@ namespace Rainy.Db
 		private IDbConnection db;
 		private IDbTransaction trans;
 
-		public DbStorage (DBUser user)
+		public DbStorage (IDbConnectionFactory factory, DBUser user) : base (factory)
 		{
-			this.User = user;
-			var factory = Rainy.Container.Instance.Resolve<IDbConnectionFactory> ();
-			db = factory.OpenDbConnection ();
+			if (user == null)
+				throw new ArgumentNullException ("user");
 
+			this.User = user;
+			db = factory.OpenDbConnection ();
 
 			// start everything as a transaction
 			trans = db.BeginTransaction ();
-
 		}
 		#region IStorage implementation
 		public Dictionary<string, Note> GetNotes ()

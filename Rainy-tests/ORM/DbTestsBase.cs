@@ -6,48 +6,24 @@ using ServiceStack.OrmLite;
 using System.Collections.Generic;
 using System.IO;
 using Rainy.Db.Config;
+using Rainy.Tests;
 
 namespace Rainy.Db
 {
-	public class DbTestsBase
+	public class DbTestsBase : TestBase
 	{
-		protected OrmLiteConnectionFactory dbFactory;
 		protected DBUser testUser;
 		
 		[TestFixtureSetUp]
 		public void FixtureSetUp ()
 		{
-			var conf = new SqliteConfig { File = "/tmp/rainy-test-data/rainy-test.db" };
-			Rainy.Container.Instance.Register<IDbConnectionFactory> (new OrmLiteConnectionFactory (conf.ConnectionString, SqliteDialect.Provider));
-			// remove the rainy-test.db file if it exists
-			if (File.Exists (conf.File)) {
-				File.Delete (conf.File);
-			}
-
-			dbFactory = new OrmLiteConnectionFactory (conf.ConnectionString, SqliteDialect.Provider);
-
 		}
 		
 		[SetUp]
 		public void SetUp ()
 		{
-			testUser = new DBUser () {
-				Username = "test"
-			};
-			// Start with empty tables in each test run
-			using (var c = dbFactory.OpenDbConnection ()) {
-				using (var t = c.BeginTransaction ()) {
-					c.DropAndCreateTable <DBNote> ();
-					c.DropAndCreateTable <DBUser> ();
-					c.DropAndCreateTable <DBAccessToken> ();
-	
-					c.InsertParam<DBUser> (testUser);
-					t.Commit ();
-				}
-			}
-			using (var c = dbFactory.OpenDbConnection ()) {
-				DBUser user = c.First<DBUser> (u => u.Username == "test");
-				Console.WriteLine (user.Username);
+			using (var db = factory.OpenDbConnection ()) {
+				testUser = db.First<DBUser> (u => u.Username == RainyTestServer.TEST_USER);
 			}
 		}
 

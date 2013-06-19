@@ -49,7 +49,7 @@ namespace Rainy.Db
 		protected void InsertBenchmark_Worker (List<DBNote> notes)
 		{
 			// now insert the notes
-			using (var conn = dbFactory.OpenDbConnection ()) {
+			using (var conn = factory.OpenDbConnection ()) {
 				using (var trans = conn.OpenTransaction ()) {
 					foreach (var note in notes) {
 						conn.Insert (note);

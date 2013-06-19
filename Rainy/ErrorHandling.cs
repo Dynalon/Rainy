@@ -74,6 +74,7 @@ namespace Rainy.ErrorHandling
 			if (e is UnauthorizedException) {
 				var ex = (UnauthorizedException) e;
 				logger.Debug (ex.ErrorMessage);
+				LogExceptionDetails (logger, e);
 				response.StatusCode = 401;
 				response.StatusDescription = "Unauthorized";
 				response.ContentType = request.ContentType;
@@ -81,19 +82,28 @@ namespace Rainy.ErrorHandling
 			} else if (e is ValidationException) {
 				var ex = (ValidationException) e;
 				logger.Debug (ex.ErrorMessage);
+				LogExceptionDetails (logger, e);
 				response.StatusCode = 400;
 				response.StatusDescription = "Bad request. Detail:" + e.Message;
 			} else if (e is RainyBaseException) {
 				var ex = (RainyBaseException) e;
 				logger.Debug (ex.ErrorMessage);
+				LogExceptionDetails (logger, e);
 				response.StatusCode = 400;
 				response.StatusDescription = ex.ErrorMessage;
 			} else {
 				logger.Debug (e.Message);
+				LogExceptionDetails (logger, e);
 				response.StatusCode = 500;
 				response.StatusDescription = "Internal server error.";
 			}
 			response.EndServiceStackRequest ();
+			throw e;
+		}
+
+		private static void LogExceptionDetails (ILog logger, Exception e)
+		{
+			logger.Debug (e.StackTrace);
 		}
 	}
 }

@@ -7,6 +7,7 @@ using ServiceStack.ServiceHost;
 using ServiceStack.Text;
 using Rainy.ErrorHandling;
 using Rainy.WebService;
+using Rainy.OAuth;
 
 namespace Rainy.WebService.OAuth
 {
@@ -25,8 +26,13 @@ namespace Rainy.WebService.OAuth
 
 	[RequestLogFilter]
 	[ResponseLogFilter]
-	public class OAuthRequestTokenService : RainyNoteServiceBase
+	public class OAuthRequestTokenService : RainyServiceBase
 	{
+		private OAuthHandlerBase oauthHandler;
+		public OAuthRequestTokenService (OAuthHandlerBase oauthHandler) : base ()
+		{
+			this.oauthHandler = oauthHandler;
+		}
 		public object Get (OAuthRequestTokenRequest request)
 		{
 			// keep this line to inspect the Request in monodevelop's debugger 
@@ -36,7 +42,7 @@ namespace Rainy.WebService.OAuth
 			HttpWebRequest original_request = ((HttpListenerRequest)Request.OriginalRequest).ToWebRequest ();
 
 			IOAuthContext context = new OAuthContextBuilder ().FromWebRequest (original_request, request.RequestStream);
-			IToken token = RainyStandaloneServer.OAuth.Provider.GrantRequestToken (context);
+			IToken token = oauthHandler.Provider.GrantRequestToken (context);
 			Logger.DebugFormat ("granting request token {0} to consumer", token);
 			Response.StatusCode = 200;
 			Response.Write (token.ToString ());
@@ -52,8 +58,13 @@ namespace Rainy.WebService.OAuth
 		}
 	}
 
-	public class OAuthAuthenticateService : RainyNoteServiceBase
+	public class OAuthAuthenticateService : RainyServiceBase
 	{
+		OAuthHandlerBase oauthHandler;
+		public OAuthAuthenticateService (OAuthHandlerBase oauthHandler) : base ()
+		{
+			this.oauthHandler = oauthHandler;
+		}
 		public object Get (OAuthAuthenticateRequest request)
 		{
 			// check if the user is authorized
@@ -81,7 +92,7 @@ namespace Rainy.WebService.OAuth
 			var response = new OAuthAuthenticateResponse ();
 
 			// TODO surround with try/catch and present 403 or 400 if token is unknown/invalid
-			var request_token = Rainy.RainyStandaloneServer.OAuth.RequestTokens.GetToken (token);
+			var request_token = oauthHandler.RequestTokens.GetToken (token);
 
 			// the verifier is important, it is proof that the user successfully authorized
 			// the verifier is later tested by the OAuth10aInspector to macht
@@ -97,7 +108,7 @@ namespace Rainy.WebService.OAuth
 				ExpiryDate = DateTime.Now.AddYears (99)
 			};
 
-			RainyStandaloneServer.OAuth.RequestTokens.SaveToken (request_token);
+			oauthHandler.RequestTokens.SaveToken (request_token);
 			Logger.DebugFormat ("created an access token for user {0}: {1}", username, token);
 	
 			// redirect to the provded callback
@@ -113,14 +124,19 @@ namespace Rainy.WebService.OAuth
 
 		protected bool userIsAllowed (string username, string password)
 		{
-			return RainyStandaloneServer.OAuth.Authenticator (username, password);
+			return oauthHandler.Authenticator.VerifyCredentials (username, password);
 		}
 	}
 
 	[RequestLogFilter]
 	[ResponseLogFilter]
-	public class OAuthAuthorizeService : RainyNoteServiceBase
+	public class OAuthAuthorizeService : RainyServiceBase
 	{
+		OAuthHandlerBase oauthHandler;
+		public OAuthAuthorizeService (OAuthHandlerBase oauthHandler) : base ()
+		{
+			this.oauthHandler = oauthHandler;
+		}
 		public object Get (OAuthAuthorizeRequest request)
 		{
 			if (!string.IsNullOrEmpty (request.Username) &&
@@ -129,12 +145,13 @@ namespace Rainy.WebService.OAuth
 				// unattended authentication, immediately perform token exchange
 				// and use data from the querystring
 
-				bool is_allowed = RainyStandaloneServer.OAuth.Authenticator (request.Username, request.Password);
+				bool is_allowed = oauthHandler.Authenticator.VerifyCredentials (request.Username, request.Password);
+				Console.WriteLine (oauthHandler.Authenticator.GetType());
 				if (!is_allowed) {
 					throw new UnauthorizedException ();
 				}
 				
-				var auth_service = new OAuthAuthenticateService ();
+				var auth_service = new OAuthAuthenticateService (oauthHandler);
 				var resp = (OAuthAuthenticateResponse) auth_service.TokenExchangeAfterAuthentication (
 					request.Username,
 					request.Password,
@@ -143,6 +160,7 @@ namespace Rainy.WebService.OAuth
 				Response.Redirect (resp.RedirectUrl);
 				return null;
 			} else {
+				// TODO
 				TextReader reader = new StreamReader ("/Users/td/gateway.html");
 				string resp = reader.ReadToEnd ();
 				reader.Close ();
@@ -153,8 +171,13 @@ namespace Rainy.WebService.OAuth
 
 	[RequestLogFilter]
 	[ResponseLogFilter]
-	public class OAuthAccessTokenService : RainyNoteServiceBase
+	public class OAuthAccessTokenService : RainyServiceBase
 	{
+		OAuthHandlerBase oauthHandler;
+		public OAuthAccessTokenService (OAuthHandlerBase oauthHandler) : base ()
+		{
+			this.oauthHandler = oauthHandler;
+		}
 		public object Get (OAuthAccessTokenRequest request)
 		{
 			// keep this line to inspect the Request in monodevelop's debugger 
@@ -169,10 +192,10 @@ namespace Rainy.WebService.OAuth
 			try {
 				var context = new OAuthContextBuilder ()
 					.FromWebRequest (original_request, new MemoryStream ());
-				AccessToken access_token = (AccessToken) RainyStandaloneServer.OAuth.Provider.ExchangeRequestTokenForAccessToken (context);
+				AccessToken access_token = (AccessToken) oauthHandler.Provider.ExchangeRequestTokenForAccessToken (context);
 
 				Logger.DebugFormat ("permanently authorizing access token: {0}", access_token);
-				RainyStandaloneServer.OAuth.AccessTokens.SaveToken (access_token);
+				oauthHandler.AccessTokens.SaveToken (access_token);
 				Response.Write (access_token.ToString ());
 				Response.End ();
 			} catch (Exception e) {

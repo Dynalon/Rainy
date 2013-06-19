@@ -11,6 +11,7 @@ using Tomboy.Sync.Web.DTO;
 using Rainy.Db;
 using Rainy.Interfaces;
 using Rainy.Db.Config;
+using JsonConfig;
 
 namespace Rainy
 {
@@ -18,8 +19,9 @@ namespace Rainy
 	// TODO make non-static
 	public class RainyTestServer
 	{
-		public string TEST_USER = "test";
-		public string TEST_PASS = "none";
+		public static string TEST_USER = "test";
+		public static string TEST_PASS = "none";
+		public static string ADMIN_TEST_PASS = "foobar";
 		public string RainyListenUrl = "http://127.0.0.1:8080/";
 
 		public string BaseUri {
@@ -30,48 +32,15 @@ namespace Rainy
 		}
 
 		private RainyStandaloneServer rainyServer;
-		private CredentialsVerifier credentialsVerifier;
 		private string tmpPath;
 
-		public RainyTestServer (CredentialsVerifier verifier = null)
+		public RainyTestServer (ComposeObjectGraphDelegate composer)
 		{
-			// for debugging, we only use a simple single user authentication 
-			if (verifier == null) {
-				credentialsVerifier = (user,pass) => {
-					if (user == TEST_USER  && pass == TEST_PASS) return true;
-					else return false;
-				};
-			}
-			else {
-				credentialsVerifier = verifier;
-			}
+			rainyServer = new RainyStandaloneServer (RainyListenUrl, composer);
 		}
 
-		public void Start (string use_backend = "sqlite")
-		{
-			tmpPath = "/tmp/rainy-test-data/";
-			Directory.CreateDirectory (tmpPath);
-			var file = Path.Combine(tmpPath, "rainy-test.db");
-			var conf = new SqliteConfig { File = file };
-			Rainy.Container.Instance.Register<SqliteConfig> (conf);
-			Rainy.Container.Instance.Register<IDbConnectionFactory> (new OrmLiteConnectionFactory (conf.ConnectionString, SqliteDialect.Provider));
-			// tmpPath = Path.GetTempPath () + Path.GetRandomFileName ();
-
-			IDataBackend backend;
-			if (use_backend == "sqlite") {
-				backend = new DatabaseBackend (credentialsVerifier);
-				Rainy.Container.Instance.Register<IDataBackend> (backend);
-				DatabaseBackend.CreateSchema(reset: true);
-				var factory = Rainy.Container.Instance.Resolve<IDbConnectionFactory> ();
-				using (var c = factory.OpenDbConnection ()) {
-					c.Insert<DBUser>(new DBUser() { Username = TEST_USER });
-				}
-			}
-			else
-				backend = new RainyFileSystemBackend (tmpPath, credentialsVerifier);
-
-			rainyServer = new RainyStandaloneServer (RainyListenUrl);
-
+		public void Start ()
+		{	
 			rainyServer.Start ();
 		}
 		public void Stop ()

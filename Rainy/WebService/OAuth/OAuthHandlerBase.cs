@@ -32,7 +32,7 @@ using Rainy.Interfaces;
 
 namespace Rainy.OAuth
 {
-	// TODO: replace with Interface
+	// TODO: replace with Interface and wire in DI composition root
 	public abstract class OAuthHandlerBase : IDisposable
 	{
 		// the data stores required by the OAuth process
@@ -40,7 +40,7 @@ namespace Rainy.OAuth
 		public ITokenRepository<RequestToken> RequestTokens;
 		public ITokenStore TokenStore;
 
-		public CredentialsVerifier Authenticator;
+		public IAuthenticator Authenticator;
 		public OAuthProvider Provider;
 
 		protected INonceStore NonceStore;
@@ -48,7 +48,7 @@ namespace Rainy.OAuth
 
 		protected List<IContextInspector> inspectors = new List<IContextInspector> ();
 
-		public OAuthHandlerBase (CredentialsVerifier auth)
+		public OAuthHandlerBase (IAuthenticator auth)
 		{
 			Authenticator = auth;
 
@@ -85,7 +85,6 @@ namespace Rainy.OAuth
 
 		public virtual void Dispose ()
 		{
-			Console.WriteLine ("disposing base");
 		}
 	}
 }

@@ -4,7 +4,14 @@ using Rainy.OAuth;
 
 namespace Rainy.Interfaces
 {
-	public delegate bool CredentialsVerifier (string username, string password);
+	public interface IAuthenticator
+	{
+		bool VerifyCredentials (string username, string password);
+	}
+	public interface IAdminAuthenticator
+	{
+		bool VerifyAdminPassword (string password);
+	}
 
 	public interface INoteRepository : IDisposable
 	{

@@ -7,6 +7,7 @@ using ServiceStack.OrmLite;
 using Rainy.WebService.Management;
 using System.Linq;
 using System.Net;
+using ServiceStack.WebHost.Endpoints;
 
 namespace Rainy.Tests.Management
 {
@@ -50,7 +51,6 @@ namespace Rainy.Tests.Management
 
 			// lookup activation key
 			var secret = "";
-			var factory = Rainy.Container.Instance.Resolve<IDbConnectionFactory> ();
 			using (var db = factory.OpenDbConnection ()) {
 				var db_user = db.First<DBUser> (u => u.Username == user.Username);
 				secret = db_user.VerifySecret;
@@ -70,6 +70,7 @@ namespace Rainy.Tests.Management
 			client.Post<DTOUser> ("/api/user/signup/new/", user);
 
 			testServer.Stop ();
+			EndpointHost.TryResolve<IAuthentiactor> ();
 			testServer = new RainyTestServer (DatabaseBackend.DbAuthenticator);
 			testServer.Start ();
 
