@@ -7,8 +7,7 @@ using System.Linq;
 
 namespace Rainy.Db
 {
-	[TestFixture()]
-	public class DbStorageTests : DbTestsBase
+	public abstract class DbStorageTests : DbTestsBase
 	{
 		protected List<Note> GetSampleNotes ()
 		{
@@ -131,5 +130,22 @@ namespace Rainy.Db
 		}
 	}
 
+	[TestFixture()]
+	public class DbStorageTestsSqlite : DbStorageTests
+	{
+		public DbStorageTestsSqlite ()
+		{
+			this.dbScenario = "sqlite";
+		}
+	}
+
+	[TestFixture()]
+	public class DbStorageTestsPostgres : DbStorageTests
+	{
+		public DbStorageTestsPostgres ()
+		{
+			this.dbScenario = "postgres";
+		}
+	}
 }
 

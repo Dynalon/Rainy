@@ -69,11 +69,11 @@
     <Compile Include="ORM\DbBenchmarks.cs" />
     <Compile Include="ORM\DbTestsBase.cs" />
     <Compile Include="ORM\DbStorageTests.cs" />
-    <Compile Include="ORM\DatabaseBackendTests.cs" />
     <Compile Include="TestServerTests.cs" />
     <Compile Include="TestBase.cs" />
     <Compile Include="DtoConversionTests.cs" />
     <Compile Include="Admin\TestUserManagement.cs" />
+    <Compile Include="WebSyncServerTests.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <ItemGroup>
@@ -110,6 +110,5 @@
     <None Include="UbuntuOneWebSyncServerTests.cs" />
     <None Include="packages.config" />
     <None Include="Admin\TestUserSignup.cs" />
-    <None Include="WebSyncServerTests.cs" />
   </ItemGroup>
 </Project>

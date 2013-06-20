@@ -12,9 +12,35 @@ using Rainy.Db;
 using Rainy.Interfaces;
 using Rainy.Db.Config;
 using JsonConfig;
+using Rainy.OAuth;
 
 namespace Rainy
 {
+	public class DummyAuthenticator : IAuthenticator
+	{
+		public bool VerifyCredentials (string username, string password)
+		{
+			return true;
+		}
+	}
+	public class DummyAdminAuthenticator : IAdminAuthenticator
+	{
+		string Password;
+		public DummyAdminAuthenticator ()
+		{
+		}
+		public DummyAdminAuthenticator (string pass)
+		{
+			Password = pass;
+		}
+		public bool VerifyAdminPassword (string password)
+		{
+			if (string.IsNullOrEmpty (Password))
+				return true;
+			else return Password == password;
+		}
+	}
+
 	// simple server that can be used from within unit tests
 	// TODO make non-static
 	public class RainyTestServer
@@ -22,6 +48,7 @@ namespace Rainy
 		public static string TEST_USER = "test";
 		public static string TEST_PASS = "none";
 		public static string ADMIN_TEST_PASS = "foobar";
+		public static Funq.Container Container;
 		public string RainyListenUrl = "http://127.0.0.1:8080/";
 
 		public string BaseUri {
@@ -33,10 +60,20 @@ namespace Rainy
 
 		private RainyStandaloneServer rainyServer;
 		private string tmpPath;
+		private ComposeObjectGraphDelegate ObjectGraphComposer;
 
-		public RainyTestServer (ComposeObjectGraphDelegate composer)
+		public RainyTestServer (ComposeObjectGraphDelegate composer = null)
 		{
-			rainyServer = new RainyStandaloneServer (RainyListenUrl, composer);
+			if (composer == null) {
+				// specifies which default scenario to use
+				this.ScenarioSqlite ();
+			}
+
+			rainyServer = new RainyStandaloneServer (RainyListenUrl, (c) => {
+				if (this.ObjectGraphComposer == null)
+					throw new Exception ("need to setup a composer/scenario for RainyTestServer!");
+				this.ObjectGraphComposer(c);
+			});
 		}
 
 		public void Start ()
@@ -47,6 +84,111 @@ namespace Rainy
 		{
 			rainyServer.Dispose ();
 		}
+
+		public void ScenarioSqlite ()
+		{
+			this.ObjectGraphComposer = (c) => {
+				this.WireupSqliteTestserver (c);
+				this.WireupGenericDatabaseClasses (c);
+			};
+		}
+		public void ScenarioPostgres ()
+		{
+			this.ObjectGraphComposer = (c) => {
+				this.WireupPostgresServer (c);
+				this.WireupGenericDatabaseClasses (c);
+			};
+		}
+
+
+		private void WireupSqliteTestserver (Funq.Container container)
+		{
+			Container = container;
+
+			container.Register<SqliteConfig> (c => {
+				var test_db_file = "/tmp/rainy-test.db";
+				if (File.Exists (test_db_file))
+					File.Delete (test_db_file);
+
+				SqliteConfig cnf = new SqliteConfig () {
+					File = test_db_file
+				};
+				return cnf;
+			});
+			container.Register<IDbConnectionFactory> (c => {
+				var connection_string = container.Resolve<SqliteConfig> ().ConnectionString;
+				return new OrmLiteConnectionFactory (connection_string, SqliteDialect.Provider);
+			});
+		}
+
+		private void WireupPostgresServer (Funq.Container container)
+		{
+			Container = container;
+
+			container.Register<PostgreConfig> (c => {
+				var cnf = new PostgreConfig {
+					Host = "localhost",
+					Username = "td",
+					Password = "foobar",
+					Port = 5432,
+					Database = "rainy"
+				};
+				return cnf;
+			});
+
+			container.Register<IDbConnectionFactory> (c => {
+				var connection_string = container.Resolve<PostgreConfig> ().ConnectionString;
+				return new OrmLiteConnectionFactory (connection_string, PostgreSqlDialect.Provider);
+			});
+
+		}
+
+		private void WireupGenericDatabaseClasses (Funq.Container container)
+		{
+			container.Register<IAuthenticator> (c => {
+				var factory = c.Resolve<IDbConnectionFactory> ();
+				var dbauth = new DbAuthenticator (factory);
+				//var dbauth = new DbTestAuthenticator ();
+
+				// insert a dummy testuser
+				using (var db = factory.OpenDbConnection ()) {
+					db.InsertParam<DBUser> (new DBUser {
+						Username = RainyTestServer.TEST_USER,
+						Password = RainyTestServer.TEST_PASS,
+						IsActivated = true,
+						IsVerified = true
+					});
+				}
+
+				return dbauth;
+			});
+
+			container.Register<IAdminAuthenticator> (c => {
+				var admin_auth = new DummyAdminAuthenticator (ADMIN_TEST_PASS);
+				return (IAdminAuthenticator)admin_auth;
+			});
+
+			container.Register<IDataBackend> (c => {
+				var factory = c.Resolve<IDbConnectionFactory> ();
+				var auth = c.Resolve<IAuthenticator> ();
+				return new DatabaseBackend (factory, auth);
+			});
+
+			container.Register<OAuthHandlerBase> (c => {
+				var auth = c.Resolve<IAuthenticator> ();
+				var factory = c.Resolve<IDbConnectionFactory> ();
+				var handler = new OAuthDatabaseHandler (factory, auth);
+				return handler;
+			});
+
+			var connFactory = container.Resolve<IDbConnectionFactory> ();
+			DatabaseBackend.CreateSchema (connFactory, true);
+
+			// HACK so the user is inserted when a fixture SetUp is run
+			container.Resolve<IAuthenticator> ();
+		}
+
+
 
 		public JsonServiceClient GetJsonClient ()
 		{

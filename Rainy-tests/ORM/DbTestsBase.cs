@@ -13,15 +13,27 @@ namespace Rainy.Db
 	public class DbTestsBase : TestBase
 	{
 		protected DBUser testUser;
-		
+		protected IDbConnectionFactory factory;
+		protected string dbScenario;
+
 		[TestFixtureSetUp]
 		public void FixtureSetUp ()
 		{
 		}
 		
 		[SetUp]
-		public void SetUp ()
+		public new void SetUp ()
 		{
+			testServer = new RainyTestServer ();
+			if (dbScenario == "postgres") {
+				testServer.ScenarioPostgres ();
+			} else if (dbScenario == "sqlite" || string.IsNullOrEmpty (dbScenario)) {
+				testServer.ScenarioSqlite ();
+			}
+
+			testServer.Start ();
+
+			this.factory = RainyTestServer.Container.Resolve<IDbConnectionFactory> ();
 			using (var db = factory.OpenDbConnection ()) {
 				testUser = db.First<DBUser> (u => u.Username == RainyTestServer.TEST_USER);
 			}

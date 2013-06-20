@@ -10,6 +10,11 @@ namespace Rainy.Tests.OAuth
 	[TestFixture()]
 	public class OAuthTests : TestBase
 	{
+		[SetUp]
+		public void SetUp ()
+		{
+			testServer.Start ();
+		}
 		[Test()]
 		public void OAuthGetRequestToken ()
 		{

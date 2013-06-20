@@ -7,6 +7,12 @@ namespace Rainy.Tests
 {
 	public class TestServerTests : TestBase
 	{
+		[SetUp]
+		public void SetUp ()
+		{
+			testServer.ScenarioSqlite ();
+			testServer.Start ();
+		}
 		[Test]
 		public void CheckApiRef ()
 		{

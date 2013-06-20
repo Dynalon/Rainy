@@ -10,12 +10,11 @@ using DevDefined.OAuth.Framework;
 using Rainy.OAuth.SimpleStore;
 using DevDefined.OAuth.Storage.Basic;
 using Rainy.OAuth;
+using Rainy.Interfaces;
 
 namespace Rainy.Db
 {
-
-	[TestFixture]
-	public class DbBasicTests : DbTestsBase
+	public abstract class DbBasicTests : DbTestsBase
 	{
 		[Test]
 		public void StoreAndRetrieveNote ()
@@ -162,6 +161,24 @@ namespace Rainy.Db
 		}
 
 		[Test]
+		public void ReadWriteManifest ()
+		{
+			var data_backend = RainyTestServer.Container.Resolve<IDataBackend> ();
+
+			var server_id = Guid.NewGuid ().ToString ();
+			using (var repo = data_backend.GetNoteRepository (testUser.Username)) {
+				repo.Manifest.LastSyncRevision = 123;
+				repo.Manifest.ServerId = server_id;
+			}
+
+			// check the manifest got saved
+			using (var repo = data_backend.GetNoteRepository (testUser.Username)) {
+				Assert.AreEqual (123, repo.Manifest.LastSyncRevision);
+				Assert.AreEqual (server_id, repo.Manifest.ServerId);
+			}
+		}
+
+		[Test]
 		public void UpdateNonExistingNoteDoesNotWork ()
 		{
 			// test if we can update a non-existing note
@@ -283,6 +300,21 @@ namespace Rainy.Db
 			Assert.AreEqual (token1.ExpiryDate, token2.ExpiryDate);
 			Assert.AreEqual (token1.Token, token2.Token);
 			Assert.AreEqual (token1.TokenSecret, token2.TokenSecret);
+		}
+	}
+
+	public class DbBasicTestsSqlite : DbBasicTests
+	{
+		public DbBasicTestsSqlite ()
+		{
+			this.dbScenario = "sqlite";
+		}
+	}
+	public class DbBasicTestsPostgres : DbBasicTests
+	{
+		public DbBasicTestsPostgres ()
+		{
+			this.dbScenario = "postgres";
 		}
 	}
 }

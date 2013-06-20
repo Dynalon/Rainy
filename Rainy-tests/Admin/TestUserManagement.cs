@@ -7,11 +7,12 @@ using System.Linq;
 using System.Collections.Generic;
 using System.Threading;
 using Rainy.WebService.Management;
+using Rainy.Db;
 
 namespace Rainy.Tests.Management
 {
 	[TestFixture()]
-	public class TestUserManagement : TestBase
+	public class TestUserManagement : DbTestsBase
 	{
 		protected JsonServiceClient adminClient;
 		protected DTOUser[] GetSampleUser ()
@@ -39,10 +40,8 @@ namespace Rainy.Tests.Management
 		}
 
 		[SetUp]
-		public override void SetUp ()
+		public new void SetUp ()
 		{
-			base.SetUp ();
-
 			adminClient = GetAdminServiceClient ();
 
 			// add some sample users to the server

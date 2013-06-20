@@ -12,9 +12,12 @@ namespace Rainy.Db.Config
 	{
 		// full path to the sqlite file
 		public string File;
+		public bool InMemory = false;
 	
 		public string ConnectionString {
-			get { return File; }
+			get {
+				return "Data source=" + File + ";busy_timeout=3000";
+			}
 		}
 	}
 
