@@ -45,10 +45,9 @@ namespace Rainy.Crypto
 
 		public static string ComputePasswordHash (this DBUser db_user, string password)
 		{
-			SHA256 sha256 = SHA256Managed.Create();
-			byte[] password_bytes = new UnicodeEncoding ().GetBytes (db_user.PasswordSalt + ":" + password);
-			byte[] hashed = sha256.ComputeHash (password_bytes);
-			return hashed.ToHexString ();
+			var pbkdf2 = new Rfc2898DeriveBytes(password, db_user.PasswordSalt.ToByteArray (), 1000);
+			byte[] hash_bytes = pbkdf2.GetBytes (32);
+			return hash_bytes.ToHexString ();
 		}
 
 		public static byte[] DeriveKeyFromPassword (this DBUser user, string password)
