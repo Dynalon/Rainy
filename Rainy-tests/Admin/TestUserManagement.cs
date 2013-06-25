@@ -120,7 +120,8 @@ namespace Rainy.Tests.Management
 
 			var johndoe = all_users.First (u => u.Username == "johndoe");
 			Assert.AreEqual (user.Username, johndoe.Username);
-			Assert.AreEqual (user.Password, johndoe.Password);
+			//password is not returned
+			Assert.AreEqual (string.Empty, johndoe.Password);
 			Assert.AreEqual (user.EmailAddress, johndoe.EmailAddress);
 			Assert.AreEqual (user.AdditionalData, johndoe.AdditionalData);
 			Assert.AreEqual (user.FirstName, johndoe.FirstName);

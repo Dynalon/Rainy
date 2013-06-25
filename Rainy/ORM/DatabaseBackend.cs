@@ -9,6 +9,7 @@ using Tomboy;
 using Tomboy.Sync;
 using Rainy.Interfaces;
 using ServiceStack.WebHost.Endpoints;
+using Rainy.Crypto;
 
 namespace Rainy
 {
@@ -21,6 +22,9 @@ namespace Rainy
 		}
 	}
 
+	/// <summary>
+	/// Authenticates a user against a database. User objects in the database always employ hashed passwords.
+	/// </summary>
 	public class DbAuthenticator : IAuthenticator
 	{
 		private IDbConnectionFactory connFactory;
@@ -37,7 +41,7 @@ namespace Rainy
 		{
 			DBUser user = null;
 			using (var conn = connFactory.OpenDbConnection ()) {
-				user = conn.FirstOrDefault<DBUser> (u => u.Username == username && u.Password == password);
+				user = conn.FirstOrDefault<DBUser> (u => u.Username == username);
 			}
 			if (user == null)
 				return false;
@@ -48,7 +52,11 @@ namespace Rainy
 			if (user.IsVerified == false)
 				return false;
 
-			return true;
+			var supplied_hash = user.ComputePasswordHash (password);
+			if (supplied_hash == user.PasswordHash)
+				return true;
+
+			return false;
 
 		}
 

@@ -6,7 +6,7 @@ namespace Rainy.UserManagement
 	{
 		public virtual string Username { get; set; }
 
-		public string Password { get; set; }
+		public virtual string Password { get; set; }
 
 		public string EmailAddress { get; set; }
 

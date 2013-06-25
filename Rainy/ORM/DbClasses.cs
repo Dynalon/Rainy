@@ -8,6 +8,8 @@ using System;
 using DevDefined.OAuth.Storage.Basic;
 using Rainy.UserManagement;
 using System.Runtime.Serialization;
+using System.Security.Cryptography;
+using System.IO;
 
 namespace Rainy.Db
 {
@@ -33,7 +35,18 @@ namespace Rainy.Db
 		[PrimaryKey]
 		public override string Username { get; set; }
 
+		public override string Password {
+			get { return ""; }
+			set { return; }
+		}
+
 		public SyncManifest Manifest { get; set; }
+
+		public string PasswordSalt { get; set; }
+		public string PasswordHash { get; set; }
+
+		public string MasterKeySalt { get; set; }
+		public string EncryptedMasterKey { get; set; }
 
 		// whether email verifcation has to take place
 		public bool IsVerified { get; set; } 
@@ -54,62 +67,6 @@ namespace Rainy.Db
 		public new string Token { get; set; }
 	}
 
-	/*public static class DbConfig
-	{
-		private static bool isInitialized = false;
-		private static string sqliteFile = "rainy.db";
-
-		public static string SqliteFile {
-			get { return sqliteFile; }
-		}
-
-		public static string ConnectionString {
-			get { return sqliteFile; }
-		}
-
-		private static object syncRoot = new object ();
-		private static OrmLiteConnectionFactory dbFactory; 
-
-		public static void SetSqliteFile (string filename)
-		{
-			lock (syncRoot) {
-				if (isInitialized) {
-					//throw new Exception ("Filename can't be set once the class is initialized");
-				} else {
-					sqliteFile = filename;
-				}
-			}
-		}
-		public static IDbConnection GetConnection ()
-		{
-			lock (syncRoot) {
-				if (!isInitialized) {
-					isInitialized = true;
-					dbFactory = new OrmLiteConnectionFactory (ConnectionString, SqliteDialect.Provider);
-				}
-			}
-			return dbFactory.OpenDbConnection ();
-		}
-		public static IDbTransaction GetTransaction ()
-		{
-			return GetConnection ().OpenTransaction ();
-		}
-
-		public static void CreateSchema (bool reset = false)
-		{
-			using (var conn = GetConnection ()) {
-				if (reset) {
-					conn.DropAndCreateTable <DBUser> ();
-					conn.DropAndCreateTable <DBNote> ();
-					conn.DropAndCreateTable <DBAccessToken> ();
-				} else {
-					conn.CreateTableIfNotExists <DBUser> ();
-					conn.CreateTableIfNotExists <DBNote> ();
-					conn.CreateTableIfNotExists <DBAccessToken> ();
-				}
-			}
-		}
-	}*/
 	public static class DbClassConverter
 	{
 		public static DBNote ToDBNote (this DTONote dto, DBUser user, bool encrypt = false)

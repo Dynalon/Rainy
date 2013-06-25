@@ -85,6 +85,7 @@ namespace Rainy.Db
 		}
 	}
 
+	[Ignore]
 	[TestFixture]
 	public class DbBenchmarksSqlite : DbBenchmarks
 	{
@@ -94,6 +95,7 @@ namespace Rainy.Db
 		}
 	}
 
+	[Ignore]
 	[TestFixture]
 	public class DbBenchmarksPostgres : DbBenchmarks
 	{

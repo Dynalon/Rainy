@@ -13,6 +13,7 @@ using Rainy.Interfaces;
 using Rainy.Db.Config;
 using JsonConfig;
 using Rainy.OAuth;
+using Rainy.Crypto;
 
 namespace Rainy
 {
@@ -150,14 +151,16 @@ namespace Rainy
 				var dbauth = new DbAuthenticator (factory);
 				//var dbauth = new DbTestAuthenticator ();
 
+				var test_user = new DBUser {
+					Username = RainyTestServer.TEST_USER,
+					IsActivated = true,
+					IsVerified = true
+				};
+				test_user.CreateCryptoFields (RainyTestServer.TEST_PASS);
+
 				// insert a dummy testuser
 				using (var db = factory.OpenDbConnection ()) {
-					db.InsertParam<DBUser> (new DBUser {
-						Username = RainyTestServer.TEST_USER,
-						Password = RainyTestServer.TEST_PASS,
-						IsActivated = true,
-						IsVerified = true
-					});
+					db.InsertParam<DBUser> (test_user);
 				}
 
 				return dbauth;

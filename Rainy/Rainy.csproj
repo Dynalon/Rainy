@@ -140,6 +140,7 @@
     <Compile Include="ORM\DbConfig.cs" />
     <Compile Include="AppHost.cs" />
     <Compile Include="RainyTestServer.cs" />
+    <Compile Include="Crypto.cs" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="WebService\" />
