@@ -3,7 +3,7 @@ using ServiceStack.DataAnnotations;
 using Tomboy.Sync;
 using ServiceStack.OrmLite;
 using System.Data;
-using Rainy.OAuth.SimpleStore;
+using Rainy.OAuth;
 using System;
 using DevDefined.OAuth.Storage.Basic;
 using Rainy.UserManagement;
@@ -62,6 +62,17 @@ namespace Rainy.Db
 	}
 
 	public class DBAccessToken : AccessToken
+	{
+		[PrimaryKey]
+		// the token is also the first half that is required to decrypt the master key
+		public new string Token { get; set; }
+
+		// other half that is required to decrypt the master key
+		// should NEVER be sent back to the user
+		public string MasterKeyHalf { get; set; }
+	}
+
+	public class DBRequestToken : RequestToken
 	{
 		[PrimaryKey]
 		public new string Token { get; set; }

@@ -22,7 +22,7 @@ namespace Rainy.Interfaces
 	public interface IDataBackend 
 	{
 		INoteRepository GetNoteRepository (string username);
-		OAuthHandlerBase OAuth { get; }
+		OAuthHandler OAuth { get; }
 	}
 
 }

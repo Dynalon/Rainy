@@ -15,6 +15,7 @@ using Mono.Unix.Native;
 using Rainy.Db.Config;
 using ServiceStack.OrmLite;
 using Rainy.OAuth;
+using DevDefined.OAuth.Storage.Basic;
 
 namespace Rainy
 {
@@ -108,7 +109,8 @@ namespace Rainy
 				container.Register<IDataBackend> (c => {
 					var auth = c.Resolve<IAuthenticator> ();
 					var factory = c.Resolve<IDbConnectionFactory> ();
-					return new FileSystemBackend (config.DataPath, factory, auth, false);
+					var oauth_handler = c.Resolve<OAuthHandler> ();
+					return new FileSystemBackend (config.DataPath, factory, auth, oauth_handler, false);
 				});
 
 			} else {
@@ -136,16 +138,22 @@ namespace Rainy
 
 				container.Register<IDataBackend> (c => {
 					var factory = c.Resolve<IDbConnectionFactory> ();
+					var handler = c.Resolve<OAuthHandler> ();
 					var auth = c.Resolve<IAuthenticator> ();
-					return new DatabaseBackend (factory, auth);
+					return new DatabaseBackend (factory, auth, handler);
 				});
 
-				container.Register<OAuthHandlerBase> (c => {
-					var auth = c.Resolve<IAuthenticator> ();
+/*				container.Register<OAuthHandler> (c => {
 					var factory = c.Resolve<IDbConnectionFactory> ();
-					var handler = new OAuthDatabaseHandler (factory, auth);
+					var access_token_repo = new DbAccessTokenRepository<AccessToken> (factory);
+					var request_token_repo = new SimpleTokenRepository<RequestToken> ();
+					var auth = c.Resolve<IAuthenticator> ();
+					var token_store = new Rainy.OAuth.SimpleStore.SimpleTokenStore (access_token_repo, request_token_repo);
+
+					var handler = new OAuthHandler (auth, token_store);
 					return handler;
 				});
+*/
 			}
 
 		}

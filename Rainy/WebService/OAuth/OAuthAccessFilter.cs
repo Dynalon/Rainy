@@ -45,7 +45,7 @@ namespace Rainy.WebService.OAuth
 			var web_request = ((HttpListenerRequest)request.OriginalRequest).ToWebRequest ();
 			IOAuthContext context = new OAuthContextBuilder ().FromWebRequest (web_request, new MemoryStream ());
 
-			var oauthHandler = EndpointHost.Container.Resolve<OAuthHandlerBase> ();
+			var oauthHandler = EndpointHost.Container.Resolve<OAuthHandler> ();
 
 			try {
 				Logger.Debug ("trying to acquire authorization");

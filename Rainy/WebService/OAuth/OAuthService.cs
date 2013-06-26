@@ -8,6 +8,9 @@ using ServiceStack.Text;
 using Rainy.ErrorHandling;
 using Rainy.WebService;
 using Rainy.OAuth;
+using Rainy.Interfaces;
+using System.Security.Cryptography;
+using Rainy.Crypto;
 
 namespace Rainy.WebService.OAuth
 {
@@ -28,8 +31,8 @@ namespace Rainy.WebService.OAuth
 	[ResponseLogFilter]
 	public class OAuthRequestTokenService : RainyServiceBase
 	{
-		private OAuthHandlerBase oauthHandler;
-		public OAuthRequestTokenService (OAuthHandlerBase oauthHandler) : base ()
+		private OAuthHandler oauthHandler;
+		public OAuthRequestTokenService (OAuthHandler oauthHandler) : base ()
 		{
 			this.oauthHandler = oauthHandler;
 		}
@@ -60,9 +63,11 @@ namespace Rainy.WebService.OAuth
 
 	public class OAuthAuthenticateService : RainyServiceBase
 	{
-		OAuthHandlerBase oauthHandler;
-		public OAuthAuthenticateService (OAuthHandlerBase oauthHandler) : base ()
+		OAuthHandler oauthHandler;
+		IAuthenticator Authenticator;
+		public OAuthAuthenticateService (OAuthHandler oauthHandler, IAuthenticator auth) : base ()
 		{
+			this.Authenticator = auth;
 			this.oauthHandler = oauthHandler;
 		}
 		public object Get (OAuthAuthenticateRequest request)
@@ -99,11 +104,15 @@ namespace Rainy.WebService.OAuth
 			request_token.Verifier = Guid.NewGuid ().ToString ();
 			request_token.AccessDenied = false;
 
+			var rng = new RNGCryptoServiceProvider ();
+			var access_token_secret = rng.Create256BitLowerCaseHexKey ();
+			var access_token_token = rng.Create256BitLowerCaseHexKey ();
+
 			request_token.AccessToken = new AccessToken () {
 				ConsumerKey = request_token.ConsumerKey,
 				Realm = request_token.Realm,
-				Token = Guid.NewGuid ().ToString (),
-				TokenSecret = Guid.NewGuid ().ToString (),
+				Token = access_token_token,
+				TokenSecret = access_token_secret,
 				UserName = username,
 				ExpiryDate = DateTime.Now.AddYears (99)
 			};
@@ -124,7 +133,7 @@ namespace Rainy.WebService.OAuth
 
 		protected bool userIsAllowed (string username, string password)
 		{
-			return oauthHandler.Authenticator.VerifyCredentials (username, password);
+			return Authenticator.VerifyCredentials (username, password);
 		}
 	}
 
@@ -132,9 +141,11 @@ namespace Rainy.WebService.OAuth
 	[ResponseLogFilter]
 	public class OAuthAuthorizeService : RainyServiceBase
 	{
-		OAuthHandlerBase oauthHandler;
-		public OAuthAuthorizeService (OAuthHandlerBase oauthHandler) : base ()
+		OAuthHandler oauthHandler;
+		IAuthenticator authenticator;
+		public OAuthAuthorizeService (OAuthHandler oauthHandler, IAuthenticator auth) : base ()
 		{
+			this.authenticator = auth;
 			this.oauthHandler = oauthHandler;
 		}
 		public object Get (OAuthAuthorizeRequest request)
@@ -145,13 +156,12 @@ namespace Rainy.WebService.OAuth
 				// unattended authentication, immediately perform token exchange
 				// and use data from the querystring
 
-				bool is_allowed = oauthHandler.Authenticator.VerifyCredentials (request.Username, request.Password);
-				Console.WriteLine (oauthHandler.Authenticator.GetType());
+				bool is_allowed = authenticator.VerifyCredentials (request.Username, request.Password);
 				if (!is_allowed) {
 					throw new UnauthorizedException ();
 				}
 				
-				var auth_service = new OAuthAuthenticateService (oauthHandler);
+				var auth_service = new OAuthAuthenticateService (oauthHandler, authenticator);
 				var resp = (OAuthAuthenticateResponse) auth_service.TokenExchangeAfterAuthentication (
 					request.Username,
 					request.Password,
@@ -173,8 +183,8 @@ namespace Rainy.WebService.OAuth
 	[ResponseLogFilter]
 	public class OAuthAccessTokenService : RainyServiceBase
 	{
-		OAuthHandlerBase oauthHandler;
-		public OAuthAccessTokenService (OAuthHandlerBase oauthHandler) : base ()
+		OAuthHandler oauthHandler;
+		public OAuthAccessTokenService (OAuthHandler oauthHandler) : base ()
 		{
 			this.oauthHandler = oauthHandler;
 		}

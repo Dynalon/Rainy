@@ -1,16 +1,15 @@
 using System;
-using Tomboy.Sync.Web.DTO;
-using NUnit.Framework;
-using System.Data;
-using ServiceStack.OrmLite;
-using ServiceStack.Common;
 using System.Collections.Generic;
+using System.Data;
 using System.Linq;
 using DevDefined.OAuth.Framework;
-using Rainy.OAuth.SimpleStore;
 using DevDefined.OAuth.Storage.Basic;
-using Rainy.OAuth;
+using NUnit.Framework;
 using Rainy.Interfaces;
+using Rainy.OAuth;
+using ServiceStack.Common;
+using ServiceStack.OrmLite;
+using Tomboy.Sync.Web.DTO;
 
 namespace Rainy.Db
 {

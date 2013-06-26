@@ -14,6 +14,8 @@ using Rainy.Db.Config;
 using JsonConfig;
 using Rainy.OAuth;
 using Rainy.Crypto;
+using DevDefined.OAuth.Storage.Basic;
+using DevDefined.OAuth.Storage;
 
 namespace Rainy
 {
@@ -90,14 +92,14 @@ namespace Rainy
 		{
 			this.ObjectGraphComposer = (c) => {
 				this.WireupSqliteTestserver (c);
-				this.WireupGenericDatabaseClasses (c);
+				this.WireupGenericTestClasses (c);
 			};
 		}
 		public void ScenarioPostgres ()
 		{
 			this.ObjectGraphComposer = (c) => {
 				this.WireupPostgresServer (c);
-				this.WireupGenericDatabaseClasses (c);
+				this.WireupGenericTestClasses (c);
 			};
 		}
 
@@ -141,10 +143,9 @@ namespace Rainy
 				var connection_string = container.Resolve<PostgreConfig> ().ConnectionString;
 				return new OrmLiteConnectionFactory (connection_string, PostgreSqlDialect.Provider);
 			});
-
 		}
 
-		private void WireupGenericDatabaseClasses (Funq.Container container)
+		private void WireupGenericTestClasses (Funq.Container container)
 		{
 			container.Register<IAuthenticator> (c => {
 				var factory = c.Resolve<IDbConnectionFactory> ();
@@ -174,13 +175,19 @@ namespace Rainy
 			container.Register<IDataBackend> (c => {
 				var factory = c.Resolve<IDbConnectionFactory> ();
 				var auth = c.Resolve<IAuthenticator> ();
-				return new DatabaseBackend (factory, auth);
+				var handler = c.Resolve<OAuthHandler> ();
+				return new DatabaseBackend (factory, auth, handler);
 			});
 
-			container.Register<OAuthHandlerBase> (c => {
+			container.Register<OAuthHandler> (c => {
 				var auth = c.Resolve<IAuthenticator> ();
 				var factory = c.Resolve<IDbConnectionFactory> ();
-				var handler = new OAuthDatabaseHandler (factory, auth);
+//				ITokenRepository<AccessToken> access_tokens = new SimpleTokenRepository<AccessToken> ();
+//				ITokenRepository<RequestToken> request_tokens = new SimpleTokenRepository<RequestToken> ();
+				ITokenRepository<AccessToken> access_tokens = new DbAccessTokenRepository<AccessToken> (factory);
+				ITokenRepository<RequestToken> request_tokens = new DbRequestTokenRepository<RequestToken> (factory);
+				ITokenStore token_store = new RainyTokenStore (access_tokens, request_tokens);
+				OAuthHandler handler = new OAuthHandler (auth, access_tokens, request_tokens, token_store);
 				return handler;
 			});
 
@@ -190,8 +197,6 @@ namespace Rainy
 			// HACK so the user is inserted when a fixture SetUp is run
 			container.Resolve<IAuthenticator> ();
 		}
-
-
 
 		public JsonServiceClient GetJsonClient ()
 		{

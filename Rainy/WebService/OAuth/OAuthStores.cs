@@ -33,19 +33,19 @@ using System;
 using DevDefined.OAuth.Framework;
 using DevDefined.OAuth.Utility;
 
-namespace Rainy.OAuth.SimpleStore
+namespace Rainy.OAuth
 {
 	/// <summary>
 	/// Simple token store. Holds our RequestTokens and AccessTokens.
 	/// </summary>
-	public class SimpleTokenStore : ITokenStore
+	public class RainyTokenStore : ITokenStore
 	{
 		public ITokenRepository<AccessToken> _accessTokenRepository { get; set; }
 		// we only want the accessTokenRepository to get serialized and permanently stores
 		// so don't use properties on the request tokens
 		readonly ITokenRepository<RequestToken> _requestTokenRepository;
 		
-		public SimpleTokenStore(ITokenRepository<AccessToken> accessTokenRepository, ITokenRepository<RequestToken> requestTokenRepository)
+		public RainyTokenStore(ITokenRepository<AccessToken> accessTokenRepository, ITokenRepository<RequestToken> requestTokenRepository)
 		{
 			if (accessTokenRepository == null) throw new ArgumentNullException("accessTokenRepository");
 			if (requestTokenRepository == null) throw new ArgumentNullException("requestTokenRepository");
@@ -105,7 +105,13 @@ namespace Rainy.OAuth.SimpleStore
 		public IToken GetAccessTokenAssociatedWithRequestToken(IOAuthContext requestContext)
 		{
 			RequestToken requestToken = GetRequestToken(requestContext);
-			return requestToken.AccessToken;
+			var access_token = requestToken.AccessToken;
+
+			// unlink the access token so we can't issue it again
+			requestToken.AccessToken = null;
+			this._requestTokenRepository.SaveToken (requestToken);
+
+			return access_token;
 		}
 		
 		public RequestForAccessStatus GetStatusOfRequestForAccess(IOAuthContext accessContext)

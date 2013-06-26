@@ -27,20 +27,19 @@ using DevDefined.OAuth.Storage.Basic;
 using DevDefined.OAuth.Testing;
 using DevDefined.OAuth.Provider;
 using DevDefined.OAuth.Provider.Inspectors;
-using Rainy.OAuth.SimpleStore;
+using Rainy.OAuth;
 using Rainy.Interfaces;
 
 namespace Rainy.OAuth
 {
 	// TODO: replace with Interface and wire in DI composition root
-	public abstract class OAuthHandlerBase : IDisposable
+	public class OAuthHandler: IDisposable
 	{
-		// the data stores required by the OAuth process
-		public ITokenRepository<AccessToken> AccessTokens;
-		public ITokenRepository<RequestToken> RequestTokens;
-		public ITokenStore TokenStore;
+		public readonly ITokenRepository<AccessToken> AccessTokens;
+		public readonly ITokenRepository<RequestToken> RequestTokens;
+		protected ITokenStore TokenStore;
+		protected IAuthenticator Authenticator;
 
-		public IAuthenticator Authenticator;
 		public OAuthProvider Provider;
 
 		protected INonceStore NonceStore;
@@ -48,16 +47,25 @@ namespace Rainy.OAuth
 
 		protected List<IContextInspector> inspectors = new List<IContextInspector> ();
 
-		public OAuthHandlerBase (IAuthenticator auth)
+		public OAuthHandler (IAuthenticator auth,
+		                     ITokenRepository<AccessToken> access_token_repo,
+		                     ITokenRepository<RequestToken> request_token_repo,
+		                     ITokenStore token_store)
 		{
-			Authenticator = auth;
 
-			ConsumerStore = new RainyConsumerStore ();
-			NonceStore = new TestNonceStore ();
+			this.Authenticator = auth;
+			this.AccessTokens = access_token_repo;
+			this.RequestTokens = request_token_repo;
+			this.TokenStore = token_store;
+
+			this.ConsumerStore = new RainyConsumerStore ();
+			this.NonceStore = new DummyNonceStore ();
 			// initialize those classes that are not persisted
 			// TODO request tokens should be persisted in the future
-			RequestTokens = new SimpleTokenRepository<RequestToken> ();
+			//RequestTokens = new SimpleTokenRepository<RequestToken> ();
 
+
+			SetupInspectors ();
 		}
 
 		protected void SetupInspectors ()

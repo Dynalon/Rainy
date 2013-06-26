@@ -64,11 +64,11 @@ namespace Rainy
 
 	public class DatabaseBackend : DbAccessObject, IDataBackend
 	{
-		OAuthHandlerBase oauthHandler;
+		OAuthHandler oauthHandler;
 
-		public DatabaseBackend (IDbConnectionFactory factory, IAuthenticator auth) : base (factory)
+		public DatabaseBackend (IDbConnectionFactory factory, IAuthenticator auth, OAuthHandler handler) : base (factory)
 		{
-			oauthHandler = new OAuthDatabaseHandler (factory, auth);
+			oauthHandler = handler;
 
 			CreateSchema (factory);
 		}
@@ -92,15 +92,18 @@ namespace Rainy
 						db.CreateTableIfNotExists <DBUser> ();
 						db.CreateTableIfNotExists <DBNote> ();
 						db.CreateTableIfNotExists <DBAccessToken> ();
+						db.CreateTableIfNotExists <DBRequestToken> ();
 					} else {
 						db.DropAndCreateTable <DBUser> ();
 						db.DropAndCreateTable <DBNote> ();
 						db.DropAndCreateTable <DBAccessToken> ();
+						db.DropAndCreateTable <DBRequestToken> ();
 					}
 				} else {
 					db.CreateTableIfNotExists <DBUser> ();
 					db.CreateTableIfNotExists <DBNote> ();
 					db.CreateTableIfNotExists <DBAccessToken> ();
+					db.CreateTableIfNotExists <DBRequestToken> ();
 				}
 			}
 		}
@@ -119,7 +122,7 @@ namespace Rainy
 			var rep = new DatabaseNoteRepository (this.connFactory, username);
 			return rep;
 		}
-		public OAuthHandlerBase OAuth {
+		public OAuthHandler OAuth {
 			get {
 				return oauthHandler;
 			}

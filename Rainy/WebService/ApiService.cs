@@ -9,8 +9,8 @@ namespace Rainy.WebService
 {
 	public class ApiService : RainyNoteServiceBase
 	{
-		protected OAuthHandlerBase oauthHandler;
-		public ApiService (IDataBackend backend, OAuthHandlerBase oauthHandler) : base (backend)
+		protected OAuthHandler oauthHandler;
+		public ApiService (IDataBackend backend, OAuthHandler oauthHandler) : base (backend)
 		{
 			this.oauthHandler = oauthHandler;
 		}

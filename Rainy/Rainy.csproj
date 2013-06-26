@@ -117,8 +117,6 @@
     <Compile Include="RainyStandaloneServer.cs" />
     <Compile Include="NoteRepository.cs" />
     <Compile Include="Interfaces.cs" />
-    <Compile Include="WebService\OAuth\SimpleTokenRepository.cs" />
-    <Compile Include="WebService\OAuth\OAuthDatabaseHandler.cs" />
     <Compile Include="WebService\OAuth\OAuthHandlerBase.cs" />
     <Compile Include="WebService\Admin\Helper.cs" />
     <Compile Include="WebService\UserService.cs" />
@@ -141,6 +139,7 @@
     <Compile Include="AppHost.cs" />
     <Compile Include="RainyTestServer.cs" />
     <Compile Include="Crypto.cs" />
+    <Compile Include="WebService\OAuth\OAuthDataStructures.cs" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="WebService\" />

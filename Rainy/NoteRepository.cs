@@ -51,11 +51,11 @@ namespace Rainy
 	public class FileSystemBackend : Rainy.Interfaces.IDataBackend
 	{
 		string notesBasePath;
-		OAuthHandlerBase oauthHandler;
+		OAuthHandler oauthHandler;
 
-		public FileSystemBackend (string data_path, IDbConnectionFactory factory, IAuthenticator auth, bool reset = false)
+		public FileSystemBackend (string data_path, IDbConnectionFactory factory, IAuthenticator auth, OAuthHandler handler, bool reset = false)
 		{
-			oauthHandler = new OAuthDatabaseHandler (factory, auth);
+			oauthHandler = handler;
 
 			// TODO move this into the oauth stuff
 			//DbConfig.CreateSchema ();
@@ -69,7 +69,7 @@ namespace Rainy
 		{
 			return new DirectoryBasedNoteRepository (username, notesBasePath);
 		}
-		public OAuthHandlerBase OAuth {
+		public OAuthHandler OAuth {
 			get { return oauthHandler; }
 		}
 
