@@ -26,6 +26,8 @@ using DevDefined.OAuth.Storage;
 using DevDefined.OAuth.Storage.Basic;
 using System.Collections.Generic;
 using DevDefined.OAuth.Tests;
+using System.Security.Cryptography;
+using Rainy.Crypto;
 
 #endregion
 
@@ -56,13 +58,19 @@ namespace Rainy.OAuth
 		public IToken CreateRequestToken(IOAuthContext context)
 		{
 			if (context == null) throw new ArgumentNullException("context");
-			
+
+			// for request tokens, 128 bit entropy should be enough
+			var rng = new RNGCryptoServiceProvider ();
+			var key = rng.Create256BitLowerCaseHexKey ();
+			var token_rnd = key.Substring(0, 32);
+			var token_secret = key.Substring(32, 32);
+
 			var token = new RequestToken
 			{
 				ConsumerKey = context.ConsumerKey,
 				Realm = context.Realm,
-				Token = Guid.NewGuid().ToString(),
-				TokenSecret = Guid.NewGuid().ToString(),
+				Token = token_rnd,
+				TokenSecret = token_secret,
 				CallbackUrl = context.CallbackUrl
 			};
 			
