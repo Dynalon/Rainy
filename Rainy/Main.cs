@@ -16,6 +16,7 @@ using Rainy.Db.Config;
 using ServiceStack.OrmLite;
 using Rainy.OAuth;
 using DevDefined.OAuth.Storage.Basic;
+using DevDefined.OAuth.Storage;
 
 namespace Rainy
 {
@@ -93,7 +94,7 @@ namespace Rainy
 				if (!string.IsNullOrEmpty (txt_conf.Password)) psql_conf.Password = txt_conf.Password;
 				if (!string.IsNullOrEmpty (txt_conf.Database)) psql_conf.Database = txt_conf.Database;
 				if (!string.IsNullOrEmpty (txt_conf.Host)) psql_conf.Host = txt_conf.Host;
-				if (txt_conf.Port) psql_conf.Port = txt_conf.Port;
+				if (txt_conf.Port > 0) psql_conf.Port = (uint) txt_conf.Port;
 
 				return psql_conf;
 			});
@@ -132,8 +133,21 @@ namespace Rainy
 
 				container.Register<IAuthenticator> (c => {
 					var factory = c.Resolve<IDbConnectionFactory> ();
-					var dbauth = new DbAuthenticator (factory);
+					//var dbauth = new DbAuthenticator (factory);
+					var dbauth = new ConfigFileAuthenticator (Config.Global.Users);
 					return dbauth;
+				});
+
+				container.Register<OAuthHandler> (c => {
+					var auth = c.Resolve<IAuthenticator> ();
+					var factory = c.Resolve<IDbConnectionFactory> ();
+					//				ITokenRepository<AccessToken> access_tokens = new SimpleTokenRepository<AccessToken> ();
+					//				ITokenRepository<RequestToken> request_tokens = new SimpleTokenRepository<RequestToken> ();
+					ITokenRepository<AccessToken> access_tokens = new DbAccessTokenRepository<AccessToken> (factory);
+					ITokenRepository<RequestToken> request_tokens = new DbRequestTokenRepository<RequestToken> (factory);
+					ITokenStore token_store = new RainyTokenStore (access_tokens, request_tokens);
+					OAuthHandler handler = new OAuthHandler (auth, access_tokens, request_tokens, token_store);
+					return handler;
 				});
 
 				container.Register<IDataBackend> (c => {
