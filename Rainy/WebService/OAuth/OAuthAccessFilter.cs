@@ -45,6 +45,7 @@ namespace Rainy.WebService.OAuth
 			var web_request = ((HttpListenerRequest)request.OriginalRequest).ToWebRequest ();
 			IOAuthContext context = new OAuthContextBuilder ().FromWebRequest (web_request, new MemoryStream ());
 
+			// HACK ServiceStack does not inject into custom attributes
 			var oauthHandler = EndpointHost.Container.Resolve<OAuthHandler> ();
 
 			try {

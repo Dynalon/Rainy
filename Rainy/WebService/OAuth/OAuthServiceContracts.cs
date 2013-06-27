@@ -18,7 +18,7 @@ namespace Rainy.WebService.OAuth
 		public string Password { get; set; }
 	}
 
-	[Route("/oauth/access_token", "GET")]
+	[Route("/oauth/access_token", "GET,POST")]
 	public class OAuthAccessTokenRequest : IReturnVoid
 	{
 	}

@@ -55,9 +55,10 @@ namespace Rainy.WebService.OAuth
 		}
 		public object Post (OAuthRequestTokenRequest request)
 		{
+			return Get (request);
 			// i.e. ConBoy only supported POST Auth which is valid accoding to the OAuth RFC, but not yet
 			// supported in Rainy
-			throw new RainyBaseException () {ErrorMessage = "Usage of POST for OAuth authorization is currently not supported. Use GET instead."};
+			//throw new RainyBaseException () {ErrorMessage = "Usage of POST for OAuth authorization is currently not supported. Use GET instead."};
 		}
 	}
 
@@ -148,7 +149,7 @@ namespace Rainy.WebService.OAuth
 			this.authenticator = auth;
 			this.oauthHandler = oauthHandler;
 		}
-		public object Get (OAuthAuthorizeRequest request)
+		public object Any (OAuthAuthorizeRequest request)
 		{
 			if (!string.IsNullOrEmpty (request.Username) &&
 			    !string.IsNullOrEmpty (request.Password)) {
@@ -188,7 +189,7 @@ namespace Rainy.WebService.OAuth
 		{
 			this.oauthHandler = oauthHandler;
 		}
-		public object Get (OAuthAccessTokenRequest request)
+		public object Any (OAuthAccessTokenRequest request)
 		{
 			// keep this line to inspect the Request in monodevelop's debugger 
 			// really helps debugging API calls

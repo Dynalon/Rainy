@@ -2,6 +2,7 @@ using System;
 using System.Net;
 using DTO = Tomboy.Sync.Web.DTO;
 using Rainy.Interfaces;
+using Rainy.WebService.OAuth;
 
 namespace Rainy.WebService
 {
@@ -11,6 +12,8 @@ namespace Rainy.WebService
 		public UserService (IDataBackend backend) : base (backend)
 		{
 		}
+
+		[OAuthRequired]
 		public object Get (UserRequest request)
 		{
 			var u = new DTO.UserResponse ();
