@@ -59,7 +59,7 @@ namespace Rainy.OAuth
 			this.TokenStore = token_store;
 
 			this.ConsumerStore = new RainyConsumerStore ();
-			this.NonceStore = new DummyNonceStore ();
+			//this.NonceStore = new DummyNonceStore ();
 			// initialize those classes that are not persisted
 			// TODO request tokens should be persisted in the future
 			//RequestTokens = new SimpleTokenRepository<RequestToken> ();
@@ -70,7 +70,7 @@ namespace Rainy.OAuth
 
 		protected void SetupInspectors ()
 		{
-			inspectors.Add(new NonceStoreInspector (NonceStore));
+			//inspectors.Add(new NonceStoreInspector (NonceStore));
 			inspectors.Add(new OAuth10AInspector (TokenStore));
 
 			// request tokens may only be 36 hour old
