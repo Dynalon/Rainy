@@ -8,6 +8,18 @@ namespace Rainy.Crypto
 {
 	public static class CryptoHelper
 	{
+		public static bool UpdatePassword (this DBUser db_user, string password)
+		{
+			// TODO update required keys?
+			var hash = db_user.ComputePasswordHash (password);
+			if (hash != db_user.PasswordHash) {
+				db_user.PasswordHash = hash;
+				return true;
+			}
+			// same password, do nothing
+			return false;
+
+		}
 		public static void CreateCryptoFields (this DBUser db_user, string password)
 		{
 			var rng = new RNGCryptoServiceProvider ();
@@ -15,8 +27,6 @@ namespace Rainy.Crypto
 			var salt = rng.Create256BitLowerCaseHexKey ();
 			db_user.PasswordSalt = salt.Substring (0, 32);
 			db_user.MasterKeySalt = salt.Substring (32, 32);
-
-			db_user.PasswordHash = db_user.ComputePasswordHash (password);
 
 			// generate master key - always fix and will sustain password changes
 			string master_key = rng.Create256BitLowerCaseHexKey ();

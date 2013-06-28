@@ -80,20 +80,25 @@ namespace Rainy.OAuth
 		}
 		public T GetToken (string token)
 		{
+			var short_token = token.Substring(0, 24);
 			using (var conn = connFactory.OpenDbConnection ()) {
 				DBAccessToken t;
-				t = conn.First<DBAccessToken> (tkn => tkn.Token == token);
+				t = conn.First<DBAccessToken> (tkn => tkn.Token == short_token);
 				return (T) t.ToAccessToken();
 			}
 		}
 		public void SaveToken (T token)
 		{
+			// we only store a part of the token - the remainder is part of the encryption key
+			// which we do not want to store
+			var db_token = token.ToDBAccessToken ();
+			db_token.Token = db_token.Token.Substring(0, 24);
 			using (var conn = connFactory.OpenDbConnection ()) {
 				using (var trans = conn.BeginTransaction ()) {
 					// first delete the token
-					conn.Delete (token.ToDBAccessToken ());
+					conn.Delete<DBAccessToken> (t => t.Token == db_token.Token);
 					// insert a fresh copy
-					conn.Insert (token.ToDBAccessToken ());
+					conn.Insert<DBAccessToken> (db_token);
 					trans.Commit ();
 				}
 			}

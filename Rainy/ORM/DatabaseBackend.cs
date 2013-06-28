@@ -80,7 +80,7 @@ namespace Rainy
 
 			using (var db = connFactory.OpenDbConnection ()) {
 				if (reset) {
-					// postgresql ormlite workaround, see issue
+					// postgresql ormlite workaround
 					var ormfac = connFactory as OrmLiteConnectionFactory;
 					if (ormfac.DialectProvider == PostgreSqlDialect.Provider) {
 						var cmd = db.CreateCommand ();

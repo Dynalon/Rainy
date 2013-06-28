@@ -78,15 +78,14 @@ namespace Rainy.OAuth
 			// by more than 36 ours, the request will fail totally
 			inspectors.Add(new TimestampRangeInspector (new TimeSpan (36, 0, 0)));
 				
-				// TODO signature validation currently fails
-				// don't know if it makes sense to enable this since this 
-				// verifies the get request_token step, but our conumser_key and consumer_secret are
-				// publically known
-				// new SignatureValidationInspector (ConsumerStore),
+			// TODO HACK signature validation currently fails
+			// this is not so bad, as we rely on SSL for encryption, we just have to make sure
+			// the access token is valid elsewhere
+			//inspectors.Add(new SignatureValidationInspector (ConsumerStore));
 				
-				// will check the consumer_key to be known
-				// might be disabled since our consumer_key is public
-				// new ConsumerValidationInspector (ConsumerStore)
+			// will check the consumer_key to be known
+			// might be disabled since our consumer_key is public (="anyone")
+			// new ConsumerValidationInspector (ConsumerStore)
 
 			Provider = new OAuthProvider (TokenStore, inspectors.ToArray ());
 		}
