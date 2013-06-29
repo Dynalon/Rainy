@@ -12,6 +12,7 @@ using Rainy.Db;
 using Rainy.Interfaces;
 using ServiceStack.OrmLite;
 using JsonConfig;
+using Rainy.WebService;
 
 
 namespace Rainy
@@ -65,9 +66,9 @@ namespace Rainy
 				Directory.CreateDirectory (notesBasePath);
 			}
 		}
-		public INoteRepository GetNoteRepository (string username)
+		public INoteRepository GetNoteRepository (IUser user)
 		{
-			return new DirectoryBasedNoteRepository (username, notesBasePath);
+			return new DirectoryBasedNoteRepository (user.Username, notesBasePath);
 		}
 		public OAuthHandler OAuth {
 			get { return oauthHandler; }

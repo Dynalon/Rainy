@@ -44,5 +44,4 @@ namespace Rainy.WebService
 		[DataMember (Name="Username")]
 		public string Username { get; set; }
 	} 
-
 }

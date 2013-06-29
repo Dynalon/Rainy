@@ -10,6 +10,7 @@ using Rainy.OAuth;
 using ServiceStack.Common;
 using ServiceStack.OrmLite;
 using Tomboy.Sync.Web.DTO;
+using Rainy.WebService;
 
 namespace Rainy.Db
 {
@@ -163,15 +164,16 @@ namespace Rainy.Db
 		public void ReadWriteManifest ()
 		{
 			var data_backend = RainyTestServer.Container.Resolve<IDataBackend> ();
+			var requesting_user = new RequestingUser { Username = RainyTestServer.TEST_USER, MasterKey = "deadbeef" };
 
 			var server_id = Guid.NewGuid ().ToString ();
-			using (var repo = data_backend.GetNoteRepository (testUser.Username)) {
+			using (var repo = data_backend.GetNoteRepository (requesting_user)) {
 				repo.Manifest.LastSyncRevision = 123;
 				repo.Manifest.ServerId = server_id;
 			}
 
 			// check the manifest got saved
-			using (var repo = data_backend.GetNoteRepository (testUser.Username)) {
+			using (var repo = data_backend.GetNoteRepository (requesting_user)) {
 				Assert.AreEqual (123, repo.Manifest.LastSyncRevision);
 				Assert.AreEqual (server_id, repo.Manifest.ServerId);
 			}

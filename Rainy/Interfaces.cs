@@ -1,6 +1,7 @@
 using System;
 using Tomboy.Sync;
 using Rainy.OAuth;
+using Rainy.WebService;
 
 namespace Rainy.Interfaces
 {
@@ -21,8 +22,7 @@ namespace Rainy.Interfaces
 
 	public interface IDataBackend 
 	{
-		INoteRepository GetNoteRepository (string username);
+		INoteRepository GetNoteRepository (IUser user);
 		OAuthHandler OAuth { get; }
 	}
-
 }

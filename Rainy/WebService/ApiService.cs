@@ -7,10 +7,10 @@ using Rainy.OAuth;
 
 namespace Rainy.WebService
 {
-	public class ApiService : RainyNoteServiceBase
+	public class ApiService : RainyServiceBase
 	{
 		protected OAuthHandler oauthHandler;
-		public ApiService (IDataBackend backend, OAuthHandler oauthHandler) : base (backend)
+		public ApiService (OAuthHandler oauthHandler) : base ()
 		{
 			this.oauthHandler = oauthHandler;
 		}

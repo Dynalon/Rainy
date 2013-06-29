@@ -12,11 +12,18 @@ using Rainy.ErrorHandling;
 
 namespace Rainy.WebService
 {
+	public interface IUser
+	{
+		string Username { get; set; }
+		string MasterKey { get; set; }
+	}
+
+
+
 	public class NotesService : RainyNoteServiceBase
 	{
 		public NotesService (IDataBackend backend) : base (backend)
 		{
-
 		}
 		protected static DTO.GetNotesResponse GetStoredNotes (INoteRepository note_repo)
 		{
@@ -45,7 +52,7 @@ namespace Rainy.WebService
 		public object Get (GetNotesRequest request)
 		{
 			try {
-				using (var note_repo = GetNotes (request.Username)) {
+				using (var note_repo = GetNotes ()) {
 					var notes = GetStoredNotes (note_repo);
 
 					// check if we need to include the note body
@@ -94,7 +101,7 @@ namespace Rainy.WebService
 		public object Put (PutNotesRequest request)
 		{
 			try {
-				using (var note_repo = GetNotes (request.Username)) {
+				using (var note_repo = GetNotes ()) {
 
 					// constraint taken from snowy source code at http://git.gnome.org/browse/snowy/tree/api/handlers.py:143
 					var new_sync_rev = note_repo.Manifest.LastSyncRevision + 1;

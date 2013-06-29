@@ -30,13 +30,13 @@ namespace Rainy.WebService.OAuth
 		
 		public void RequestFilter (IHttpRequest request, IHttpResponse response, object requestDto)
 		{
-			string Username = "";
+			string username = "";
 			if (requestDto is UserRequest) {
-				Username = ((UserRequest)requestDto).Username;
+				username = ((UserRequest)requestDto).Username;
 			} else if (requestDto is GetNotesRequest) {
-				Username = ((GetNotesRequest)requestDto).Username;
+				username = ((GetNotesRequest)requestDto).Username;
 			} else if (requestDto is PutNotesRequest) {
-				Username = ((PutNotesRequest)requestDto).Username;
+				username = ((PutNotesRequest)requestDto).Username;
 			} else {
 				response.ReturnAuthRequired ();
 				return;
@@ -55,18 +55,21 @@ namespace Rainy.WebService.OAuth
 
 				// check if the access token matches the username
 				var access_token = oauthHandler.AccessTokens.GetToken (context.Token);
-				if (access_token.UserName != Username) {
+				if (access_token.UserName != username) {
 					// forbidden
 					Logger.Debug ("username does not match the one in the access token, denying");
 					response.ReturnAuthRequired ();
 					return;
+				} else {
+					request.Items.Add ("MasterKey", access_token.Token);
+					request.Items.Add ("Username", username);
 				}
 			} catch (Exception e) {
 				Logger.DebugFormat ("failed to obtain authorization, oauth context is: {0}", context.Dump ());
 				response.ReturnAuthRequired ();
 			}
 
-			Logger.DebugFormat ("authorization granted for user {0}", Username);
+			Logger.DebugFormat ("authorization granted for user {0}", username);
 
 			// possible race condition but locking is to expensive
 			// at this point, rather accept non-precise values

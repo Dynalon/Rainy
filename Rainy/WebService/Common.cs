@@ -58,16 +58,28 @@ namespace Rainy.WebService
 		}
 	}
 
+	public class RequestingUser : IUser {
+		public string Username { get; set; }
+		public string MasterKey { get; set; }
+	}
+
 	public abstract class RainyNoteServiceBase : RainyServiceBase
 	{
 		protected IDataBackend dataBackend;
 		public RainyNoteServiceBase (IDataBackend backend) : base ()
 		{
 			this.dataBackend = backend;
+
+
 		}
-		protected Rainy.Interfaces.INoteRepository GetNotes (string username)
+		protected Rainy.Interfaces.INoteRepository GetNotes ()
 		{
-			return dataBackend.GetNoteRepository (username);
+			var requesting_user = new RequestingUser ();
+			var base_req = base.RequestContext.Get<IHttpRequest> ();
+			requesting_user.Username = (string) base_req.Items["Username"];
+			requesting_user.MasterKey = (string) base_req.Items["MasterKey"];
+
+			return dataBackend.GetNoteRepository (requesting_user);
 		}
 	}
 

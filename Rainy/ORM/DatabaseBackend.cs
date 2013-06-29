@@ -10,6 +10,7 @@ using Tomboy.Sync;
 using Rainy.Interfaces;
 using ServiceStack.WebHost.Endpoints;
 using Rainy.Crypto;
+using Rainy.WebService;
 
 namespace Rainy
 {
@@ -110,16 +111,17 @@ namespace Rainy
 
 
 		#region IDataBackend implementation
-		public INoteRepository GetNoteRepository (string username)
+		public INoteRepository GetNoteRepository (IUser user)
 		{
-			DBUser user = null;
+			DBUser db_user = null;
 			using (var db = connFactory.OpenDbConnection ()) {
-				user = db.First<DBUser> (u => u.Username == username);
+				db_user = db.First<DBUser> (u => u.Username == user.Username);
 				// TODO why doesn't ormlite raise this error?
-				if (user == null)
-					throw new ArgumentException(username);
+				if (db_user == null)
+					throw new ArgumentException(user.Username);
 			}
-			var rep = new DatabaseNoteRepository (this.connFactory, username);
+
+			var rep = new DatabaseNoteRepository (this.connFactory, db_user);
 			return rep;
 		}
 		public OAuthHandler OAuth {
@@ -138,11 +140,9 @@ namespace Rainy
 		private Engine engine;
 		private DBUser dbUser;
 
-		public DatabaseNoteRepository (IDbConnectionFactory factory, string username) : base (factory)
+		public DatabaseNoteRepository (IDbConnectionFactory factory, DBUser user) : base (factory)
 		{
-			using (var db = connFactory.OpenDbConnection ()) {
-				dbUser = db.First<DBUser> (u => u.Username == username);
-			}
+			dbUser = user;
 
 			storage = new DbStorage (factory, dbUser);
 			engine = new Engine (storage);
