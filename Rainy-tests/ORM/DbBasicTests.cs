@@ -277,7 +277,7 @@ namespace Rainy.Db
 		}
 
 		[Test]
-		public void DbTokenRepository ()
+		public void DbAccessTokenRepository ()
 		{
 			var repo = new DbAccessTokenRepository<AccessToken> (this.factory);
 
@@ -297,7 +297,9 @@ namespace Rainy.Db
 			Assert.AreEqual (token1.Realm, token2.Realm);
 			Assert.AreEqual (token1.UserName, token2.UserName);
 			Assert.AreEqual (token1.ExpiryDate, token2.ExpiryDate);
-			Assert.AreEqual (token1.Token, token2.Token);
+
+			// the token is only the first 24 byte = 96 bits
+			Assert.AreEqual (token1.Token.Substring (0, 24), token2.Token);
 			Assert.AreEqual (token1.TokenSecret, token2.TokenSecret);
 		}
 	}

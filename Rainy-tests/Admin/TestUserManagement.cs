@@ -72,6 +72,7 @@ namespace Rainy.Tests.Management
 			var user = new DTOUser ();
 			user.Username = "michael";
 			user.EmailAddress = "michael@knight.com";
+			user.Password = "none";
 			user.AdditionalData = "Some more info about Michael";
 		
 			var user_url = new UserRequest ().ToUrl("POST");
@@ -79,11 +80,32 @@ namespace Rainy.Tests.Management
 		
 			var user_get_url = new UserRequest () { Username = "michael" }.ToUrl("GET");
 			var resp = adminClient.Get<DTOUser[]> (user_get_url);
-
+			
 			Assert.AreEqual (1, resp.Length);
 			Assert.AreEqual (user.Username, resp[0].Username);
 			Assert.AreEqual (user.EmailAddress, resp[0].EmailAddress);
 			Assert.AreEqual (user.AdditionalData, resp[0].AdditionalData);
+
+		}
+
+		[Test]
+		[ExpectedException(typeof(WebServiceException))]
+		public void AddNewUserWithEmptyPasswordFails ()
+		{
+			var user = new DTOUser ();
+			user.Username = "michael";
+			user.EmailAddress = "michael@knight.com";
+			user.Password = "";
+			user.AdditionalData = "Some more info about Michael";
+
+			var user_url = new UserRequest ().ToUrl("POST");
+			try {
+				adminClient.Post<UserRequest> (user_url, user);
+			} catch (WebServiceException e) {
+				Assert.AreEqual (400, e.StatusCode);
+				throw e;
+			}
+
 		}
 
 		[Test]

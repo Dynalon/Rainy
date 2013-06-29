@@ -13,6 +13,7 @@ using System.Linq;
 using Rainy.WebService.Admin;
 using Rainy.ErrorHandling;
 using Rainy.Interfaces;
+using Rainy.Crypto;
 
 namespace Rainy.WebService.Management.Admin
 {
@@ -104,19 +105,24 @@ namespace Rainy.WebService.Management.Admin
 
 			// TODO move into RequestFilter
 			if (string.IsNullOrEmpty (user.Username))
-				throw new ArgumentNullException ("user.Username");
+				throw new InvalidRequestDtoException { ErrorMessage = "Username was empty" };
 
+			if (string.IsNullOrEmpty (user.Password))
+				throw new InvalidRequestDtoException { ErrorMessage = "Password was empty" };
+			
 			// TODO move into RequestFilter
 			if (! (user.Username.IsOnlySafeChars ()
 			    && user.Password.IsOnlySafeChars ()
 				&& user.EmailAddress.Replace ("@", "").IsOnlySafeChars ())) {
 
-				throw new ArgumentException ("found unsafe/unallowed characters");
+				throw new ValidationException { ErrorMessage = "found unsafe/unallowed characters" };
 			}
 
 			// TODO move into RequestFilter
 			// lowercase the username
 			new_user.Username = new_user.Username.ToLower ();
+
+			new_user.CreateCryptoFields (user.Password);
 
 			using (var conn = connFactory.OpenDbConnection ()) {
 				var existing_user = conn.FirstOrDefault<DBUser> ("Username = {0}", new_user.Username);

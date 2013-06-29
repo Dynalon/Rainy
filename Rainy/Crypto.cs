@@ -10,6 +10,9 @@ namespace Rainy.Crypto
 	{
 		public static bool UpdatePassword (this DBUser db_user, string password)
 		{
+			if (string.IsNullOrEmpty (db_user.PasswordSalt))
+				throw new ArgumentException("Salt must be set", "db_user");
+
 			// TODO update required keys?
 			var hash = db_user.ComputePasswordHash (password);
 			if (hash != db_user.PasswordHash) {
@@ -27,6 +30,8 @@ namespace Rainy.Crypto
 			var salt = rng.Create256BitLowerCaseHexKey ();
 			db_user.PasswordSalt = salt.Substring (0, 32);
 			db_user.MasterKeySalt = salt.Substring (32, 32);
+
+			db_user.UpdatePassword (password);
 
 			// generate master key - always fix and will sustain password changes
 			string master_key = rng.Create256BitLowerCaseHexKey ();
