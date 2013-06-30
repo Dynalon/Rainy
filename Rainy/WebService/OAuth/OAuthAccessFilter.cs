@@ -61,7 +61,7 @@ namespace Rainy.WebService.OAuth
 					response.ReturnAuthRequired ();
 					return;
 				} else {
-					request.Items.Add ("MasterKey", access_token.Token);
+					request.Items.Add ("MasterKey", context.Token);
 					request.Items.Add ("Username", username);
 				}
 			} catch (Exception e) {

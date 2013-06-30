@@ -1,25 +1,37 @@
-using Tomboy;
-using ServiceStack.OrmLite;
 using System;
-using System.Data;
 using System.Collections.Generic;
+using System.Data;
 using System.Linq;
+using ServiceStack.OrmLite;
+using Tomboy;
 using Tomboy.Sync.Web.DTO;
+using Rainy.Crypto;
 
 namespace Rainy.Db
 {
 	public class DbStorage : DbAccessObject, IStorage, IDisposable
 	{
-		public readonly DBUser User;
+		public readonly DBUser dbUser;
 		private IDbConnection db;
 		private IDbTransaction trans;
 
+		private byte[] encryptionKey;
+		private bool encryptNotes {
+			get { return encryptionKey != null && encryptionKey.Length > 0; }
+		}
+
+		public DbStorage (IDbConnectionFactory factory, DBUser user, byte[] encryption_key)
+			: this (factory, user)
+		{
+			encryptionKey = encryption_key;
+		}
 		public DbStorage (IDbConnectionFactory factory, DBUser user) : base (factory)
 		{
+			encryptionKey = "d019f8a34c5b2c0fd1444e27ba02eec1f7816739ff98a674043fb3da72bbd625".ToByteArray ();
 			if (user == null)
 				throw new ArgumentNullException ("user");
 
-			this.User = user;
+			this.dbUser = user;
 			db = factory.OpenDbConnection ();
 
 			// start everything as a transaction
@@ -28,12 +40,15 @@ namespace Rainy.Db
 		#region IStorage implementation
 		public Dictionary<string, Note> GetNotes ()
 		{
-			var notes = db.Select<DBNote> (dbn => dbn.Username == User.Username);
+			var notes = db.Select<DBNote> (dbn => dbn.Username == dbUser.Username);
+
+			if (encryptNotes) {
+				notes.ForEach(n => n.Text = dbUser.DecryptUnicodeString (encryptionKey, n.Text.ToByteArray()));
+			}
 
 			// TODO remove the double copying
 			var dict = notes.ToDictionary (n => n.Guid, n => n.ToDTONote ().ToTomboyNote ());
 			return dict;
-
 		}
 		public void SetPath (string path)
 		{
@@ -43,7 +58,11 @@ namespace Rainy.Db
 		}
 		public void SaveNote (Note note)
 		{
-			var dbNote = note.ToDTONote ().ToDBNote (User);
+			var dbNote = note.ToDTONote ().ToDBNote (dbUser);
+
+			if (encryptNotes) {
+				dbNote.Text = dbUser.EncryptUnicodeString (encryptionKey, dbNote.Text).ToHexString ();
+			}
 
 			// unforunately, we can't know if that note already exist
 			// so we delete any previous incarnations of that note and
@@ -53,7 +72,7 @@ namespace Rainy.Db
 		}
 		public void DeleteNote (Note note)
 		{
-			var dbNote = note.ToDTONote ().ToDBNote (User);
+			var dbNote = note.ToDTONote ().ToDBNote (dbUser);
 			db.Delete<DBNote> (n => n.CompoundPrimaryKey == dbNote.CompoundPrimaryKey);
 		}
 		public void SetConfigVariable (string key, string value)

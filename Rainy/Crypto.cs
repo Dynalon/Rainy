@@ -98,13 +98,12 @@ namespace Rainy.Crypto
 			return plaintext.ToByteArray ();
 		}
 
-		public static byte[] EncryptUnicodeString (this DBUser user, string password, string plaintext)
+		public static byte[] EncryptUnicodeString (this DBUser user, byte[] key, string plaintext)
 		{
 			byte[] encrypted;
-			var master_key = user.GetPlaintextMasterKey (password);
 
 			var aes = new AesManaged ();
-			aes.Key = master_key;
+			aes.Key = key;
 			aes.IV = user.MasterKeySalt.ToByteArray ();
 
 			ICryptoTransform encryptor = aes.CreateEncryptor (aes.Key, aes.IV);
@@ -124,14 +123,13 @@ namespace Rainy.Crypto
 			return encrypted;
 		}
 
-		public static string DecryptUnicodeString (this DBUser user, string password, byte[] ciphertext)
+		public static string DecryptUnicodeString (this DBUser user, byte[] key, byte[] ciphertext)
 		{
 			string plaintext;
 			// Create a decrytor to perform the stream transform.
 			var aes = new AesManaged ();
-			var master_key = user.GetPlaintextMasterKey (password);
 
-			aes.Key = master_key;
+			aes.Key = key;
 			aes.IV = user.MasterKeySalt.ToByteArray ();
 
 			ICryptoTransform decryptor = aes.CreateDecryptor(aes.Key, aes.IV); 

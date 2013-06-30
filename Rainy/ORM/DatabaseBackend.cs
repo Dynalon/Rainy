@@ -109,19 +109,10 @@ namespace Rainy
 			}
 		}
 
-
 		#region IDataBackend implementation
 		public INoteRepository GetNoteRepository (IUser user)
 		{
-			DBUser db_user = null;
-			using (var db = connFactory.OpenDbConnection ()) {
-				db_user = db.First<DBUser> (u => u.Username == user.Username);
-				// TODO why doesn't ormlite raise this error?
-				if (db_user == null)
-					throw new ArgumentException(user.Username);
-			}
-
-			var rep = new DatabaseNoteRepository (this.connFactory, db_user);
+			var rep = new DatabaseNoteRepository (this.connFactory, user);
 			return rep;
 		}
 		public OAuthHandler OAuth {
@@ -134,17 +125,24 @@ namespace Rainy
 	}
 
 	// maybe move into DatabaseBackend as nested class
-	public class DatabaseNoteRepository : DbAccessObject, Rainy.Interfaces.INoteRepository
+	public class DatabaseNoteRepository : DbAccessObject, INoteRepository
 	{
 		private DbStorage storage;
 		private Engine engine;
 		private DBUser dbUser;
 
-		public DatabaseNoteRepository (IDbConnectionFactory factory, DBUser user) : base (factory)
+		public DatabaseNoteRepository (IDbConnectionFactory factory, IUser user) : base (factory)
 		{
-			dbUser = user;
+			using (var db = connFactory.OpenDbConnection ()) {
+				dbUser = db.First<DBUser> (u => u.Username == user.Username);
+				// TODO why doesn't ormlite raise this error?
+				if (dbUser == null)
+					throw new ArgumentException(user.Username);
+			}
 
-			storage = new DbStorage (factory, dbUser);
+			byte[] encryption_key = user.MasterKey.ToByteArray ();
+
+			storage = new DbStorage (factory, dbUser, encryption_key);
 			engine = new Engine (storage);
 
 			if (dbUser.Manifest == null || string.IsNullOrEmpty (dbUser.Manifest.ServerId)) {

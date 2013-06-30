@@ -11,6 +11,8 @@ using Rainy.OAuth;
 using Rainy.Interfaces;
 using System.Security.Cryptography;
 using Rainy.Crypto;
+using Rainy.Db;
+using ServiceStack.OrmLite;
 
 namespace Rainy.WebService.OAuth
 {
@@ -66,8 +68,10 @@ namespace Rainy.WebService.OAuth
 	{
 		OAuthHandler oauthHandler;
 		IAuthenticator Authenticator;
-		public OAuthAuthenticateService (OAuthHandler oauthHandler, IAuthenticator auth) : base ()
+		IDbConnectionFactory connFactory;
+		public OAuthAuthenticateService (IDbConnectionFactory factory, OAuthHandler oauthHandler, IAuthenticator auth) : base ()
 		{
+			this.connFactory = factory;
 			this.Authenticator = auth;
 			this.oauthHandler = oauthHandler;
 		}
@@ -96,20 +100,28 @@ namespace Rainy.WebService.OAuth
 		public object TokenExchangeAfterAuthentication (string username, string password, string token)
 		{
 			var response = new OAuthAuthenticateResponse ();
+			var rng = new RNGCryptoServiceProvider ();
 
 			// TODO surround with try/catch and present 403 or 400 if token is unknown/invalid
 			var request_token = oauthHandler.RequestTokens.GetToken (token);
 
 			// the verifier is important, it is proof that the user successfully authorized
 			// the verifier is later tested by the OAuth10aInspector to macht
-			request_token.Verifier = Guid.NewGuid ().ToString ();
+			request_token.Verifier = rng.Create256BitLowerCaseHexKey ();
 			request_token.AccessDenied = false;
 
-			var rng = new RNGCryptoServiceProvider ();
 			var access_token_secret = rng.Create256BitLowerCaseHexKey ();
 			var access_token_token = rng.Create256BitLowerCaseHexKey ();
 
-			request_token.AccessToken = new AccessToken () {
+			string master_key_half;
+			DBUser user;
+			using (var db = connFactory.OpenDbConnection ()) {
+				user = db.First<DBUser> (u => u.Username == username);
+			}
+			var master_key = user.GetPlaintextMasterKey (password);
+
+
+			request_token.AccessToken = new DBAccessToken () {
 				ConsumerKey = request_token.ConsumerKey,
 				Realm = request_token.Realm,
 				Token = access_token_token,
@@ -144,8 +156,10 @@ namespace Rainy.WebService.OAuth
 	{
 		OAuthHandler oauthHandler;
 		IAuthenticator authenticator;
-		public OAuthAuthorizeService (OAuthHandler oauthHandler, IAuthenticator auth) : base ()
+		IDbConnectionFactory connFactory;
+		public OAuthAuthorizeService (IDbConnectionFactory factory, OAuthHandler oauthHandler, IAuthenticator auth) : base ()
 		{
+			this.connFactory = factory;
 			this.authenticator = auth;
 			this.oauthHandler = oauthHandler;
 		}
@@ -162,7 +176,7 @@ namespace Rainy.WebService.OAuth
 					throw new UnauthorizedException ();
 				}
 				
-				var auth_service = new OAuthAuthenticateService (oauthHandler, authenticator);
+				var auth_service = new OAuthAuthenticateService (connFactory, oauthHandler, authenticator);
 				var resp = (OAuthAuthenticateResponse) auth_service.TokenExchangeAfterAuthentication (
 					request.Username,
 					request.Password,

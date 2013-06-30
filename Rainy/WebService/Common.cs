@@ -72,7 +72,7 @@ namespace Rainy.WebService
 
 
 		}
-		protected Rainy.Interfaces.INoteRepository GetNotes ()
+		protected INoteRepository GetNotes ()
 		{
 			var requesting_user = new RequestingUser ();
 			var base_req = base.RequestContext.Get<IHttpRequest> ();

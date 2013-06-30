@@ -92,8 +92,10 @@ namespace Rainy.Tests
 			u.CreateCryptoFields (password);
 			var test_string = "The quick brown fox jumps over the lazy dog.";
 
-			byte[] encrypted_bytes = u.EncryptUnicodeString (password, test_string);
-			string decrypted_string = u.DecryptUnicodeString (password, encrypted_bytes);
+			var master_key = u.GetPlaintextMasterKey (password);
+
+			byte[] encrypted_bytes = u.EncryptUnicodeString (master_key, test_string);
+			string decrypted_string = u.DecryptUnicodeString (master_key, encrypted_bytes);
 
 			Assert.AreEqual (test_string, decrypted_string);
 		}
@@ -106,11 +108,13 @@ namespace Rainy.Tests
 			var password = "Asdf1234öäü%&";
 
 			u.CreateCryptoFields (password);
+			var master_key = u.GetPlaintextMasterKey (password);
+			var key = master_key.ToHexString ();
 			var test_string = "The quick brown fox jumps over the lazy dog.";
 
-			byte[] encrypted_bytes = u.EncryptUnicodeString (password, test_string);
+			byte[] encrypted_bytes = u.EncryptUnicodeString (master_key, test_string);
 			string encrypted_string = encrypted_bytes.ToHexString ();
-			string decrypted_string = u.DecryptUnicodeString (password, encrypted_string.ToByteArray ());
+			string decrypted_string = u.DecryptUnicodeString (master_key, encrypted_string.ToByteArray ());
 
 			Assert.AreEqual (test_string, decrypted_string);
 

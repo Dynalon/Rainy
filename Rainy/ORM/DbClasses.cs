@@ -28,6 +28,8 @@ namespace Rainy.Db
 	
 		// to associate a note to a username
 		public string Username { get; set; }
+
+		public bool IsEncypted { get; set; }
 	}
 	
 	public class DBUser : DTOUser
@@ -80,7 +82,7 @@ namespace Rainy.Db
 
 	public static class DbClassConverter
 	{
-		public static DBNote ToDBNote (this DTONote dto, DBUser user, bool encrypt = false)
+		public static DBNote ToDBNote (this DTONote dto, DBUser user)
 		{
 			// ServiceStack's .PopulateWith is for some reasons
 			// ORDERS of magnitudes slower than manually copying
