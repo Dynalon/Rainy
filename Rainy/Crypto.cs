@@ -73,6 +73,68 @@ namespace Rainy.Crypto
 			return pw_key;
 		}
 
+		// should be used to encrypt a key with another key
+		public static string EncryptWithKey (this string plaintext, string hexkey, string iv)
+		{
+			byte[] key = hexkey.ToByteArray ();
+			byte[] byte_iv = iv.ToByteArray ();
+			var aes = new AesManaged ();
+
+			if (key.Length != 16 && key.Length != 20 && key.Length != 32)
+				throw new Exception ("Key must be 128, 192 or 256 bits");
+
+			ICryptoTransform encryptor = aes.CreateEncryptor (key, byte_iv);
+			// Create the streams used for encryption. 
+			using (MemoryStream msEncrypt = new MemoryStream())
+			{
+				using (CryptoStream csEncrypt = new CryptoStream(msEncrypt, encryptor, CryptoStreamMode.Write))
+				{
+					using (StreamWriter swEncrypt = new StreamWriter(csEncrypt))
+					{
+						//Write all data to the stream.
+						swEncrypt.Write(plaintext);
+					}
+					var encrypted = msEncrypt.ToArray();
+					return encrypted.ToHexString ();
+				}
+			}
+		}
+
+		public static string DecryptWithKey (this string ciphertext, string hexkey, string iv)
+		{
+			string plaintext;
+			byte[] key = hexkey.ToByteArray ();
+			byte[] byte_iv = iv.ToByteArray ();
+			byte[] byte_cipher = ciphertext.ToByteArray ();
+
+			if (key.Length != 16 && key.Length != 20 && key.Length != 32)
+				throw new Exception ("Key must be 128, 192 or 256 bits");
+
+			// Create a decrytor to perform the stream transform.
+			var aes = new AesManaged () {
+				Key = key,
+				IV = byte_iv
+			};
+
+			ICryptoTransform decryptor = aes.CreateDecryptor(aes.Key, aes.IV); 
+
+			// Create the streams used for decryption. 
+			using (MemoryStream msDecrypt = new MemoryStream(byte_cipher))
+			{
+				using (CryptoStream csDecrypt = new CryptoStream(msDecrypt, decryptor, CryptoStreamMode.Read))
+				{
+					using (StreamReader srDecrypt = new StreamReader(csDecrypt))
+					{
+
+						// Read the decrypted bytes from the decrypting stream 
+						// and place them in a string.
+						plaintext = srDecrypt.ReadToEnd();
+					}
+				}
+			}
+			return plaintext;
+		}
+
 		public static byte[] GetPlaintextMasterKey (this DBUser user, string password)
 		{
 			var pw_key = user.DeriveKeyFromPassword (password);
@@ -98,56 +160,24 @@ namespace Rainy.Crypto
 			return plaintext.ToByteArray ();
 		}
 
-		public static byte[] EncryptUnicodeString (this DBUser user, byte[] key, string plaintext)
+		public static byte[] EncryptString (this DBUser user, byte[] key, string plaintext)
 		{
 			byte[] encrypted;
+			// TODO pass in string as argument instead of byte
+			string hexkey = key.ToHexString ();
+			string iv = user.MasterKeySalt;
 
-			var aes = new AesManaged ();
-			aes.Key = key;
-			aes.IV = user.MasterKeySalt.ToByteArray ();
-
-			ICryptoTransform encryptor = aes.CreateEncryptor (aes.Key, aes.IV);
-
-			using (MemoryStream msEncrypt = new MemoryStream ())
-			{
-				using (CryptoStream csEncrypt = new CryptoStream (msEncrypt, encryptor, CryptoStreamMode.Write))
-				{
-					using (StreamWriter swEncrypt = new StreamWriter (csEncrypt))
-					{
-						//Write all data to the stream.
-						swEncrypt.Write (plaintext);
-					}
-					encrypted = msEncrypt.ToArray ();
-				}
-			}
+			encrypted = plaintext.EncryptWithKey (hexkey, iv).ToByteArray ();
 			return encrypted;
 		}
 
 		public static string DecryptUnicodeString (this DBUser user, byte[] key, byte[] ciphertext)
 		{
-			string plaintext;
-			// Create a decrytor to perform the stream transform.
-			var aes = new AesManaged ();
+			var hexkey = key.ToHexString ();
+			string hexcipher = ciphertext.ToHexString ();
+			string iv = user.MasterKeySalt;
 
-			aes.Key = key;
-			aes.IV = user.MasterKeySalt.ToByteArray ();
-
-			ICryptoTransform decryptor = aes.CreateDecryptor(aes.Key, aes.IV); 
-
-			// Create the streams used for decryption. 
-			using (MemoryStream msDecrypt = new MemoryStream(ciphertext))
-			{
-				using (CryptoStream csDecrypt = new CryptoStream(msDecrypt, decryptor, CryptoStreamMode.Read))
-				{
-					using (StreamReader srDecrypt = new StreamReader(csDecrypt))
-					{
-
-						// Read the decrypted bytes from the decrypting stream 
-						// and place them in a string.
-						plaintext = srDecrypt.ReadToEnd();
-					}
-				}
-			}
+			string plaintext = hexcipher.DecryptWithKey (hexkey, iv);
 			return plaintext;
 		}
 

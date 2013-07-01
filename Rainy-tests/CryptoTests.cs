@@ -37,6 +37,22 @@ namespace Rainy.Tests
 		}
 
 		[Test]
+		public void TestEncryptKeyWithKey ()
+		{
+			// 256 bit keys
+			var random_key = "fdc6e6227bd83d807c0cf6a5ce6df303b4d580b672611a0a7676fd95d7525ec1";
+			var master_key = "1ce5257d59df6767a0a116276b085d4b303fd6ec5a6fc0c708d38db7226e6cdf";
+
+			// 128 bit iv
+			var iv = "f6a5ce6df303b4d5affedeadbeef0ffe";
+
+			var token_key = master_key.EncryptWithKey (random_key, iv);
+			var plaintext_key = token_key.DecryptWithKey (random_key, iv);
+
+			Assert.AreEqual (master_key, plaintext_key);
+		}
+
+		[Test]
 		public void CreateCryptoFieldsForNewUser ()
 		{
 			var u = new DBUser ();
@@ -94,7 +110,7 @@ namespace Rainy.Tests
 
 			var master_key = u.GetPlaintextMasterKey (password);
 
-			byte[] encrypted_bytes = u.EncryptUnicodeString (master_key, test_string);
+			byte[] encrypted_bytes = u.EncryptString (master_key, test_string);
 			string decrypted_string = u.DecryptUnicodeString (master_key, encrypted_bytes);
 
 			Assert.AreEqual (test_string, decrypted_string);
@@ -112,7 +128,7 @@ namespace Rainy.Tests
 			var key = master_key.ToHexString ();
 			var test_string = "The quick brown fox jumps over the lazy dog.";
 
-			byte[] encrypted_bytes = u.EncryptUnicodeString (master_key, test_string);
+			byte[] encrypted_bytes = u.EncryptString (master_key, test_string);
 			string encrypted_string = encrypted_bytes.ToHexString ();
 			string decrypted_string = u.DecryptUnicodeString (master_key, encrypted_string.ToByteArray ());
 

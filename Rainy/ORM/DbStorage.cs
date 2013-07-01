@@ -61,7 +61,7 @@ namespace Rainy.Db
 			var dbNote = note.ToDTONote ().ToDBNote (dbUser);
 
 			if (encryptNotes) {
-				dbNote.Text = dbUser.EncryptUnicodeString (encryptionKey, dbNote.Text).ToHexString ();
+				dbNote.Text = dbUser.EncryptString (encryptionKey, dbNote.Text).ToHexString ();
 			}
 
 			// unforunately, we can't know if that note already exist
