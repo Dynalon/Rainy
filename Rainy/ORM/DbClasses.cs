@@ -30,6 +30,7 @@ namespace Rainy.Db
 		public string Username { get; set; }
 
 		public bool IsEncypted { get; set; }
+		public string EncryptedKey { get; set; }
 	}
 	
 	public class DBUser : DTOUser

@@ -140,7 +140,7 @@ namespace Rainy
 					throw new ArgumentException(user.Username);
 			}
 
-			byte[] encryption_key = user.MasterKey.ToByteArray ();
+			var encryption_key = user.MasterKey;
 
 			storage = new DbStorage (factory, dbUser, encryption_key);
 			engine = new Engine (storage);

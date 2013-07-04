@@ -6,6 +6,7 @@ using ServiceStack.OrmLite;
 using Tomboy;
 using Tomboy.Sync.Web.DTO;
 using Rainy.Crypto;
+using System.Security.Cryptography;
 
 namespace Rainy.Db
 {
@@ -15,19 +16,19 @@ namespace Rainy.Db
 		private IDbConnection db;
 		private IDbTransaction trans;
 
-		private byte[] encryptionKey;
+		private string encryptionMasterKey;
 		private bool encryptNotes {
-			get { return encryptionKey != null && encryptionKey.Length > 0; }
+			get { return !string.IsNullOrEmpty (encryptionMasterKey); }
 		}
 
-		public DbStorage (IDbConnectionFactory factory, DBUser user, byte[] encryption_key)
+		public DbStorage (IDbConnectionFactory factory, DBUser user, string encryption_master_key)
 			: this (factory, user)
 		{
-			encryptionKey = encryption_key;
+			encryptionMasterKey = encryption_master_key;
 		}
 		public DbStorage (IDbConnectionFactory factory, DBUser user) : base (factory)
 		{
-			encryptionKey = "d019f8a34c5b2c0fd1444e27ba02eec1f7816739ff98a674043fb3da72bbd625".ToByteArray ();
+//			encryptionMasterKey = "d019f8a34c5b2c0fd1444e27ba02eec1f7816739ff98a674043fb3da72bbd625".ToByteArray ();
 			if (user == null)
 				throw new ArgumentNullException ("user");
 
@@ -43,7 +44,7 @@ namespace Rainy.Db
 			var notes = db.Select<DBNote> (dbn => dbn.Username == dbUser.Username);
 
 			if (encryptNotes) {
-				notes.ForEach(n => n.Text = dbUser.DecryptUnicodeString (encryptionKey, n.Text.ToByteArray()));
+				notes.ForEach(n => n.Text = dbUser.DecryptUnicodeString (encryptionMasterKey.ToByteArray (), n.Text.ToByteArray()));
 			}
 
 			// TODO remove the double copying
@@ -58,18 +59,20 @@ namespace Rainy.Db
 		}
 		public void SaveNote (Note note)
 		{
-			var dbNote = note.ToDTONote ().ToDBNote (dbUser);
+			var db_note = note.ToDTONote ().ToDBNote (dbUser);
 
 			if (encryptNotes) {
-				dbNote.Text = dbUser.EncryptString (encryptionKey, dbNote.Text).ToHexString ();
+				// we need to check if the note exists, and if so, use the same encryption key
+				db_note.EncryptedKey = GetEncryptedNoteKey (db_note);
+				EncryptNoteBody (db_note);
 			}
-
 			// unforunately, we can't know if that note already exist
 			// so we delete any previous incarnations of that note and
 			// re-insert
-			db.Delete<DBNote> (n => n.CompoundPrimaryKey == dbNote.CompoundPrimaryKey);
-			db.Insert (dbNote);
+			db.Delete<DBNote> (n => n.CompoundPrimaryKey == db_note.CompoundPrimaryKey);
+			db.Insert (db_note);
 		}
+
 		public void DeleteNote (Note note)
 		{
 			var dbNote = note.ToDTONote ().ToDBNote (dbUser);
@@ -88,6 +91,29 @@ namespace Rainy.Db
 			throw new System.NotImplementedException ();
 		}
 		#endregion
+
+		private string GetEncryptedNoteKey (DBNote note)
+		{
+			// re-use the same key when saving a note
+			string encrypted_per_note_key;
+
+			var saved_note = db.FirstOrDefault<DBNote> (n => n.CompoundPrimaryKey == note.CompoundPrimaryKey);
+			if (saved_note != null) {
+				encrypted_per_note_key = saved_note.EncryptedKey;
+			} else {
+				// new note, generate a new key
+				var rng = new RNGCryptoServiceProvider ();
+				encrypted_per_note_key = rng.Create256BitLowerCaseHexKey ().EncryptWithKey (encryptionMasterKey, dbUser.MasterKeySalt);
+			}
+			return encrypted_per_note_key;
+		}
+		private void EncryptNoteBody (DBNote note)
+		{
+			// decrypt the per note key
+			var plaintext_key = note.EncryptedKey.DecryptWithKey (encryptionMasterKey, dbUser.MasterKeySalt);
+			note.IsEncypted = true;
+			note.Text = dbUser.EncryptString (plaintext_key.ToByteArray (), note.Text).ToHexString ();
+		}
 
 		#region IDisposable implementation
 		public void Dispose ()
