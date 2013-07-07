@@ -102,6 +102,13 @@ namespace Rainy.Crypto
 
 		public static string DecryptWithKey (this string ciphertext, string hexkey, string iv)
 		{
+			if (iv == null)
+				throw new ArgumentNullException ("iv");
+			if (hexkey == null)
+				throw new ArgumentNullException ("hexkey");
+			if (ciphertext == null)
+				throw new ArgumentNullException ("ciphertext");
+
 			string plaintext;
 			byte[] key = hexkey.ToByteArray ();
 			byte[] byte_iv = iv.ToByteArray ();

@@ -24,11 +24,13 @@ namespace Rainy.Db
 		public DbStorage (IDbConnectionFactory factory, DBUser user, string encryption_master_key)
 			: this (factory, user)
 		{
+			if (encryption_master_key == null)
+				throw new ArgumentNullException ("encryption_master_key");
+
 			encryptionMasterKey = encryption_master_key;
 		}
 		public DbStorage (IDbConnectionFactory factory, DBUser user) : base (factory)
 		{
-//			encryptionMasterKey = "d019f8a34c5b2c0fd1444e27ba02eec1f7816739ff98a674043fb3da72bbd625".ToByteArray ();
 			if (user == null)
 				throw new ArgumentNullException ("user");
 
@@ -44,7 +46,7 @@ namespace Rainy.Db
 			var notes = db.Select<DBNote> (dbn => dbn.Username == dbUser.Username);
 
 			if (encryptNotes) {
-				notes.ForEach(n => n.Text = dbUser.DecryptUnicodeString (encryptionMasterKey.ToByteArray (), n.Text.ToByteArray()));
+				notes.ForEach(n => DecryptNoteBody (n));
 			}
 
 			// TODO remove the double copying
@@ -113,6 +115,14 @@ namespace Rainy.Db
 			var plaintext_key = note.EncryptedKey.DecryptWithKey (encryptionMasterKey, dbUser.MasterKeySalt);
 			note.IsEncypted = true;
 			note.Text = dbUser.EncryptString (plaintext_key.ToByteArray (), note.Text).ToHexString ();
+		}
+		private void DecryptNoteBody (DBNote note)
+		{
+			if (!note.IsEncypted)
+				return;
+
+			var plaintext_key = note.EncryptedKey.DecryptWithKey (encryptionMasterKey, dbUser.MasterKeySalt);
+			note.Text = dbUser.DecryptUnicodeString (plaintext_key.ToByteArray (), note.Text.ToByteArray ());
 		}
 
 		#region IDisposable implementation

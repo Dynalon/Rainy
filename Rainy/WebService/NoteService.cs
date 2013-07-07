@@ -15,10 +15,8 @@ namespace Rainy.WebService
 	public interface IUser
 	{
 		string Username { get; set; }
-		string MasterKey { get; set; }
+		string AuthToken { get; set; }
 	}
-
-
 
 	public class NotesService : RainyNoteServiceBase
 	{

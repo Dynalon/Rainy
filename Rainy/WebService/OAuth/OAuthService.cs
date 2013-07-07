@@ -13,6 +13,7 @@ using System.Security.Cryptography;
 using Rainy.Crypto;
 using Rainy.Db;
 using ServiceStack.OrmLite;
+using ServiceStack.Common;
 
 namespace Rainy.WebService.OAuth
 {
@@ -111,20 +112,22 @@ namespace Rainy.WebService.OAuth
 			request_token.AccessDenied = false;
 
 			var access_token_secret = rng.Create256BitLowerCaseHexKey ();
-			var access_token_token = rng.Create256BitLowerCaseHexKey ();
+			var master_key_half = rng.Create256BitLowerCaseHexKey ();
 
-			string master_key_half;
 			DBUser user;
 			using (var db = connFactory.OpenDbConnection ()) {
 				user = db.First<DBUser> (u => u.Username == username);
 			}
 			var master_key = user.GetPlaintextMasterKey (password);
 
+			// the token is the master key encrypted with the "master key half"
+			var access_token_token = master_key.ToHexString ().EncryptWithKey (master_key_half, user.MasterKeySalt);
 
-			request_token.AccessToken = new DBAccessToken () {
+			request_token.AccessToken = new AccessToken () {
 				ConsumerKey = request_token.ConsumerKey,
 				Realm = request_token.Realm,
 				Token = access_token_token,
+				Roles = new string[] { "master_key_half:" + master_key_half },
 				TokenSecret = access_token_secret,
 				UserName = username,
 				ExpiryDate = DateTime.Now.AddYears (99)
@@ -199,9 +202,11 @@ namespace Rainy.WebService.OAuth
 	public class OAuthAccessTokenService : RainyServiceBase
 	{
 		OAuthHandler oauthHandler;
-		public OAuthAccessTokenService (OAuthHandler oauthHandler) : base ()
+		IDbConnectionFactory connFactory;
+		public OAuthAccessTokenService (IDbConnectionFactory factory, OAuthHandler oauthHandler) : base ()
 		{
 			this.oauthHandler = oauthHandler;
+			this.connFactory = connFactory;
 		}
 		public object Any (OAuthAccessTokenRequest request)
 		{
@@ -217,10 +222,11 @@ namespace Rainy.WebService.OAuth
 			try {
 				var context = new OAuthContextBuilder ()
 					.FromWebRequest (original_request, new MemoryStream ());
-				AccessToken access_token = (AccessToken) oauthHandler.Provider.ExchangeRequestTokenForAccessToken (context);
 
+				AccessToken access_token = (AccessToken) oauthHandler.Provider.ExchangeRequestTokenForAccessToken (context);
 				Logger.DebugFormat ("permanently authorizing access token: {0}", access_token);
 				oauthHandler.AccessTokens.SaveToken (access_token);
+
 				Response.Write (access_token.ToString ());
 				Response.End ();
 			} catch (Exception e) {

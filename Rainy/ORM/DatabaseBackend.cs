@@ -11,6 +11,7 @@ using Rainy.Interfaces;
 using ServiceStack.WebHost.Endpoints;
 using Rainy.Crypto;
 using Rainy.WebService;
+using DevDefined.OAuth.Storage.Basic;
 
 namespace Rainy
 {
@@ -138,9 +139,16 @@ namespace Rainy
 				// TODO why doesn't ormlite raise this error?
 				if (dbUser == null)
 					throw new ArgumentException(user.Username);
+
 			}
 
-			var encryption_key = user.MasterKey;
+			var access_token_repo = new DbAccessTokenRepository<AccessToken> (factory);
+			var access_token = access_token_repo.GetToken (user.AuthToken);
+
+			// prefix: master_key_half:  has 16 chars
+			var master_key_half = access_token.Roles[0].Substring (16);
+		
+			var encryption_key = user.AuthToken.DecryptWithKey (master_key_half, dbUser.MasterKeySalt);
 
 			storage = new DbStorage (factory, dbUser, encryption_key);
 			engine = new Engine (storage);

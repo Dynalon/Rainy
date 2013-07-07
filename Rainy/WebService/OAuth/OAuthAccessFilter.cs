@@ -9,6 +9,7 @@ using Rainy.WebService;
 using log4net;
 using Rainy.OAuth;
 using ServiceStack.WebHost.Endpoints;
+using Rainy.Crypto;
 
 namespace Rainy.WebService.OAuth
 {
@@ -61,7 +62,8 @@ namespace Rainy.WebService.OAuth
 					response.ReturnAuthRequired ();
 					return;
 				} else {
-					request.Items.Add ("MasterKey", context.Token);
+					//context.Token.DecryptWithKey (atkn.MasterKeyHalf, user.MasterKeySalt);
+					request.Items.Add ("AccessToken", context.Token);
 					request.Items.Add ("Username", username);
 				}
 			} catch (Exception e) {
