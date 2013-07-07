@@ -131,5 +131,16 @@ namespace Rainy.OAuth
 			request_token.PopulateWith (token);
 			return request_token;
 		}
+		public static void SetTokenKey (this AccessToken token, string key)
+		{
+			if (string.IsNullOrEmpty (key))
+				throw new ArgumentNullException ("key");
+
+			token.Roles = new string[] { "token_key:" + key };
+		}
+		public static string GetTokenKey (this AccessToken token)
+		{
+			return token.Roles[0].Substring ("token_key:".Length);
+		}
 	}
 }

@@ -111,27 +111,26 @@ namespace Rainy.WebService.OAuth
 			request_token.Verifier = rng.Create256BitLowerCaseHexKey ();
 			request_token.AccessDenied = false;
 
-			var access_token_secret = rng.Create256BitLowerCaseHexKey ();
-			var master_key_half = rng.Create256BitLowerCaseHexKey ();
+			string access_token_secret = rng.Create256BitLowerCaseHexKey ();
+			string token_key = rng.Create256BitLowerCaseHexKey ();
 
-			DBUser user;
+			// the token is the master key encrypted with the token key
+			string access_token_token;
 			using (var db = connFactory.OpenDbConnection ()) {
-				user = db.First<DBUser> (u => u.Username == username);
+				DBUser user = db.First<DBUser> (u => u.Username == username);
+				string master_key = user.GetPlaintextMasterKey (password).ToHexString ();
+				access_token_token = master_key.EncryptWithKey (token_key, user.MasterKeySalt);
 			}
-			var master_key = user.GetPlaintextMasterKey (password);
-
-			// the token is the master key encrypted with the "master key half"
-			var access_token_token = master_key.ToHexString ().EncryptWithKey (master_key_half, user.MasterKeySalt);
 
 			request_token.AccessToken = new AccessToken () {
 				ConsumerKey = request_token.ConsumerKey,
 				Realm = request_token.Realm,
 				Token = access_token_token,
-				Roles = new string[] { "master_key_half:" + master_key_half },
 				TokenSecret = access_token_secret,
 				UserName = username,
 				ExpiryDate = DateTime.Now.AddYears (99)
 			};
+			request_token.AccessToken.SetTokenKey (token_key);
 
 			oauthHandler.RequestTokens.SaveToken (request_token);
 			Logger.DebugFormat ("created an access token for user {0}: {1}", username, token);

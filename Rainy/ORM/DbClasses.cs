@@ -67,12 +67,11 @@ namespace Rainy.Db
 	public class DBAccessToken : AccessToken
 	{
 		[PrimaryKey]
-		// the token is also the first half that is required to decrypt the master key
 		public new string Token { get; set; }
 
-		// other half that is required to decrypt the master key
-		// should NEVER be sent back to the user
-		public string MasterKeyHalf { get; set; }
+		// the TokenKey encrypts the master_key; the so encrypted master_key
+		// is sent back as access token to the user
+		public string TokenKey { get; set; }
 	}
 
 	public class DBRequestToken : RequestToken

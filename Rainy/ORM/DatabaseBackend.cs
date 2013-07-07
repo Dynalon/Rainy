@@ -139,18 +139,16 @@ namespace Rainy
 				// TODO why doesn't ormlite raise this error?
 				if (dbUser == null)
 					throw new ArgumentException(user.Username);
-
 			}
 
 			var access_token_repo = new DbAccessTokenRepository<AccessToken> (factory);
 			var access_token = access_token_repo.GetToken (user.AuthToken);
 
-			// prefix: master_key_half:  has 16 chars
-			var master_key_half = access_token.Roles[0].Substring (16);
+			var token_key = access_token.GetTokenKey ();
 		
-			var encryption_key = user.AuthToken.DecryptWithKey (master_key_half, dbUser.MasterKeySalt);
+			var master_key = user.AuthToken.DecryptWithKey (token_key, dbUser.MasterKeySalt);
 
-			storage = new DbStorage (factory, dbUser, encryption_key);
+			storage = new DbStorage (factory, dbUser, master_key);
 			engine = new Engine (storage);
 
 			if (dbUser.Manifest == null || string.IsNullOrEmpty (dbUser.Manifest.ServerId)) {
