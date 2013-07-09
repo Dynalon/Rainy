@@ -8,6 +8,11 @@
 [Contribute](CONTRIBUTE.md)
 [Support](SUPPORT.md)
 
+[Developer]()
+
+  * [OAuth docs](developer/oauth.md)
+  * [Crypto docs](developer/crypto.md)
+
 [gimmick:theme(inverse: true)](united)
 
 [gimmick:ForkMeOnGithub({ color: 'red', position: 'right'})](https://github.com/Dynalon/Rainy)
