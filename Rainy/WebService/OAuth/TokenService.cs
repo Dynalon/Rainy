@@ -24,15 +24,17 @@ namespace Rainy.WebService.Management.Admin
 	[OAuthRequired]
 	public class DeleteTokenRequest: AccessTokenDto, IReturnVoid
 	{
+		public string Username { get; set; }
 	}
 
 	[Route("/api/{Username}/access_token/","PUT")]
 	[OAuthRequired]
 	public class UpdateTokenRequest: AccessTokenDto, IReturnVoid
 	{
+		public string Username { get; set; }
 	}
 
-	public class TokenService : RainyOAuthService
+	public class TokenService : OAuthServiceBase
 	{
 		private IDbConnectionFactory connFactory;
 		public TokenService (IDbConnectionFactory factory) : base ()
@@ -69,6 +71,9 @@ namespace Rainy.WebService.Management.Admin
 		}
 		public object Delete (DeleteTokenRequest req)
 		{
+			using (var db = connFactory.OpenDbConnection ()) {
+				db.Delete<DBAccessToken> (t => t.Token == req.TokenPart);
+			}
 			return null;
 		}
 	}

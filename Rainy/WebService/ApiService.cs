@@ -7,7 +7,7 @@ using Rainy.OAuth;
 
 namespace Rainy.WebService
 {
-	public class ApiService : RainyServiceBase
+	public class ApiService : ServiceBase
 	{
 		protected OAuthHandler oauthHandler;
 		public ApiService (OAuthHandler oauthHandler) : base ()

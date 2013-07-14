@@ -21,7 +21,7 @@ using Rainy.ErrorHandling;
 
 namespace Rainy.WebService.Signup
 {
-	public class SignupService : RainyServiceBase
+	public class SignupService : ServiceBase
 	{
 		private IDbConnectionFactory connFactory;
 		public SignupService (IDbConnectionFactory factory) : base ()

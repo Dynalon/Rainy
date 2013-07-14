@@ -12,7 +12,7 @@ using Rainy.Crypto;
 
 namespace Rainy.WebService.Management.Admin
 {
-	public class UserService : RainyServiceBase
+	public class UserService : ServiceBase
 	{
 		private IDbConnectionFactory connFactory;
 		public UserService (IDbConnectionFactory factory) : base ()

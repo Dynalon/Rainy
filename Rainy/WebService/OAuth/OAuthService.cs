@@ -31,7 +31,7 @@ namespace Rainy.WebService.OAuth
 
 	[RequestLogFilter]
 	[ResponseLogFilter]
-	public class OAuthRequestTokenService : RainyServiceBase
+	public class OAuthRequestTokenService : ServiceBase
 	{
 		private OAuthHandler oauthHandler;
 		public OAuthRequestTokenService (OAuthHandler oauthHandler) : base ()
@@ -64,7 +64,7 @@ namespace Rainy.WebService.OAuth
 		}
 	}
 
-	public class OAuthAuthenticateService : RainyServiceBase
+	public class OAuthAuthenticateService : ServiceBase
 	{
 		OAuthHandler oauthHandler;
 		IAuthenticator Authenticator;
@@ -153,7 +153,7 @@ namespace Rainy.WebService.OAuth
 
 	[RequestLogFilter]
 	[ResponseLogFilter]
-	public class OAuthAuthorizeService : RainyServiceBase
+	public class OAuthAuthorizeService : ServiceBase
 	{
 		OAuthHandler oauthHandler;
 		IAuthenticator authenticator;
@@ -197,7 +197,7 @@ namespace Rainy.WebService.OAuth
 
 	[RequestLogFilter]
 	[ResponseLogFilter]
-	public class OAuthAccessTokenService : RainyServiceBase
+	public class OAuthAccessTokenService : ServiceBase
 	{
 		OAuthHandler oauthHandler;
 		IDbConnectionFactory connFactory;

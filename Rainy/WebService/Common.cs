@@ -63,7 +63,7 @@ namespace Rainy.WebService
 		public string AuthToken { get; set; }
 	}
 
-	public abstract class RainyNoteServiceBase : RainyOAuthService
+	public abstract class RainyNoteServiceBase : OAuthServiceBase
 	{
 		protected IDataBackend dataBackend;
 		public RainyNoteServiceBase (IDataBackend backend) : base ()
@@ -78,10 +78,10 @@ namespace Rainy.WebService
 
 	[RequestLogFilter]
 	[ResponseLogFilter]
-	public abstract class RainyServiceBase : Service
+	public abstract class ServiceBase : Service
 	{
 		protected ILog Logger;
-		public RainyServiceBase ()
+		public ServiceBase ()
 		{
 			Logger = LogManager.GetLogger (GetType ());
 		}
@@ -89,10 +89,10 @@ namespace Rainy.WebService
 
 
 	[OAuthRequired]
-	public class RainyOAuthService : RainyServiceBase
+	public abstract class OAuthServiceBase : ServiceBase
 	{
 		protected IUser requestingUser;
-		public RainyOAuthService () : base ()
+		public OAuthServiceBase () : base ()
 		{
 			var base_req = base.RequestContext.Get<IHttpRequest> ();
 			requestingUser = new RequestingUser ();
