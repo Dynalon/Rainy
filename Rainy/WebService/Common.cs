@@ -63,23 +63,16 @@ namespace Rainy.WebService
 		public string AuthToken { get; set; }
 	}
 
-	public abstract class RainyNoteServiceBase : RainyServiceBase
+	public abstract class RainyNoteServiceBase : RainyOAuthService
 	{
 		protected IDataBackend dataBackend;
 		public RainyNoteServiceBase (IDataBackend backend) : base ()
 		{
 			this.dataBackend = backend;
-
-
 		}
 		protected INoteRepository GetNotes ()
 		{
-			var requesting_user = new RequestingUser ();
-			var base_req = base.RequestContext.Get<IHttpRequest> ();
-			requesting_user.Username = (string) base_req.Items["Username"];
-			requesting_user.AuthToken = (string) base_req.Items["AccessToken"];
-
-			return dataBackend.GetNoteRepository (requesting_user);
+			return dataBackend.GetNoteRepository (requestingUser);
 		}
 	}
 
@@ -94,6 +87,19 @@ namespace Rainy.WebService
 		}
 	}
 
+
+	[OAuthRequired]
+	public class RainyOAuthService : RainyServiceBase
+	{
+		protected IUser requestingUser;
+		public RainyOAuthService () : base ()
+		{
+			var base_req = base.RequestContext.Get<IHttpRequest> ();
+			requestingUser = new RequestingUser ();
+			requestingUser.Username = (string) base_req.Items["Username"];
+			requestingUser.AuthToken = (string) base_req.Items["AccessToken"];
+		}
+	}
 
 	public static class ResponseShortcuts
 	{

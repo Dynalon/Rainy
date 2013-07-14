@@ -18,7 +18,7 @@ namespace Rainy.Tests
 		{
 			var response = testServer.GetRootApiRef ();
 
-			var rainy_listen_url = testServer.RainyListenUrl;
+			var rainy_listen_url = testServer.ListenUrl;
 			Assert.AreEqual ("1.0", response.ApiVersion);
 
 			// check the OAuth urls

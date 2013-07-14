@@ -140,6 +140,7 @@
     <Compile Include="RainyTestServer.cs" />
     <Compile Include="Crypto.cs" />
     <Compile Include="WebService\OAuth\OAuthDataStructures.cs" />
+    <Compile Include="WebService\OAuth\TokenService.cs" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="WebService\" />

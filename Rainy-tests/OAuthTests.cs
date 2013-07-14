@@ -4,6 +4,8 @@ using DevDefined.OAuth.Framework;
 using NUnit.Framework;
 using ServiceStack.ServiceClient.Web;
 using Tomboy.Sync.Web.DTO;
+using Rainy.WebService.Management.Admin;
+using System.Collections.Generic;
 
 namespace Rainy.Tests.OAuth
 {
@@ -65,6 +67,25 @@ namespace Rainy.Tests.OAuth
 			} finally {
 				Assert.AreEqual ("Unauthorized", caught_exception.Message);
 			}
+		}
+	}
+
+	[TestFixture()]
+	public class TokenApiTests : TestBase
+	{
+		[SetUp]
+		public void SetUp ()
+		{
+			testServer.Start ();
+		}
+		[Test()]
+		public void GetListOfValidAccesstokens ()
+		{
+			//testServer.GetAccessToken ();
+			var client = testServer.GetJsonClient ();
+			var url = new GetTokenRequest () { Username = RainyTestServer.TEST_USER }.ToUrl ("GET");
+			var service_url = testServer.ListenUrl + url;
+			var tokens = client.Get<List<AccessTokenDto>> (service_url);
 		}
 	}
 }

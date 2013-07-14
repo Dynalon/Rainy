@@ -52,12 +52,12 @@ namespace Rainy
 		public static string TEST_PASS = "none";
 		public static string ADMIN_TEST_PASS = "foobar";
 		public static Funq.Container Container;
-		public string RainyListenUrl = "http://127.0.0.1:8080/";
+		public string ListenUrl = "http://127.0.0.1:8080/";
 
 		public string BaseUri {
 			// i.e. http://127.0.0.1:8080/johndoe/none/
 			get {
-				return RainyListenUrl + TEST_USER + "/" + TEST_PASS + "/";
+				return ListenUrl + TEST_USER + "/" + TEST_PASS + "/";
 			}
 		}
 
@@ -72,7 +72,7 @@ namespace Rainy
 				this.ScenarioSqlite ();
 			}
 
-			rainyServer = new RainyStandaloneServer (RainyListenUrl, (c) => {
+			rainyServer = new RainyStandaloneServer (ListenUrl, (c) => {
 				if (this.ObjectGraphComposer == null)
 					throw new Exception ("need to setup a composer/scenario for RainyTestServer!");
 				this.ObjectGraphComposer(c);

@@ -2,7 +2,6 @@ using System.Security.Cryptography;
 using System.IO;
 using Rainy.Db;
 using System;
-using System.Text;
 
 namespace Rainy.Crypto
 {

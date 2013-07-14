@@ -300,7 +300,8 @@ namespace Rainy.Db
 			Assert.AreEqual (token1.UserName, token2.UserName);
 			Assert.AreEqual (token1.ExpiryDate, token2.ExpiryDate);
 
-			// the token is only the first 24 byte = 96 bits
+			// the token is only the first 16 byte = 192 bits - the token is
+			// 160 byte = 920 bits long (due to the padding added)
 			Assert.AreEqual (token1.Token.Substring (0, 24), token2.Token);
 			Assert.AreEqual (token1.TokenSecret, token2.TokenSecret);
 		}

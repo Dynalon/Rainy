@@ -1,5 +1,4 @@
 using System;
-using System.IO;
 using System.Data;
 
 using Rainy.OAuth;
@@ -8,7 +7,6 @@ using ServiceStack.OrmLite;
 using Tomboy;
 using Tomboy.Sync;
 using Rainy.Interfaces;
-using ServiceStack.WebHost.Endpoints;
 using Rainy.Crypto;
 using Rainy.WebService;
 using DevDefined.OAuth.Storage.Basic;

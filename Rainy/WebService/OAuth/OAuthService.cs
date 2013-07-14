@@ -13,7 +13,6 @@ using System.Security.Cryptography;
 using Rainy.Crypto;
 using Rainy.Db;
 using ServiceStack.OrmLite;
-using ServiceStack.Common;
 
 namespace Rainy.WebService.OAuth
 {

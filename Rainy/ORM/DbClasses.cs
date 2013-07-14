@@ -1,15 +1,8 @@
 using Tomboy.Sync.Web.DTO;
 using ServiceStack.DataAnnotations;
 using Tomboy.Sync;
-using ServiceStack.OrmLite;
-using System.Data;
-using Rainy.OAuth;
-using System;
 using DevDefined.OAuth.Storage.Basic;
 using Rainy.UserManagement;
-using System.Runtime.Serialization;
-using System.Security.Cryptography;
-using System.IO;
 
 namespace Rainy.Db
 {
@@ -68,6 +61,10 @@ namespace Rainy.Db
 	{
 		[PrimaryKey]
 		public new string Token { get; set; }
+
+		// a short name for the device, i.e. "my laptop", or "my phone"
+		// will be set by the user 
+		public string DeviceName { get; set; }
 
 		// the TokenKey encrypts the master_key; the so encrypted master_key
 		// is sent back as access token to the user
