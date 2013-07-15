@@ -11,7 +11,7 @@ namespace Rainy.Db
 		[PrimaryKey]
 		// Guid is not feasible for primary key as on an account move as user
 		// might duplicate notes across different accounts
-		public string CompoundPrimaryKey {
+		public virtual string CompoundPrimaryKey {
 			get {
 				return Username + "_" + Guid;
 			}
@@ -24,6 +24,16 @@ namespace Rainy.Db
 
 		public bool IsEncypted { get; set; }
 		public string EncryptedKey { get; set; }
+	}
+
+	public class DBArchivedNote : DBNote
+	{
+		[PrimaryKey]
+		public override string CompoundPrimaryKey {
+			get {
+				return Username + "_" + Guid + "_" + LastSyncRevision;
+			}
+		}
 	}
 	
 	public class DBUser : DTOUser

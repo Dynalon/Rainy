@@ -91,17 +91,20 @@ namespace Rainy
 						cmd.ExecuteNonQuery ();
 						db.CreateTableIfNotExists <DBUser> ();
 						db.CreateTableIfNotExists <DBNote> ();
+						db.CreateTableIfNotExists <DBArchivedNote> ();
 						db.CreateTableIfNotExists <DBAccessToken> ();
 						db.CreateTableIfNotExists <DBRequestToken> ();
 					} else {
 						db.DropAndCreateTable <DBUser> ();
 						db.DropAndCreateTable <DBNote> ();
+						db.DropAndCreateTable <DBArchivedNote> ();
 						db.DropAndCreateTable <DBAccessToken> ();
 						db.DropAndCreateTable <DBRequestToken> ();
 					}
 				} else {
 					db.CreateTableIfNotExists <DBUser> ();
 					db.CreateTableIfNotExists <DBNote> ();
+					db.CreateTableIfNotExists <DBArchivedNote> ();
 					db.CreateTableIfNotExists <DBAccessToken> ();
 					db.CreateTableIfNotExists <DBRequestToken> ();
 				}
@@ -146,7 +149,7 @@ namespace Rainy
 		
 			var master_key = user.AuthToken.DecryptWithKey (token_key, dbUser.MasterKeySalt);
 
-			storage = new DbStorage (factory, dbUser, master_key);
+			storage = new DbStorage (factory, dbUser, master_key, use_history: true);
 			engine = new Engine (storage);
 
 			if (dbUser.Manifest == null || string.IsNullOrEmpty (dbUser.Manifest.ServerId)) {

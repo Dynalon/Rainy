@@ -44,4 +44,40 @@ namespace Rainy.WebService
 		[DataMember (Name="Username")]
 		public string Username { get; set; }
 	} 
+
+
+	// NOTE HISTORY API
+	[DataContract]
+	public class NoteHistoryRequest
+	{
+		[DataMember (Name="guid")]
+		public string Guid { get; set; }
+	}
+
+	[DataContract]
+	public class NoteHistory
+	{
+		[DataMember (Name="revision")]
+		public string Revision { get; set; }
+
+		[DataMember (Name="title")]
+		public string Title { get; set; }
+	}
+
+	public class NoteHistoryResponse
+	{
+		[DataMember (Name="current-revision")]
+		public string CurrentRevision { get; set; }
+
+		[DataMember (Name="versions")]
+		public NoteHistory[] Versions;
+	}
+
+	[Route("/api/1.0/{Username}/notes/archive/{Guid}/", "GET")]
+	[DataContract]
+	public class GetNoteHistoryRequest : NoteHistoryRequest,  IReturn<NoteHistoryResponse>
+	{
+		[DataMember (Name="Username")]
+		public string Username { get; set; }
+	}
 }

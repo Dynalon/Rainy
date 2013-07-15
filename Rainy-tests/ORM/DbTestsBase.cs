@@ -13,7 +13,7 @@ namespace Rainy.Db
 	public class DbTestsBase : TestBase
 	{
 		protected DBUser testUser;
-		protected IDbConnectionFactory factory;
+		protected IDbConnectionFactory connFactory;
 		protected string dbScenario;
 
 		[TestFixtureSetUp]
@@ -33,8 +33,8 @@ namespace Rainy.Db
 
 			testServer.Start ();
 
-			this.factory = RainyTestServer.Container.Resolve<IDbConnectionFactory> ();
-			using (var db = factory.OpenDbConnection ()) {
+			this.connFactory = RainyTestServer.Container.Resolve<IDbConnectionFactory> ();
+			using (var db = connFactory.OpenDbConnection ()) {
 				testUser = db.First<DBUser> (u => u.Username == RainyTestServer.TEST_USER);
 			}
 		}

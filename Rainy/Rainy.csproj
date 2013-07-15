@@ -141,6 +141,7 @@
     <Compile Include="Crypto.cs" />
     <Compile Include="WebService\OAuth\OAuthDataStructures.cs" />
     <Compile Include="WebService\OAuth\TokenService.cs" />
+    <Compile Include="WebService\NoteHistoryService.cs" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="WebService\" />

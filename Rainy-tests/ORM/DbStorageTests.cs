@@ -50,11 +50,11 @@ namespace Rainy.Db
 		{
 			var sample_notes = GetSampleNotes ();
 
-			using (var store = new DbStorage (factory, testUser)) {
+			using (var store = new DbStorage (connFactory, testUser)) {
 				sample_notes.ForEach (n => store.SaveNote (n));
 			}
 			// now check if we have stored that notes
-			using (var store = new DbStorage (factory, testUser)) {
+			using (var store = new DbStorage (connFactory, testUser)) {
 				var stored_notes = store.GetNotes ().Values.ToList ();
 
 				Assert.AreEqual (sample_notes.Count, stored_notes.Count);
@@ -74,7 +74,7 @@ namespace Rainy.Db
 		{
 			StoreSomeNotes ();
 
-			using (var store = new DbStorage (factory, testUser)) {
+			using (var store = new DbStorage (connFactory, testUser)) {
 				var stored_notes = store.GetNotes ().Values.ToList ();
 
 				var deleted_note = stored_notes[0];
@@ -97,7 +97,7 @@ namespace Rainy.Db
 		[Test]
 		public void DateUtcIsCorrectlyStored ()
 		{
-			DbStorage storage = new DbStorage(factory, testUser);
+			DbStorage storage = new DbStorage(connFactory, testUser);
 
 			var tomboy_note = new Note ();
 			tomboy_note.ChangeDate = new DateTime (2000, 1, 1, 0, 0, 0, DateTimeKind.Utc);
@@ -115,7 +115,7 @@ namespace Rainy.Db
 		[Test]
 		public void DateLocalIsCorrectlyStored ()
 		{
-			DbStorage storage = new DbStorage(factory, testUser);
+			DbStorage storage = new DbStorage(connFactory, testUser);
 			
 			var tomboy_note = new Note ();
 			tomboy_note.ChangeDate = new DateTime (2000, 1, 1, 0, 0, 0, DateTimeKind.Local);
@@ -135,7 +135,7 @@ namespace Rainy.Db
 		public void EncryptedStorageStoresNoPlaintextNotes ()
 		{
 			string key = "d019f8a34c5b2c0fd1444e27ba02eec1f7816739ff98a674043fb3da72bbd625";
-			var storage = new DbStorage (factory, testUser, key);
+			var storage = new DbStorage (connFactory, testUser, key);
 
 			var sample_notes = GetSampleNotes ();
 			foreach(var note in sample_notes) {
@@ -145,7 +145,7 @@ namespace Rainy.Db
 
 			foreach(var note in sample_notes) {
 				// the stored notes should only contain hex chars
-				using (var db = factory.OpenDbConnection ()) {
+				using (var db = connFactory.OpenDbConnection ()) {
 					var db_note = db.First<DBNote> (n => n.Guid == note.Guid);
 					// this will fail if any non-hex chars are in
 					var bytes = db_note.Text.ToByteArray ();
@@ -160,10 +160,10 @@ namespace Rainy.Db
 			string first_key;
 			var note = GetSampleNotes ()[0];
 			// save for first time
-			using (var storage = new DbStorage (factory, testUser, key)) {
+			using (var storage = new DbStorage (connFactory, testUser, key)) {
 				storage.SaveNote (note);
 			}
-			using (var db = factory.OpenDbConnection ()) {
+			using (var db = connFactory.OpenDbConnection ()) {
 				var db_note = db.First<DBNote> (n => n.Guid == note.Guid);
 				first_key = db_note.EncryptedKey;
 				Assert.That (!string.IsNullOrEmpty (first_key));
@@ -173,10 +173,10 @@ namespace Rainy.Db
 			note.Text = "Foobar";
 
 			// save for first time
-			using (var storage = new DbStorage (factory, testUser, key)) {
+			using (var storage = new DbStorage (connFactory, testUser, key)) {
 				storage.SaveNote (note);
 			}
-			using (var db = factory.OpenDbConnection ()) {
+			using (var db = connFactory.OpenDbConnection ()) {
 				var db_note = db.First<DBNote> (n => n.Guid == note.Guid);
 				Assert.AreEqual (first_key, db_note.EncryptedKey);
 			}
@@ -188,7 +188,7 @@ namespace Rainy.Db
 			// test with encrypted notes
 			string key = "d019f8a34c5b2c0fd1444e27ba02eec1f7816739ff98a674043fb3da72bbd625";
 
-			var storage = new DbStorage (this.factory, this.testUser, key);
+			var storage = new DbStorage (this.connFactory, this.testUser, key);
 			var sample_notes = GetSampleNotes ();
 			foreach(var note in sample_notes) {
 				storage.SaveNote (note);
@@ -197,14 +197,14 @@ namespace Rainy.Db
 
 			foreach(var note in sample_notes) {
 				// the stored notes should only contain hex chars
-				using (var db = factory.OpenDbConnection ()) {
+				using (var db = connFactory.OpenDbConnection ()) {
 					var db_note = db.First<DBNote> (n => n.Guid == note.Guid);
 					// this will fail if any non-hex chars are in
 					Assert.IsTrue (db_note.IsEncypted);
 				}
 			}
 
-			storage = new DbStorage (this.factory, this.testUser);
+			storage = new DbStorage (this.connFactory, this.testUser);
 			sample_notes = GetSampleNotes ();
 			foreach(var note in sample_notes) {
 				storage.SaveNote (note);
@@ -213,10 +213,40 @@ namespace Rainy.Db
 
 			foreach(var note in sample_notes) {
 				// the stored notes should only contain hex chars
-				using (var db = factory.OpenDbConnection ()) {
+				using (var db = connFactory.OpenDbConnection ()) {
 					var db_note = db.First<DBNote> (n => n.Guid == note.Guid);
 					// this will fail if any non-hex chars are in
 					Assert.IsFalse (db_note.IsEncypted);
+				}
+			}
+		}
+
+		// note history tests
+		[Test]
+		public void NoteHistoryIsSaved ()
+		{
+			var sample_notes = GetSampleNotes ();
+
+			using (var storage = new DbStorage (this.connFactory, this.testUser, use_history: true)) {
+				foreach(var note in sample_notes) {
+					storage.SaveNote (note);
+				}
+			}
+
+			// modify the notes
+			using (var storage = new DbStorage (this.connFactory, this.testUser, use_history: true)) {
+				foreach(var note in sample_notes) {
+					note.Title = "Random new title";
+					storage.SaveNote (note);
+				}
+			}
+
+			// for each note there should exist a backup copy
+			foreach (var note in sample_notes) {
+				using (var db = connFactory.OpenDbConnection ()) {
+					var archived_note = db.FirstOrDefault<DBArchivedNote> (n => n.Guid == note.Guid);
+					Assert.IsNotNull (archived_note);
+					Assert.AreNotEqual ("Random new title", archived_note.Title);
 				}
 			}
 		}
