@@ -11,7 +11,6 @@ using Tomboy.Sync.Web.DTO;
 using Rainy.Db;
 using Rainy.Interfaces;
 using Rainy.Db.Config;
-using JsonConfig;
 using Rainy.OAuth;
 using Rainy.Crypto;
 using DevDefined.OAuth.Storage.Basic;

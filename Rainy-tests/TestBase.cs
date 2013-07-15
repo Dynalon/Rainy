@@ -1,13 +1,6 @@
 using NUnit.Framework;
 using ServiceStack.ServiceClient.Web;
-using JsonConfig;
-using ServiceStack.OrmLite;
-using System.Data;
-using Rainy.Db.Config;
-using Rainy.Db;
 using Rainy.Interfaces;
-using System.IO;
-using Rainy.OAuth;
 
 namespace Rainy.Tests
 {
