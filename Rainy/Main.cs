@@ -120,14 +120,23 @@ namespace Rainy
 				switch ((string) config.Backend) {
 					case "sqlite":
 					container.Register<IDbConnectionFactory> (c => {
-						var connection_string = container.Resolve<SqliteConfig> ().ConnectionString;
-						return new OrmLiteConnectionFactory (connection_string, SqliteDialect.Provider);
+						var conf = container.Resolve<SqliteConfig> ();
+						var connection_string = conf.ConnectionString;
+						var factory = new OrmLiteConnectionFactory (connection_string, SqliteDialect.Provider);
+
+						if (!File.Exists (conf.File)) {
+							DatabaseBackend.CreateSchema (factory);
+						}
+
+						return (IDbConnectionFactory) factory;
 					});
 					break;
 					case "postgre":
 					container.Register<IDbConnectionFactory> (c => {
 						var connection_string = container.Resolve<PostgreConfig> ().ConnectionString;
-						return new OrmLiteConnectionFactory (connection_string, PostgreSqlDialect.Provider);
+						var factory = new OrmLiteConnectionFactory (connection_string, PostgreSqlDialect.Provider);
+						DatabaseBackend.CreateSchema (factory);
+						return factory;
 					});
 					break;
 				}
