@@ -6,6 +6,8 @@ using ServiceStack.ServiceClient.Web;
 using Tomboy.Sync.Web.DTO;
 using Rainy.WebService.Management.Admin;
 using System.Collections.Generic;
+using System.Linq;
+using Rainy.OAuth;
 
 namespace Rainy.Tests.OAuth
 {
@@ -81,11 +83,60 @@ namespace Rainy.Tests.OAuth
 		[Test()]
 		public void GetListOfValidAccesstokens ()
 		{
-			//testServer.GetAccessToken ();
 			var client = testServer.GetJsonClient ();
-			var url = new GetTokenRequest () { Username = RainyTestServer.TEST_USER }.ToUrl ("GET");
+			var url = new GetTokenRequest ().ToUrl ("GET");
 			var service_url = testServer.ListenUrl + url;
 			var tokens = client.Get<List<AccessTokenDto>> (service_url);
+			Assert.AreEqual (1, tokens.Count);
+
+			testServer.GetAccessToken ();
+			testServer.GetAccessToken ();
+			tokens = client.Get<List<AccessTokenDto>> (service_url);
+			Assert.AreEqual(3, tokens.Count);
+
+		}
+		[Test()]
+		public void DeleteAccessTokenRevokesTheToken ()
+		{
+			var token = testServer.GetAccessToken ();
+			var token_part = token.Token.Substring (0, 24);
+			var client = testServer.GetJsonClient ();
+			var url = new DeleteTokenRequest () {
+				TokenPart = token_part
+			}.ToUrl ("DELETE");
+			var service_url = testServer.ListenUrl + url;
+			client.Delete<AccessTokenDto> (service_url);
+
+			// check that the token has been delete from the db
+			var get_url = new GetTokenRequest () { Username = RainyTestServer.TEST_USER }.ToUrl ("GET");
+			var get_service_url = testServer.ListenUrl + get_url;
+			List<AccessTokenDto> tokens = client.Get<List<AccessTokenDto>> (get_service_url);
+
+			var the_token = tokens.Where (t => token.Token.StartsWith (t.TokenPart));
+			Assert.That (the_token.Count () == 0);
+		}
+
+		[Test]
+		public void UpdateTokenDeviceName ()
+		{
+			string new_device_name = "My home computer";
+
+			var token = testServer.GetAccessToken ().Token.ToShortToken ();
+			var client = testServer.GetJsonClient ();
+			var url = new UpdateTokenRequest ().ToUrl ("PUT");
+			var req = new AccessTokenDto { 
+				TokenPart = token,
+				DeviceName = new_device_name };
+			var service_url = testServer.ListenUrl + url;
+			client.Put<AccessTokenDto> (service_url, req);
+
+			// check that the token has been updated
+			var get_url = new GetTokenRequest () { Username = RainyTestServer.TEST_USER }.ToUrl ("GET");
+			var get_service_url = testServer.ListenUrl + get_url;
+			List<AccessTokenDto> tokens = client.Get<List<AccessTokenDto>> (get_service_url);
+			var updated_token = tokens.First (t => token == t.TokenPart);
+
+			Assert.AreEqual (new_device_name, updated_token.DeviceName);
 		}
 	}
 }

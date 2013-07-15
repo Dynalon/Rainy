@@ -10,6 +10,7 @@ using log4net;
 using Rainy.OAuth;
 using ServiceStack.WebHost.Endpoints;
 using Rainy.Crypto;
+using System.Linq;
 
 namespace Rainy.WebService.OAuth
 {
@@ -38,7 +39,7 @@ namespace Rainy.WebService.OAuth
 				username = ((GetNotesRequest)requestDto).Username;
 			} else if (requestDto is PutNotesRequest) {
 				username = ((PutNotesRequest)requestDto).Username;
-			} else {
+			} else if (!request.Headers.AllKeys.Contains ("Authorization")) {
 				response.ReturnAuthRequired ();
 				return;
 			}
@@ -54,17 +55,19 @@ namespace Rainy.WebService.OAuth
 				Logger.Debug ("trying to acquire authorization");
 				oauthHandler.Provider.AccessProtectedResourceRequest (context);
 
-				// check if the access token matches the username
+				// check if the access token matches the username given in an url
 				var access_token = oauthHandler.AccessTokens.GetToken (context.Token);
-				if (access_token.UserName != username) {
+				if (!string.IsNullOrEmpty (username) && access_token.UserName != username) {
 					// forbidden
 					Logger.Debug ("username does not match the one in the access token, denying");
 					response.ReturnAuthRequired ();
 					return;
 				} else {
-					//context.Token.DecryptWithKey (atkn.MasterKeyHalf, user.MasterKeySalt);
-					request.Items.Add ("AccessToken", context.Token);
-					request.Items.Add ("Username", username);
+					// TODO remove checks - why is it run twice?
+					if (!request.Items.Keys.Contains ("AccessToken"))
+						request.Items.Add ("AccessToken", context.Token);
+					if (!request.Items.Keys.Contains ("Username"))
+						request.Items.Add ("Username", access_token.UserName);
 				}
 			} catch (Exception e) {
 				Logger.DebugFormat ("failed to obtain authorization, oauth context is: {0}", context.Dump ());

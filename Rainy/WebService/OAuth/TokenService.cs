@@ -4,6 +4,7 @@ using Rainy.WebService.OAuth;
 using System.Collections.Generic;
 using Rainy.Db;
 using System.Linq;
+using Rainy.OAuth;
 
 namespace Rainy.WebService.Management.Admin
 {
@@ -13,22 +14,19 @@ namespace Rainy.WebService.Management.Admin
 		public string DeviceName { get; set; }
 	}
 
-	[Route("/api/{Username}/access_token","GET, OPTIONS")]
-	[OAuthRequired]
+	[Route("/oauth/tokens/access_token","GET, OPTIONS")]
 	public class GetTokenRequest: IReturn<List<AccessTokenDto>>
 	{
 		public string Username { get; set; }
 	}
 
-	[Route("/api/{Username}/access_token/{TokenPart}","DELETE")]
-	[OAuthRequired]
+	[Route("/oauth/tokens/access_token/{TokenPart}","DELETE")]
 	public class DeleteTokenRequest: AccessTokenDto, IReturnVoid
 	{
 		public string Username { get; set; }
 	}
 
-	[Route("/api/{Username}/access_token/","PUT")]
-	[OAuthRequired]
+	[Route("/oauth/tokens/access_token/","PUT")]
 	public class UpdateTokenRequest: AccessTokenDto, IReturnVoid
 	{
 		public string Username { get; set; }
@@ -52,20 +50,20 @@ namespace Rainy.WebService.Management.Admin
 			if (db_tokens == null)
 				return new List<AccessTokenDto> ();
 
-			else
-				return db_tokens.Select (db_token => {
-					return new AccessTokenDto {
-						TokenPart = db_token.Token,
-						DeviceName = "Unknown Device"
-					};
-				}).ToList ();
+			return db_tokens.Select (db_token => {
+				return new AccessTokenDto {
+					TokenPart = db_token.Token,
+					DeviceName = db_token.DeviceName
+				};
+			}).ToList ();
 		}
 		public object Put (UpdateTokenRequest req)
 		{
 			string device_name = req.DeviceName;
+			var token_part = req.TokenPart;
 
 			using (var db = connFactory.OpenDbConnection ()) {
-				db.UpdateOnly (new DBAccessToken () { DeviceName = device_name }, t => new { t.DeviceName },  tk => tk.Token == requestingUser.AuthToken);
+				db.UpdateOnly (new DBAccessToken () { DeviceName = device_name }, t => new { t.DeviceName },  tk => tk.Token == token_part);
 			}
 			return null;
 		}

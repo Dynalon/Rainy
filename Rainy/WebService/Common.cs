@@ -91,13 +91,18 @@ namespace Rainy.WebService
 	[OAuthRequired]
 	public abstract class OAuthServiceBase : ServiceBase
 	{
-		protected IUser requestingUser;
+		protected IUser requestingUser {
+			get {
+				var base_req = base.RequestContext.Get<IHttpRequest> ();
+				var user = new RequestingUser ();
+				user.Username = (string) base_req.Items["Username"];
+				user.AuthToken = (string) base_req.Items["AccessToken"];
+				return user;
+			}
+		}
+
 		public OAuthServiceBase () : base ()
 		{
-			var base_req = base.RequestContext.Get<IHttpRequest> ();
-			requestingUser = new RequestingUser ();
-			requestingUser.Username = (string) base_req.Items["Username"];
-			requestingUser.AuthToken = (string) base_req.Items["AccessToken"];
 		}
 	}
 

@@ -80,7 +80,7 @@ namespace Rainy.OAuth
 		}
 		public T GetToken (string token)
 		{
-			var short_token = token.Substring(0, 24);
+			var short_token = token.ToShortToken ();
 			using (var conn = connFactory.OpenDbConnection ()) {
 				DBAccessToken t;
 				t = conn.First<DBAccessToken> (tkn => tkn.Token == short_token);
@@ -92,7 +92,7 @@ namespace Rainy.OAuth
 			// we only store a part of the token - the remainder is part of the encryption key
 			// which we do not want to store
 			var db_token = token.ToDBAccessToken ();
-			db_token.Token = db_token.Token.Substring(0, 24);
+			db_token.Token = db_token.Token.ToShortToken ();
 			using (var conn = connFactory.OpenDbConnection ()) {
 				using (var trans = conn.BeginTransaction ()) {
 					// first delete the token
@@ -141,6 +141,13 @@ namespace Rainy.OAuth
 		public static string GetTokenKey (this AccessToken token)
 		{
 			return token.Roles[0].Substring ("token_key:".Length);
+		}
+
+		// the token is a crypto key, but we only store a fraction of the key in the database
+		// for authentication
+		public static string ToShortToken (this string token)
+		{
+			return token.Substring(0, 24);
 		}
 	}
 }
