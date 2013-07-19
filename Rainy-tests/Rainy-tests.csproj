@@ -75,6 +75,7 @@
     <Compile Include="Admin\TestUserManagement.cs" />
     <Compile Include="WebSyncServerTests.cs" />
     <Compile Include="CryptoTests.cs" />
+    <Compile Include="NoteHistoryTests.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <ItemGroup>

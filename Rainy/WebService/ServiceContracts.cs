@@ -2,6 +2,7 @@ using System.Runtime.Serialization;
 using ServiceStack.ServiceHost;
 using Rainy.WebService.OAuth;
 using DTO = Tomboy.Sync.Web.DTO;
+using Tomboy.Sync.Web.DTO;
 
 namespace Rainy.WebService
 {
@@ -58,7 +59,7 @@ namespace Rainy.WebService
 	public class NoteHistory
 	{
 		[DataMember (Name="revision")]
-		public string Revision { get; set; }
+		public long Revision { get; set; }
 
 		[DataMember (Name="title")]
 		public string Title { get; set; }
@@ -67,10 +68,10 @@ namespace Rainy.WebService
 	public class NoteHistoryResponse
 	{
 		[DataMember (Name="current-revision")]
-		public string CurrentRevision { get; set; }
+		public long CurrentRevision { get; set; }
 
 		[DataMember (Name="versions")]
-		public NoteHistory[] Versions;
+		public NoteHistory[] Versions { get; set; }
 	}
 
 	[Route("/api/1.0/{Username}/notes/archive/{Guid}/", "GET")]
@@ -80,4 +81,16 @@ namespace Rainy.WebService
 		[DataMember (Name="Username")]
 		public string Username { get; set; }
 	}
+
+	[Route("/api/1.0/{Username}/notes/archive/{Guid}/{Revision}", "GET")]
+	[DataContract]
+	public class GetArchivedNoteRequest : NoteHistoryRequest, IReturn<DTONote>
+	{
+		[DataMember (Name="Username")]
+		public string Username { get; set; }
+
+		[DataMember (Name="Revision")]
+		public string Revision { get; set; }
+	}
+
 }
