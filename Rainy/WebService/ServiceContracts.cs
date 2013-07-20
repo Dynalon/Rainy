@@ -90,7 +90,7 @@ namespace Rainy.WebService
 		public string Username { get; set; }
 
 		[DataMember (Name="Revision")]
-		public string Revision { get; set; }
+		public long Revision { get; set; }
 	}
 
 }
