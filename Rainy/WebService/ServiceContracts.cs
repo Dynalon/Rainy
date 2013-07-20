@@ -49,20 +49,13 @@ namespace Rainy.WebService
 
 	// NOTE HISTORY API
 	[DataContract]
-	public class NoteHistoryRequest
-	{
-		[DataMember (Name="guid")]
-		public string Guid { get; set; }
-	}
-
-	[DataContract]
 	public class NoteHistory
 	{
 		[DataMember (Name="revision")]
 		public long Revision { get; set; }
 
-		[DataMember (Name="title")]
-		public string Title { get; set; }
+		[DataMember (Name="note")]
+		public DTONote Note { get; set; }
 	}
 
 	public class NoteHistoryResponse
@@ -74,23 +67,63 @@ namespace Rainy.WebService
 		public NoteHistory[] Versions { get; set; }
 	}
 
-	[Route("/api/1.0/{Username}/notes/archive/{Guid}/", "GET")]
+
+	[Route("/api/1.0/{Username}/notes/archive/{Guid}/", "GET",
+	       Summary = "Retrieves the list of archived notes with full note data fields, but empty note text")]
 	[DataContract]
-	public class GetNoteHistoryRequest : NoteHistoryRequest,  IReturn<NoteHistoryResponse>
+	public class GetNoteHistoryRequest : IReturn<NoteHistoryResponse>
 	{
 		[DataMember (Name="Username")]
 		public string Username { get; set; }
+
+		[DataMember (Name="Guid")]
+		public string Guid { get; set; }
 	}
 
-	[Route("/api/1.0/{Username}/notes/archive/{Guid}/{Revision}", "GET")]
+	[Route("/api/1.0/{Username}/notes/archive/{Guid}/{Revision}/", "GET",
+	       Summary = "Retrieves a specific version of a note including the note text.")]
 	[DataContract]
-	public class GetArchivedNoteRequest : NoteHistoryRequest, IReturn<DTONote>
+	public class GetArchivedNoteRequest : IReturn<DTONote>
 	{
 		[DataMember (Name="Username")]
 		public string Username { get; set; }
+
+		[DataMember (Name="Guid")]
+		public string Guid { get; set; }
 
 		[DataMember (Name="Revision")]
 		public long Revision { get; set; }
 	}
+
+	// lists all notes we have a history (current and deleted ones), and a list of revisions we know
+	// and the number of and are not anymore in the latest sync
+	// (so the note is likely to have gotten deleted)
+
+	[DataContract]
+	public class NoteInNoteArchive
+	{
+		[DataMember (Name="guid")]
+		public string Guid { get; set; }
+
+		[DataMember (Name="versions")]
+		public NoteHistory[] Versions { get; set; }
+	}
+	[DataContract]
+	public class NoteArchiveResponse
+	{
+
+		[DataMember (Name="versions")]
+		public NoteHistory[] Versions { get; set; }
+	}
+
+	[Route("/api/1.0/{Username}/notes/archive/")]
+	[DataContract]
+	public class GetNoteArchiveRequest : IReturn<NoteArchiveResponse>
+	{
+		[DataMember (Name="Username")]
+		public string Username { get; set; }
+
+	}
+
 
 }

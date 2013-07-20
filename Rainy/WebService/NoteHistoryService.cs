@@ -3,6 +3,8 @@ using ServiceStack.OrmLite;
 using Rainy.Db;
 using System.Linq;
 using Tomboy.Sync.Web.DTO;
+using ServiceStack.ServiceHost;
+using Rainy.ErrorHandling;
 
 namespace Rainy.WebService
 {
@@ -16,6 +18,11 @@ namespace Rainy.WebService
 
 		public object Get (GetNoteHistoryRequest request)
 		{
+			string include_note_text = Request.GetParam ("include_text");
+			bool include_text = false;
+			if (!string.IsNullOrEmpty (include_note_text) && !bool.TryParse (include_note_text, out include_text))
+				throw new InvalidRequestDtoException () {ErrorMessage = "unable to parse parameter include_text to boolean"};
+
 			var resp = new NoteHistoryResponse () {
 				CurrentRevision = -1,
 				Versions = new NoteHistory[] {}
@@ -29,8 +36,13 @@ namespace Rainy.WebService
 				}
 
 				var archived_notes = db.Select<DBArchivedNote> (n => n.Username == requestingUser.Username && n.Guid == request.Guid);
-				resp.Versions = archived_notes.Select (note => new NoteHistory () { Revision = note.LastSyncRevision, Title = note.Title}).ToArray ();
+				resp.Versions = archived_notes.Select (note => new NoteHistory () { Revision = note.LastSyncRevision, Note = note}).ToArray ();
 
+				if (!include_text) {
+					foreach (var version in resp.Versions) {
+						version.Note.Text = "";
+					}
+				}
 			}
 			return resp;
 		}

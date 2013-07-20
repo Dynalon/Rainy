@@ -47,15 +47,13 @@ namespace Rainy.Tests
 		}
 
 		[Test]
-		public void NoteHistoryRevisionForUnknownNote ()
+		[ExpectedException]
+		public void ExceptionForUnknownNote ()
 		{
 			var client = testServer.GetJsonClient ();
-
 			var url = GetNoteHistoryUrl (Guid.NewGuid ().ToString ());
-			var resp = client.Get<NoteHistoryResponse> (url);
+			client.Get<NoteHistoryResponse> (url);
 
-			Assert.AreEqual (-1, resp.CurrentRevision);
-			//Assert.AreEqual (0, resp.Versions.Length);
 		}
 
 		[Test]
@@ -78,7 +76,7 @@ namespace Rainy.Tests
 
 			Assert.AreEqual (1, resp.Versions.Length);
 			Assert.AreEqual (1, resp.Versions[0].Revision);
-			Assert.AreEqual (old_title, resp.Versions[0].Title);
+			Assert.AreEqual (old_title, resp.Versions[0].Note.Title);
 
 		}
 
@@ -87,12 +85,13 @@ namespace Rainy.Tests
 		{
 			this.FirstSyncForBothSides ();
 
-			var first_note = this.clientEngineOne.GetNotes ().Values.First ();
+			Tomboy.Note first_note = this.clientEngineOne.GetNotes ().Values.First ();
+			DTONote first_note_dto = first_note.ToDTONote ();
 
 			var new_title = "Some other title";
-			var old_title = first_note.Title;
+			var old_title = first_note_dto.Title;
 			var new_text = "Some new text";
-			var old_text = first_note.Text;
+			var old_text = first_note_dto.Text;
 
 			first_note.Title = new_title;
 			first_note.Text = new_text;
@@ -111,11 +110,42 @@ namespace Rainy.Tests
 			url = GetArchivedNoteUrl (first_note.Guid, rev);
 			var note = client.Get<DTONote> (url);
 
-			//Assert.AreEqual (old_text, note.Text);
+			Assert.AreEqual (old_text, note.Text);
 			Assert.AreEqual (old_title, note.Title);
-			Assert.AreEqual (first_note.ChangeDate, note.ChangeDate);
-			Assert.AreEqual (first_note.Tags, note.Tags);
+			Assert.AreEqual (first_note_dto.Tags, note.Tags);
 
+		}
+
+		[Test]
+		public void NoteArchiveDoesHonorTheIncludeTextParameter ()
+		{
+			this.FirstSyncForBothSides ();
+
+			Tomboy.Note first_note = this.clientEngineOne.GetNotes ().Values.First ();
+			first_note.Title = "different";
+			clientEngineOne.SaveNote (first_note);
+
+			var sync_manager = new SyncManager (this.syncClientOne, this.syncServer);
+			sync_manager.DoSync ();
+
+			var client = testServer.GetJsonClient ();
+			var url = GetNoteHistoryUrl (first_note.Guid);
+			var resp = client.Get<NoteHistoryResponse> (url + "?include_text=false");
+
+			foreach (var archived_note in resp.Versions) {
+				Assert.AreEqual ("", archived_note.Note.Text);
+			}
+
+			resp = client.Get<NoteHistoryResponse> (url + "?include_text=true");
+			foreach (var archived_note in resp.Versions) {
+				Assert.AreNotEqual ("", archived_note.Note.Text);
+			}
+		}
+
+		[Test]
+		public void DeletedNoteShowsUpInNoteHistory ()
+		{
+			Assert.Fail ();
 		}
 
 		protected override void ClearServer (bool reset = false)
