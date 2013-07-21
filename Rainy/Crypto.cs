@@ -5,7 +5,18 @@ using System;
 
 namespace Rainy.Crypto
 {
-	public static class CryptoHelper
+	public static class CryptoHelperNote
+	{
+		public static void Decrypt (this DBNote note, DBUser user, string master_key)
+		{
+			var per_note_key = note.EncryptedKey.DecryptWithKey (master_key, user.MasterKeySalt);
+			byte[] b_key = per_note_key.ToByteArray ();
+			byte[] b_note_text = note.Text.ToByteArray ();
+
+			note.Text = user.DecryptUnicodeString (b_key, b_note_text);
+		}
+	}
+	public static class CryptoHelperDBUser
 	{
 		public static bool UpdatePassword (this DBUser db_user, string password)
 		{
@@ -72,6 +83,56 @@ namespace Rainy.Crypto
 			return pw_key;
 		}
 
+		public static byte[] GetPlaintextMasterKey (this DBUser user, string password)
+		{
+			var pw_key = user.DeriveKeyFromPassword (password);
+
+			var aes = new AesManaged ();
+			// Create a decrytor to perform the stream transform.
+			ICryptoTransform decryptor = aes.CreateDecryptor (pw_key, user.MasterKeySalt.ToByteArray ());
+
+			// Create the streams used for decryption. 
+			string plaintext;
+			using (MemoryStream msDecrypt = new MemoryStream (user.EncryptedMasterKey.ToByteArray ()))
+			{
+				using (CryptoStream csDecrypt = new CryptoStream(msDecrypt, decryptor, CryptoStreamMode.Read))
+				{
+					using (StreamReader srDecrypt = new StreamReader(csDecrypt))
+					{
+						// Read the decrypted bytes from the decrypting stream 
+						// and place them in a string.
+						plaintext = srDecrypt.ReadToEnd();
+					}
+				}
+			}
+			return plaintext.ToByteArray ();
+		}
+		
+
+		public static byte[] EncryptString (this DBUser user, byte[] key, string plaintext)
+		{
+			byte[] encrypted;
+			// TODO pass in string as argument instead of byte
+			string hexkey = key.ToHexString ();
+			string iv = user.MasterKeySalt;
+
+			encrypted = plaintext.EncryptWithKey (hexkey, iv).ToByteArray ();
+			return encrypted;
+		}
+
+		public static string DecryptUnicodeString (this DBUser user, byte[] key, byte[] ciphertext)
+		{
+			var hexkey = key.ToHexString ();
+			string hexcipher = ciphertext.ToHexString ();
+			string iv = user.MasterKeySalt;
+
+			string plaintext = hexcipher.DecryptWithKey (hexkey, iv);
+			return plaintext;
+		}
+	}
+
+	public static class CryptoHelper
+	{
 		// should be used to encrypt a key with another key
 		public static string EncryptWithKey (this string plaintext, string hexkey, string iv)
 		{
@@ -138,52 +199,6 @@ namespace Rainy.Crypto
 					}
 				}
 			}
-			return plaintext;
-		}
-
-		public static byte[] GetPlaintextMasterKey (this DBUser user, string password)
-		{
-			var pw_key = user.DeriveKeyFromPassword (password);
-
-			var aes = new AesManaged ();
-			// Create a decrytor to perform the stream transform.
-			ICryptoTransform decryptor = aes.CreateDecryptor (pw_key, user.MasterKeySalt.ToByteArray ());
-
-			// Create the streams used for decryption. 
-			string plaintext;
-			using (MemoryStream msDecrypt = new MemoryStream (user.EncryptedMasterKey.ToByteArray ()))
-			{
-				using (CryptoStream csDecrypt = new CryptoStream(msDecrypt, decryptor, CryptoStreamMode.Read))
-				{
-					using (StreamReader srDecrypt = new StreamReader(csDecrypt))
-					{
-						// Read the decrypted bytes from the decrypting stream 
-						// and place them in a string.
-						plaintext = srDecrypt.ReadToEnd();
-					}
-				}
-			}
-			return plaintext.ToByteArray ();
-		}
-
-		public static byte[] EncryptString (this DBUser user, byte[] key, string plaintext)
-		{
-			byte[] encrypted;
-			// TODO pass in string as argument instead of byte
-			string hexkey = key.ToHexString ();
-			string iv = user.MasterKeySalt;
-
-			encrypted = plaintext.EncryptWithKey (hexkey, iv).ToByteArray ();
-			return encrypted;
-		}
-
-		public static string DecryptUnicodeString (this DBUser user, byte[] key, byte[] ciphertext)
-		{
-			var hexkey = key.ToHexString ();
-			string hexcipher = ciphertext.ToHexString ();
-			string iv = user.MasterKeySalt;
-
-			string plaintext = hexcipher.DecryptWithKey (hexkey, iv);
 			return plaintext;
 		}
 

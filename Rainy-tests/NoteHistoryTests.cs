@@ -6,8 +6,8 @@ using Rainy.WebService;
 using ServiceStack.ServiceClient.Web;
 using Tomboy.Sync;
 using Tomboy.Sync.Web;
-using Rainy.Tests;
 using Tomboy.Sync.Web.DTO;
+using Rainy.Tests;
 
 namespace Rainy.Tests
 {

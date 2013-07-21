@@ -142,13 +142,7 @@ namespace Rainy
 					throw new ArgumentException(user.Username);
 			}
 
-			var access_token_repo = new DbAccessTokenRepository<AccessToken> (factory);
-			var access_token = access_token_repo.GetToken (user.AuthToken);
-
-			var token_key = access_token.GetTokenKey ();
-		
-			var master_key = user.AuthToken.DecryptWithKey (token_key, dbUser.MasterKeySalt);
-
+			var master_key = user.EncryptionMasterKey;
 			storage = new DbStorage (factory, dbUser, master_key, use_history: true);
 			engine = new Engine (storage);
 

@@ -8,6 +8,7 @@ using Rainy.Interfaces;
 using Tomboy.Sync.Web.DTO;
 using DTO = Tomboy.Sync.Web.DTO;
 using Rainy.ErrorHandling;
+using ServiceStack.OrmLite;
 
 
 namespace Rainy.WebService
@@ -15,12 +16,12 @@ namespace Rainy.WebService
 	public interface IUser
 	{
 		string Username { get; set; }
-		string AuthToken { get; set; }
+		string EncryptionMasterKey { get; set; }
 	}
 
 	public class NotesService : RainyNoteServiceBase
 	{
-		public NotesService (IDataBackend backend) : base (backend)
+		public NotesService (IDataBackend backend, IDbConnectionFactory factory) : base (factory, backend)
 		{
 		}
 		protected static DTO.GetNotesResponse GetStoredNotes (INoteRepository note_repo)

@@ -164,7 +164,7 @@ namespace Rainy.Db
 		public void ReadWriteManifest ()
 		{
 			var data_backend = RainyTestServer.Container.Resolve<IDataBackend> ();
-			var requesting_user = new RequestingUser { Username = RainyTestServer.TEST_USER, AuthToken = "deadbeefaffedeadbeef0ffe" };
+			var requesting_user = new RequestingUser { Username = RainyTestServer.TEST_USER, EncryptionMasterKey = "deadbeefaffedeadbeef0ffe" };
 
 			var server_id = Guid.NewGuid ().ToString ();
 			using (var repo = data_backend.GetNoteRepository (requesting_user)) {

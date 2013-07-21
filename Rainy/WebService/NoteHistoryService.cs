@@ -1,19 +1,21 @@
-using DTO = Tomboy.Sync.Web.DTO;
-using ServiceStack.OrmLite;
-using Rainy.Db;
 using System.Linq;
-using Tomboy.Sync.Web.DTO;
+using ServiceStack.OrmLite;
 using ServiceStack.ServiceHost;
+using Tomboy.Sync.Web.DTO;
+using Rainy.Db;
 using Rainy.ErrorHandling;
+using DTO = Tomboy.Sync.Web.DTO;
+using Rainy.Crypto;
 
 namespace Rainy.WebService
 {
 	public class NoteHistoryService : OAuthServiceBase
 	{
-		IDbConnectionFactory connFactory;
-		public NoteHistoryService (IDbConnectionFactory factory) : base ()
+		public NoteHistoryService () : base ()
 		{
-			connFactory = factory;
+		}
+		public NoteHistoryService (IDbConnectionFactory factory) : base (factory)
+		{
 		}
 
 		public object Get (GetNoteHistoryRequest request)
@@ -36,26 +38,44 @@ namespace Rainy.WebService
 				}
 
 				var archived_notes = db.Select<DBArchivedNote> (n => n.Username == requestingUser.Username && n.Guid == request.Guid);
-				resp.Versions = archived_notes.Select (note => new NoteHistory () { Revision = note.LastSyncRevision, Note = note}).ToArray ();
 
-				if (!include_text) {
-					foreach (var version in resp.Versions) {
-						version.Note.Text = "";
+				DBUser user = null;
+				resp.Versions = archived_notes.Select (note => { 
+					var history = new NoteHistory () { Revision = note.LastSyncRevision };
+
+					if (note.IsEncypted && include_text) {
+						if (user == null) 
+							user = db.First<DBUser> (u => u.Username == requestingUser.Username);
+
+						note.Decrypt (user, requestingUser.EncryptionMasterKey);
+					} else if (!include_text) {
+						note.Text = "";
 					}
-				}
+
+					history.Note = note.ToDTONote ();
+					return history;
+				}).ToArray ();
 			}
 			return resp;
 		}
 
 		public object Get (GetArchivedNoteRequest request)
 		{
-			DTONote resp;
 			using (var db = connFactory.OpenDbConnection ()) {
 				var archived_note = db.FirstOrDefault<DBArchivedNote> (an => an.Username == requestingUser.Username && an.Guid == request.Guid);
-				if (archived_note != null)
-					return archived_note.ToDTONote ();
-				else
+
+				if (archived_note == null)
 					throw new Rainy.ErrorHandling.InvalidRequestDtoException ();
+
+				DBUser db_user = null;
+				if (archived_note.IsEncypted) {
+					if (db_user == null) 
+						db_user = db.First<DBUser> (u => u.Username == requestingUser.Username);
+
+					archived_note.Decrypt (db_user, requestingUser.EncryptionMasterKey);
+				}
+
+				return archived_note.ToDTONote ();
 			}
 		}
 	}

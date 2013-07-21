@@ -6,6 +6,11 @@ using Rainy.WebService.OAuth;
 using System.Linq;
 using ServiceStack.Text;
 using Rainy.Interfaces;
+using Rainy.OAuth;
+using ServiceStack.OrmLite;
+using DevDefined.OAuth.Storage.Basic;
+using Rainy.Crypto;
+using Rainy.Db;
 
 namespace Rainy.WebService
 {
@@ -60,13 +65,20 @@ namespace Rainy.WebService
 
 	public class RequestingUser : IUser {
 		public string Username { get; set; }
-		public string AuthToken { get; set; }
+		public string EncryptionMasterKey { get; set; }
 	}
 
 	public abstract class RainyNoteServiceBase : OAuthServiceBase
 	{
 		protected IDataBackend dataBackend;
 		public RainyNoteServiceBase (IDataBackend backend) : base ()
+		{
+			this.dataBackend = backend;
+		}
+		public RainyNoteServiceBase (IDbConnectionFactory factory) : base (factory)
+		{
+		}
+		public RainyNoteServiceBase (IDbConnectionFactory factory, IDataBackend backend) : base (factory)
 		{
 			this.dataBackend = backend;
 		}
@@ -80,10 +92,15 @@ namespace Rainy.WebService
 	[ResponseLogFilter]
 	public abstract class ServiceBase : Service
 	{
+		protected IDbConnectionFactory connFactory;
 		protected ILog Logger;
-		public ServiceBase ()
+		public ServiceBase () : base ()
 		{
 			Logger = LogManager.GetLogger (GetType ());
+		}
+		public ServiceBase (IDbConnectionFactory factory) : this ()
+		{
+			this.connFactory = factory;
 		}
 	}
 
@@ -91,18 +108,39 @@ namespace Rainy.WebService
 	[OAuthRequired]
 	public abstract class OAuthServiceBase : ServiceBase
 	{
+		public OAuthServiceBase () : base ()
+		{
+		}
+		public OAuthServiceBase (IDbConnectionFactory factory) : base (factory)
+		{
+		}
+		private IUser _requestingUser;
 		protected IUser requestingUser {
 			get {
+				if (this._requestingUser != null)
+					return _requestingUser;
+
+				// TODO ugly as heck - don't access DB* classes as we might not operate with a DB
 				var base_req = base.RequestContext.Get<IHttpRequest> ();
 				var user = new RequestingUser ();
 				user.Username = (string) base_req.Items["Username"];
-				user.AuthToken = (string) base_req.Items["AccessToken"];
+				var full_auth_token = (string) base_req.Items["AccessToken"];
+
+				DBUser db_user;
+				using (var db = connFactory.OpenDbConnection ()) {
+					db_user = db.First<DBUser> (u => u.Username == user.Username);
+				}
+
+				var access_token_repo = new DbAccessTokenRepository<AccessToken> (connFactory);
+				var access_token = access_token_repo.GetToken (full_auth_token);
+				var token_key = access_token.GetTokenKey ();
+				var master_key = full_auth_token.DecryptWithKey (token_key, db_user.MasterKeySalt);
+
+				user.EncryptionMasterKey = master_key;
+				_requestingUser = user;
+
 				return user;
 			}
-		}
-
-		public OAuthServiceBase () : base ()
-		{
 		}
 	}
 

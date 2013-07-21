@@ -23,10 +23,8 @@ namespace Rainy.WebService.Signup
 {
 	public class SignupService : ServiceBase
 	{
-		private IDbConnectionFactory connFactory;
-		public SignupService (IDbConnectionFactory factory) : base ()
+		public SignupService (IDbConnectionFactory factory) : base (factory)
 		{
-			connFactory = factory;
 		}
 
 		public object Put (UpdateUserRequest req)

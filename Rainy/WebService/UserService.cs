@@ -4,6 +4,7 @@ using DTO = Tomboy.Sync.Web.DTO;
 using Rainy.Interfaces;
 using Rainy.WebService.OAuth;
 using ServiceStack.ServiceHost;
+using ServiceStack.OrmLite;
 
 namespace Rainy.WebService
 {
@@ -11,6 +12,9 @@ namespace Rainy.WebService
 	public class UserService : RainyNoteServiceBase
 	{
 		public UserService (IDataBackend backend) : base (backend)
+		{
+		}
+		public UserService (IDataBackend backend, IDbConnectionFactory factory) : base (factory, backend)
 		{
 		}
 

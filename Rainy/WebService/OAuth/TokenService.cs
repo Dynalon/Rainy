@@ -34,10 +34,8 @@ namespace Rainy.WebService.Management.Admin
 
 	public class TokenService : OAuthServiceBase
 	{
-		private IDbConnectionFactory connFactory;
-		public TokenService (IDbConnectionFactory factory) : base ()
+		public TokenService (IDbConnectionFactory factory) : base (factory)
 		{
-			connFactory = factory;
 		}
 
 		public object Get (GetTokenRequest req)

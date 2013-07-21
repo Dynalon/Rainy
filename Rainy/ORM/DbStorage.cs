@@ -154,8 +154,7 @@ namespace Rainy.Db
 			if (!note.IsEncypted)
 				return;
 
-			var plaintext_key = note.EncryptedKey.DecryptWithKey (encryptionMasterKey, dbUser.MasterKeySalt);
-			note.Text = dbUser.DecryptUnicodeString (plaintext_key.ToByteArray (), note.Text.ToByteArray ());
+			note.Decrypt (dbUser, encryptionMasterKey);
 		}
 
 		#region IDisposable implementation
