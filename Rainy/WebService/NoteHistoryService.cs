@@ -35,6 +35,8 @@ namespace Rainy.WebService
 				if (revisions.ContainsKey (request.Guid)) {
 					// note was not deleted in the meantime
 					resp.CurrentRevision = revisions[request.Guid];
+				} else {
+					throw new Rainy.ErrorHandling.InvalidRequestDtoException ();
 				}
 
 				var archived_notes = db.Select<DBArchivedNote> (n => n.Username == requestingUser.Username && n.Guid == request.Guid);
