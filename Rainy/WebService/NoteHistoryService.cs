@@ -78,5 +78,21 @@ namespace Rainy.WebService
 				return archived_note.ToDTONote ();
 			}
 		}
+
+		public object Get (GetNoteArchiveRequest request)
+		{
+			var resp = new NoteArchiveResponse ();
+			using (var db = connFactory.OpenDbConnection ()) {
+				var full_archive = db.Select<DBArchivedNote> (an => an.Username == requestingUser.Username);
+				resp.Notes = full_archive.Select (an => {
+					var dto_note = an.ToDTONote ();
+					dto_note.Text = "";
+					return dto_note;
+				}).ToArray ();
+
+				resp.Guids = full_archive.Select (an => an.Guid).ToArray<string> ();
+			}
+			return resp;
+		}
 	}
 }

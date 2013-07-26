@@ -143,9 +143,33 @@ namespace Rainy.Tests
 		}
 
 		[Test]
-		public void DeletedNoteShowsUpInNoteHistory ()
+		public void NoteArchiveContainsAllGuids ()
 		{
-			Assert.Fail ();
+		}
+
+		[Test]
+		public void NoteArchiveContainsNoteDataButNoText ()
+		{
+		}
+
+		[Test]
+		public void DeletedNoteShowsUpInNoteArchive()
+		{
+			this.FirstSyncForBothSides ();
+
+			// now, lets delete a note from the client
+			var deleted_note = clientEngineOne.GetNotes ().First ().Value;
+			clientEngineOne.DeleteNote (deleted_note);
+			clientManifestOne.NoteDeletions.Add (deleted_note.Guid, deleted_note.Title);
+
+			var sync_manager = new SyncManager (this.syncClientOne, this.syncServer);
+			sync_manager.DoSync ();
+
+			var client = testServer.GetJsonClient ();
+			var url = testServer.ListenUrl + new GetNoteArchiveRequest (){ Username = RainyTestServer.TEST_USER }.ToUrl ("GET");
+			var resp = client.Get<NoteArchiveResponse> (url);
+
+			Assert.That (resp.Guids.Contains (deleted_note.Guid));
 		}
 
 		protected override void ClearServer (bool reset = false)

@@ -3,6 +3,7 @@ using ServiceStack.ServiceHost;
 using Rainy.WebService.OAuth;
 using DTO = Tomboy.Sync.Web.DTO;
 using Tomboy.Sync.Web.DTO;
+using System.Collections.Generic;
 
 namespace Rainy.WebService
 {
@@ -69,7 +70,7 @@ namespace Rainy.WebService
 
 
 	[Route("/api/1.0/{Username}/notes/archive/{Guid}/", "GET",
-	       Summary = "Retrieves the list of archived notes with full note data fields, but empty note text")]
+	       Summary = "Retrieves the list of archived notes with full note data fields, but empty note text.")]
 	[DataContract]
 	public class GetNoteHistoryRequest : IReturn<NoteHistoryResponse>
 	{
@@ -100,30 +101,32 @@ namespace Rainy.WebService
 	// (so the note is likely to have gotten deleted)
 
 	[DataContract]
-	public class NoteInNoteArchive
-	{
-		[DataMember (Name="guid")]
-		public string Guid { get; set; }
-
-		[DataMember (Name="versions")]
-		public NoteHistory[] Versions { get; set; }
-	}
-	[DataContract]
 	public class NoteArchiveResponse
 	{
-
+		[DataMember (Name="Guids")]
+		public string[] Guids { get; set; }
 		[DataMember (Name="versions")]
-		public NoteHistory[] Versions { get; set; }
+		public DTONote[] Notes { get; set; }
 	}
 
-	[Route("/api/1.0/{Username}/notes/archive/")]
+	[Route("/api/1.0/{Username}/notes/archive/all",
+	       Summary = "Retrieves a list of all known Guids, including notes that have been deleted previously")]
 	[DataContract]
 	public class GetNoteArchiveRequest : IReturn<NoteArchiveResponse>
 	{
 		[DataMember (Name="Username")]
 		public string Username { get; set; }
-
 	}
 
 
+	// NOTE SHARING API
+	//
+	[Route("/api/1.0/{Username}/notes/public/{Guid}/",
+	       Summary = "Retrieves a public, shareable url to the note with the embedded encryption key as a parameter (if required).")]
+	[DataContract]
+	public class GetPublicUrlForNote : IReturn<string>
+	{
+		[DataMember (Name="Username")]
+		public string Username { get; set; }
+	}
 }
