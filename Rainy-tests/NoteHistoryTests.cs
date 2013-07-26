@@ -145,11 +145,43 @@ namespace Rainy.Tests
 		[Test]
 		public void NoteArchiveContainsAllGuids ()
 		{
+			this.FirstSyncForBothSides ();
+
+			// now, lets delete a note from the client
+			var first_note = clientEngineOne.GetNotes ().First ().Value;
+			first_note.Title = "different";
+			clientEngineOne.SaveNote (first_note);
+
+			var sync_manager = new SyncManager (this.syncClientOne, this.syncServer);
+			sync_manager.DoSync ();
+
+			var client = testServer.GetJsonClient ();
+			var url = testServer.ListenUrl + new GetNoteArchiveRequest (){ Username = RainyTestServer.TEST_USER }.ToUrl ("GET");
+			var resp = client.Get<NoteArchiveResponse> (url);
+
+			Assert.That (resp.Guids.Contains (first_note.Guid));
+			Assert.AreEqual (1, resp.Guids.Count ());
 		}
 
 		[Test]
 		public void NoteArchiveContainsNoteDataButNoText ()
 		{
+			this.FirstSyncForBothSides ();
+
+			// now, lets delete a note from the client
+			var first_note = clientEngineOne.GetNotes ().First ().Value;
+			first_note.Title = "different";
+			clientEngineOne.SaveNote (first_note);
+
+			var sync_manager = new SyncManager (this.syncClientOne, this.syncServer);
+			sync_manager.DoSync ();
+
+			var client = testServer.GetJsonClient ();
+			var url = testServer.ListenUrl + new GetNoteArchiveRequest (){ Username = RainyTestServer.TEST_USER }.ToUrl ("GET");
+			var resp = client.Get<NoteArchiveResponse> (url);
+
+			Assert.AreEqual ("", resp.Notes[0].Text);
+
 		}
 
 		[Test]
