@@ -103,7 +103,7 @@ namespace Rainy.WebService
 	[DataContract]
 	public class NoteArchiveResponse
 	{
-		[DataMember (Name="Guids")]
+		[DataMember (Name="guids")]
 		public string[] Guids { get; set; }
 		[DataMember (Name="versions")]
 		public DTONote[] Notes { get; set; }
@@ -121,6 +121,8 @@ namespace Rainy.WebService
 
 	// NOTE SHARING API
 	//
+
+	// note that this url is NOT the url that should be passed along, but rather the url that the service returns should.
 	[Route("/api/1.0/{Username}/notes/public/{Guid}/",
 	       Summary = "Retrieves a public, shareable url to the note with the embedded encryption key as a parameter (if required).")]
 	[DataContract]
@@ -128,5 +130,8 @@ namespace Rainy.WebService
 	{
 		[DataMember (Name="Username")]
 		public string Username { get; set; }
+
+		[DataMember (Name="Guid")]
+		public string Guid { get; set; }
 	}
 }

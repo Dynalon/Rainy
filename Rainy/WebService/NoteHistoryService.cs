@@ -96,5 +96,12 @@ namespace Rainy.WebService
 			}
 			return resp;
 		}
+
+
+		// TODO move into own service
+		public object Get (GetPublicUrlForNote request)
+		{
+			throw new Rainy.ErrorHandling.InvalidRequestDtoException ();
+		}
 	}
 }

@@ -8,6 +8,7 @@ using Tomboy.Sync;
 using Tomboy.Sync.Web;
 using Tomboy.Sync.Web.DTO;
 using Rainy.Tests;
+using System.Net;
 
 namespace Rainy.Tests
 {
@@ -181,7 +182,6 @@ namespace Rainy.Tests
 			var resp = client.Get<NoteArchiveResponse> (url);
 
 			Assert.AreEqual ("", resp.Notes[0].Text);
-
 		}
 
 		[Test]
