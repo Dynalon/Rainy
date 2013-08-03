@@ -148,28 +148,27 @@
 
 </script>
 
-<scipt type="text/ng-template" id="auth.html">
-            <!-- authentication modal -->
-            <div ng-controller="AuthCtrl" class="modal fade" id="loginModal">
-            <form class="form" ng-submit="doLogin()">
-                <div class="modal-header">
-                    <h3>
-                        Authentication
-                    </h3>
-                </div>
-                <div class="modal-body">
-                    <p>
-                            <label>Password: </label>
-                            <input ng-model="adminPassword" type="password" required />
-                    </p>
-                </div>
-                <div class="modal-footer">
-                    <button type="submit" class="btn btn-primary">Login</a>
-                </div>
-            </form>
-            </div>
+<!-- authentication modal -->
+<div ng-controller="AuthCtrl" class="modal fade" id="loginModal">
+<form class="form" ng-submit="doLogin()">
+    <div class="modal-header">
+        <h3>
+            Authentication
+        </h3>
+    </div>
+    <div class="modal-body">
+        <p>
+                <label>Password: </label>
+                <input ng-model="adminPassword" type="password" required />
+        </p>
+    </div>
+    <div class="modal-footer">
+        <button type="submit" class="btn btn-primary">Login</a>
+    </div>
+</form>
+</div>
 
-</script>
+
 <script type="text/ng-template" id="login.html">
 
 <!-- login form -->

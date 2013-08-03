@@ -17,7 +17,6 @@ module.exports = function (grunt) {
                     'bower_components/angular/angular.min.js',
                     'bower_components/angular-strap/dist/angular-strap.min.js',
                     'app_admin/js/**/*.js',
-                    //'app_login/js/**/*.js',
                 ],
                 dest: 'dist/built.js'
             },
@@ -29,12 +28,8 @@ module.exports = function (grunt) {
             },
             admin_ui: {
                 src: ['app_admin/index.html', 'app_admin/html/*.html'],
-                dest: 'dist/admin.html'
+                dest: 'dist/manage.html'
             },
-            /*login_ui: {
-                src: ['app_login/index.html', 'app_login/html/*.html'],
-                dest: 'dist/login.html'
-            } */
         },
         watch: {
             files: ['app_*/**/*.js', 'app_*/**/*.html'],

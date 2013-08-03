@@ -1,9 +1,8 @@
 function StatusCtrl($scope, $http, $route) {
-   
     $scope.serverStatus = {};
 
     $scope.getStatus = function () {
-        backend.ajax('api/admin/status/') 
+        $scope.backend.ajax('api/admin/status/')
         .success(function(data) {
             $scope.serverStatus = data;
 
@@ -14,7 +13,7 @@ function StatusCtrl($scope, $http, $route) {
             $scope.upSinceDays = Math.round(dt / 86400000); // days
             $scope.upSinceHours = Math.round((dt % 86400000) / 3600000); // hours
             $scope.upSinceMinutes = Math.round(((dt % 86400000) % 3600000) / 60000); // minutes
-            
+
             $scope.$apply();
         });
     }();

@@ -2,7 +2,7 @@
 function AllUserCtrl($scope, $route) {
 
     $scope.reload_user_list = function() {
-        backend.ajax('api/admin/alluser/').success(function(data) {
+        $scope.backend.ajax('api/admin/alluser/').success(function(data) {
             $scope.alluser = data;
             console.log(data);
             $scope.$apply();
@@ -28,7 +28,7 @@ function AllUserCtrl($scope, $route) {
     $scope.save_user = function(user, is_new) {
         var ajax_req;
         if(is_new === true) {
-            ajax_req = backend.ajax('api/admin/user/', {
+            ajax_req = $scope.backend.ajax('api/admin/user/', {
                data: JSON.stringify($scope.new_user),
                type:"POST",
                contentType:"application/json; charset=utf-8",
@@ -36,7 +36,7 @@ function AllUserCtrl($scope, $route) {
             });
         } else {
             // update user is done via PUT request
-            ajax_req = backend.ajax('api/admin/user/', {
+            ajax_req = $scope.backend.ajax('api/admin/user/', {
                data: JSON.stringify($scope.currently_edited_user),
                type:"PUT",
                contentType:"application/json; charset=utf-8",
@@ -58,7 +58,7 @@ function AllUserCtrl($scope, $route) {
         if(!confirm("Really delete user \"" + user.Username + "\" ?")) {
             return;
         }
-        backend.ajax('api/admin/user/' + user.Username, {
+        $scope.backend.ajax('api/admin/user/' + user.Username, {
             type:"DELETE",
             data: JSON.stringify(user),
             contentType:"application/json; charset=utf-8",
