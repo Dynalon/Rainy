@@ -336,11 +336,6 @@ function AuthCtrl($scope, $route, $location) {
 }
 AuthCtrl.$inject = [ '$scope','$route', '$location' ];
 
-function MainCtrl($scope, $routeParams, $route, $location) {
-
-    if ($location.path() === "/login")
-        $scope.hideNav = true;
-    }
 
 function LoginCtrl($scope, $rootScope, $http) {
 
@@ -358,11 +353,11 @@ function LoginCtrl($scope, $rootScope, $http) {
 
     var url_vars = $scope.getUrlVars();
 
-    $scope.auth_data = { Username: "johndoe", Password: "none", RequestToken: "" };
-    $scope.auth_data.RequestToken = url_vars['oauth_token'];
+    $scope.authData = { Username: "", Password: "", RequestToken: "" };
+    $scope.authData.RequestToken = url_vars['oauth_token'];
 
     $scope.doLogin = function () {
-        $http.post('/oauth/authenticate', $scope.auth_data)
+        $http.post('/oauth/authenticate', $scope.authData)
             .success(function (data, status, headers, config) {
                 window.document.location = data.RedirectUrl;
             });

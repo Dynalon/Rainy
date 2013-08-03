@@ -79,7 +79,14 @@ namespace Rainy.WebService.OAuth
 		public object Post (OAuthAuthenticateRequest request)
 		{
 			// check if the user is authorized
-			if (!userIsAllowed (request.Username, request.Password)) {
+			string username = request.Username;
+			if (request.Username.Contains ("@")) {
+				// user supplied email address, lookup the username
+				using (var db = connFactory.OpenDbConnection ()) {
+					username = db.FirstOrDefault<DBUser> (u => u.EmailAddress == request.Username).Username;
+				}
+			}
+			if (username == null || !userIsAllowed (username, request.Password)) {
 				// unauthorized
 				Logger.WarnFormat ("Failed to authenticate user {0}", request.Username);
 				Response.StatusCode = 403;
@@ -96,7 +103,7 @@ namespace Rainy.WebService.OAuth
 			// authentication successful
 			Logger.InfoFormat ("Successfully authorized user: {0}", request.Username);
 
-			return TokenExchangeAfterAuthentication (request.Username, request.Password, request.RequestToken);
+			return TokenExchangeAfterAuthentication (username, request.Password, request.RequestToken);
 		}
 
 		public object TokenExchangeAfterAuthentication (string username, string password, string token)
@@ -188,7 +195,7 @@ namespace Rainy.WebService.OAuth
 				Response.Redirect (resp.RedirectUrl);
 				return null;
 			} else {
-				// take all url parameters and redirect
+				// take all url parameters and redirect to the login page
 				string prams =  new Uri (Request.RawUrl).PathAndQuery.Split (new char[] { '?' })[1];
 				Response.Redirect ("/ui/manage.html#/login?" + prams);
 				Response.EndServiceStackRequest ();
