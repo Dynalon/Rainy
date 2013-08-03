@@ -12,7 +12,7 @@ using ServiceStack.WebHost.Endpoints;
 namespace Rainy.Tests.Management
 {
 	[TestFixture()]
-	public class TestUserSignup : TestBase
+	public class TestUserSignup : DbTestsBase
 	{
 		protected JsonServiceClient client;
 		protected JsonServiceClient adminClient;
@@ -51,12 +51,12 @@ namespace Rainy.Tests.Management
 
 			// lookup activation key
 			var secret = "";
-			using (var db = factory.OpenDbConnection ()) {
+			using (var db = connFactory.OpenDbConnection ()) {
 				var db_user = db.First<DBUser> (u => u.Username == user.Username);
 				secret = db_user.VerifySecret;
 				client.Get<VerifyUserRequest> ("/api/user/signup/verify/" + secret + "/");
 			}
-			using (var db = factory.OpenDbConnection ()) {
+			using (var db = connFactory.OpenDbConnection ()) {
 				var db_user = db.First<DBUser> (u => u.Username == user.Username);
 				Assert.IsTrue (db_user.IsVerified);
 				Assert.IsEmpty (db_user.VerifySecret);
@@ -68,17 +68,7 @@ namespace Rainy.Tests.Management
 		{
 			var user = getTestUser ();
 			client.Post<DTOUser> ("/api/user/signup/new/", user);
-
-			testServer.Stop ();
-			EndpointHost.TryResolve<IAuthentiactor> ();
-			testServer = new RainyTestServer (DatabaseBackend.DbAuthenticator);
-			testServer.Start ();
-
-			testServer.TEST_USER = user.Username;
-			testServer.TEST_PASS = user.Password;
-
 			testServer.GetAccessToken ();
-
 		}
 
 		[Test]
@@ -90,20 +80,12 @@ namespace Rainy.Tests.Management
 
 			// lookup activation key
 			var secret = "";
-			using (var db = factory.OpenDbConnection ()) {
+			using (var db = connFactory.OpenDbConnection ()) {
 				var db_user = db.First<DBUser> (u => u.Username == user.Username);
 				secret = db_user.VerifySecret;
 			}
 			client.Get<VerifyUserRequest> ("/api/user/signup/verify/" + secret + "/");
-
-			testServer.Stop ();
-			testServer = new RainyTestServer (DatabaseBackend.DbAuthenticator);
-			testServer.TEST_USER = user.Username;
-			testServer.TEST_PASS = user.Password;
-			testServer.Start ();
-
 			testServer.GetAccessToken ();
-
 		}
 
 
@@ -173,7 +155,7 @@ namespace Rainy.Tests.Management
 		
 			// lookup activation key
 			var secret = "";
-			using (var db = factory.OpenDbConnection ()) {
+			using (var db = connFactory.OpenDbConnection ()) {
 				var db_user = db.First<DBUser> (u => u.Username == user.Username);
 				secret = db_user.VerifySecret;
 			}
@@ -181,7 +163,7 @@ namespace Rainy.Tests.Management
 
 			adminClient.Post<ActivateUserRequest> ("/api/user/signup/activate/" + user.Username + "/", new object());
 
-			using (var db = factory.OpenDbConnection ()) {
+			using (var db = connFactory.OpenDbConnection ()) {
 				var db_user = db.First<DBUser> (u => u.Username == user.Username);
 				Assert.IsTrue (db_user.IsActivated);
 			}

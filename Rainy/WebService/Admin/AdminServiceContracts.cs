@@ -4,6 +4,7 @@ using System.Web.Routing;
 using Rainy.UserManagement;
 using ServiceStack.ServiceHost;
 using Rainy.WebService.Admin;
+using System.Collections.Generic;
 
 namespace Rainy.WebService.Management
 {
@@ -17,7 +18,7 @@ namespace Rainy.WebService.Management
 
 	[AdminPasswordRequired]
 	[Route("/api/admin/alluser/","GET")]
-	public class AllUserRequest : IReturn<DTOUser[]>
+	public class AllUserRequest : IReturn<List<DTOUser>>
 	{
 	}
 

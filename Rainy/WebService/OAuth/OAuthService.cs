@@ -13,6 +13,7 @@ using System.Security.Cryptography;
 using Rainy.Crypto;
 using Rainy.Db;
 using ServiceStack.OrmLite;
+using ServiceStack.WebHost.Endpoints.Extensions;
 
 namespace Rainy.WebService.OAuth
 {
@@ -75,7 +76,7 @@ namespace Rainy.WebService.OAuth
 			this.Authenticator = auth;
 			this.oauthHandler = oauthHandler;
 		}
-		public object Get (OAuthAuthenticateRequest request)
+		public object Post (OAuthAuthenticateRequest request)
 		{
 			// check if the user is authorized
 			if (!userIsAllowed (request.Username, request.Password)) {
@@ -83,12 +84,13 @@ namespace Rainy.WebService.OAuth
 				Logger.WarnFormat ("Failed to authenticate user {0}", request.Username);
 				Response.StatusCode = 403;
 				Response.StatusDescription ="Authorization failed";
+				Response.ApplyGlobalResponseHeaders ();
 				Response.Write (
 					"<html><h1 style='margin-top: 1em'>Authorization failed for user "
 					+ "<b>" + request.Username + "</b>"
 					+ " (maybe wrong password?).</h1></html>"
 					);
-				Response.Close ();
+				Response.EndServiceStackRequest ();
 				return null;
 			}
 			// authentication successful
@@ -186,11 +188,11 @@ namespace Rainy.WebService.OAuth
 				Response.Redirect (resp.RedirectUrl);
 				return null;
 			} else {
-				// TODO
-				TextReader reader = new StreamReader ("/Users/td/gateway.html");
-				string resp = reader.ReadToEnd ();
-				reader.Close ();
-				return resp;
+				// take all url parameters and redirect
+				string prams =  new Uri (Request.RawUrl).PathAndQuery.Split (new char[] { '?' })[1];
+				Response.Redirect ("/ui/manage.html#/login?" + prams);
+				Response.EndServiceStackRequest ();
+				return null;
 			}
 		}
 	}

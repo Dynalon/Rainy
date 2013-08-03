@@ -9,6 +9,7 @@ using System.Linq;
 using Rainy.WebService.Admin;
 using Rainy.ErrorHandling;
 using Rainy.Crypto;
+using System.Collections.Generic;
 
 namespace Rainy.WebService.Management.Admin
 {
@@ -21,14 +22,13 @@ namespace Rainy.WebService.Management.Admin
 		}
 
 		// gets a list of all users
-		public DTOUser[] Get (AllUserRequest req)
+		public object Get (AllUserRequest req)
 		{
-			DTOUser[] all_user;
+			List<DTOUser> all_user;
 			using (var conn = connFactory.OpenDbConnection ()) {
-				all_user = conn.Select<DBUser> ().ToArray<DTOUser> ();
-				return all_user;
+				all_user = conn.Select<DBUser> ().ToList<DTOUser> ();
 			}
-
+			return all_user;
 		}
 
 		public DTOUser Get (UserRequest req)
@@ -69,7 +69,8 @@ namespace Rainy.WebService.Management.Admin
 					// password was not sent so use the old password
 					// TODO hashing
 					user.Password = stored_user.Password;
-				}
+				} else
+					throw new NotImplementedException ("Password changing is not yet implemented");
 
 				conn.Update<DBUser> (user, u => u.Username == user.Username);
 			}
@@ -117,7 +118,11 @@ namespace Rainy.WebService.Management.Admin
 			// lowercase the username
 			new_user.Username = new_user.Username.ToLower ();
 
+			// TODO move into API
 			new_user.CreateCryptoFields (user.Password);
+
+			new_user.IsVerified = true;
+			new_user.IsActivated = true;
 
 			using (var conn = connFactory.OpenDbConnection ()) {
 				var existing_user = conn.FirstOrDefault<DBUser> ("Username = {0}", new_user.Username);

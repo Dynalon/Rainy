@@ -13,9 +13,9 @@ namespace Rainy.WebService.Admin
 	{
 	}
 
-	public class StatusService : RainyNoteServiceBase
-	{
-		public StatusService () : base ()
+	public class StatusService : ServiceBase {
+
+		public StatusService (IDbConnectionFactory fac) : base (fac)
 		{
 		}
 
@@ -26,7 +26,7 @@ namespace Rainy.WebService.Admin
 			s.NumberOfRequests = MainClass.ServedRequests;
 
 			// determine number of users
-			using (var conn = DbConfig.GetConnection ()) {
+			using (var conn = connFactory.OpenDbConnection ()) {
 				s.NumberOfUser = conn.Scalar<int>("SELECT COUNT(*) FROM DBUser");
 				s.TotalNumberOfNotes = conn.Scalar<int>("SELECT COUNT(*) FROM DBNote");
 				s.AverageNotesPerUser = (float)s.TotalNumberOfNotes / (float)s.NumberOfUser; 

@@ -14,6 +14,7 @@ using ServiceStack.OrmLite;
 using Rainy.Db;
 using JsonConfig;
 using Rainy.Db.Config;
+using ServiceStack.WebHost.Endpoints.Extensions;
 
 namespace Rainy
 {
@@ -42,7 +43,9 @@ namespace Rainy
 			var swagger_path = Path.Combine(Path.GetDirectoryName(this.GetType ().Assembly.Location), "../../swagger-ui/");
 			var swagger_handler = new FilesystemHandler ("/swagger-ui/", swagger_path);
 
-			var embedded_handler = new EmbeddedResourceHandler ("/srv/", this.GetType ().Assembly, "Rainy.WebService.Admin.UI");
+			var adminui_path = Path.Combine(Path.GetDirectoryName(this.GetType ().Assembly.Location), "../../../Rainy.UI/dist/");
+			var adminui_handler = new FilesystemHandler ("/ui/", adminui_path);
+			//var embedded_handler = new EmbeddedResourceHandler ("/adminui/", this.GetType ().Assembly, "Rainy.WebService.Admin.UI");
 
 			// BUG HACK
 			// GlobalResponseHeaders are not cleared between creating instances of a new config
@@ -56,7 +59,7 @@ namespace Rainy
 
 				RawHttpHandlers = { 
 					swagger_handler.CheckAndProcess,
-					embedded_handler.CheckAndProcess
+					adminui_handler.CheckAndProcess
 				},
 
 				// enable cors

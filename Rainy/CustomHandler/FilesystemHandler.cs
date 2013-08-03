@@ -30,12 +30,9 @@
 //
 
 using System;
-using System.Collections.Generic;
 using System.IO;
 using System.Web;
-using ServiceStack.Common;
 using ServiceStack.Common.Web;
-using ServiceStack.Logging;
 using ServiceStack.ServiceHost;
 using ServiceStack.Text;
 using ServiceStack.WebHost.Endpoints.Extensions;
@@ -112,7 +109,9 @@ namespace Rainy.CustomHandler
                         {
                             var defaultFileName = Path.Combine(fi.FullName, defaultDoc);
                             if (!File.Exists(defaultFileName)) continue;
-                            r.Redirect(request.GetPathUrl() + '/' + defaultDoc);
+							var path = new Uri(request.AbsoluteUri).PathAndQuery;
+							var redirect_url = path + "/" + defaultDoc;
+							r.Redirect(redirect_url);
                             return;
                         }
                     }

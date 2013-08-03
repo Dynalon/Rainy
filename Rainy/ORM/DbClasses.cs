@@ -54,12 +54,8 @@ namespace Rainy.Db
 		public string MasterKeySalt { get; set; }
 		public string EncryptedMasterKey { get; set; }
 
-		// whether email verifcation has to take place
-		public bool IsVerified { get; set; } 
 		// the verification key 
 		public string VerifySecret { get; set; }
-
-		public bool IsActivated { get; set; }
 
 		public DBUser ()
 		{

@@ -77,6 +77,7 @@
     <Compile Include="CryptoTests.cs" />
     <Compile Include="NoteHistoryTests.cs" />
     <Compile Include="PublicNoteShareTestsSqlite.cs" />
+    <Compile Include="Admin\TestUserSignup.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <ItemGroup>
@@ -112,6 +113,5 @@
   <ItemGroup>
     <None Include="UbuntuOneWebSyncServerTests.cs" />
     <None Include="packages.config" />
-    <None Include="Admin\TestUserSignup.cs" />
   </ItemGroup>
 </Project>

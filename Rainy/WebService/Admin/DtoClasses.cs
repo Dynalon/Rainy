@@ -15,5 +15,9 @@ namespace Rainy.UserManagement
 		public string LastName { get; set; }
 		
 		public string AdditionalData { get; set; }
+
+		public bool IsVerified { get; set; }
+
+		public bool IsActivated { get; set; }
 	}
 }

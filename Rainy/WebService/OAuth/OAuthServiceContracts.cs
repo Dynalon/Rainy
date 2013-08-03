@@ -26,7 +26,7 @@ namespace Rainy.WebService.OAuth
 	// The authenticate service is NOT part of the Tomboy/Rainy/SNowy/OAuth standard but rather a helper
 	// service that we can call via JSON from Javascript to authenticate a user. The verifier
 	// we receive is our proof to the server that we authenticated successfully
-	[Route("/oauth/authenticate", "GET")]
+	[Route("/oauth/authenticate", "POST")]
 	public class OAuthAuthenticateRequest : IReturn<OAuthAuthenticateResponse>
 	{
 		public string Username { get; set; }

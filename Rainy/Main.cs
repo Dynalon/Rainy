@@ -144,34 +144,41 @@ namespace Rainy
 				container.Register<IAuthenticator> (c => {
 					var factory = c.Resolve<IDbConnectionFactory> ();
 //					var sfactory = new OrmLiteConnectionFactory ();
-					//var dbauth = new DbAuthenticator (factory);
-					var dbauth = new ConfigFileAuthenticator (Config.Global.Users);
+					var dbauth = new DbAuthenticator (factory);
+					//var dbauth = new ConfigFileAuthenticator (Config.Global.Users);
 
 					// we have to make sure users from the config file exist with the configured password
 					// in the db
 					// TODO delete old users? or restrict to webinterface?
-					foreach (dynamic user in Config.Global.Users) {
-						string username = user.Username;
-						string password = user.Password;
-						using (var db = factory.OpenDbConnection ()) {
-							var db_user = db.FirstOrDefault<DBUser> (u => u.Username == username);
-							if (db_user != null) { 
-								var need_update = db_user.UpdatePassword (password);
-								if (need_update)
-									db.UpdateOnly (new DBUser { PasswordHash = db_user.PasswordHash }, u => new { u.PasswordHash }, (DBUser p) => p.Username == username);
-							} else {
-								// create the user in the db
-								var new_user = new DBUser ();
-								new_user.Username = username;
-								new_user.CreateCryptoFields (password);
-								new_user.UpdatePassword (password); 
-								db.Insert<DBUser> (new_user);
+					if (dbauth is ConfigFileAuthenticator) {
+						foreach (dynamic user in Config.Global.Users) {
+							string username = user.Username;
+							string password = user.Password;
+							using (var db = factory.OpenDbConnection ()) {
+								var db_user = db.FirstOrDefault<DBUser> (u => u.Username == username);
+								if (db_user != null) { 
+									var need_update = db_user.UpdatePassword (password);
+									if (need_update)
+										db.UpdateOnly (new DBUser { PasswordHash = db_user.PasswordHash }, u => new { u.PasswordHash }, (DBUser p) => p.Username == username);
+								} else {
+									// create the user in the db
+									var new_user = new DBUser ();
+									new_user.Username = username;
+									new_user.CreateCryptoFields (password);
+									new_user.UpdatePassword (password); 
+									db.Insert<DBUser> (new_user);
+								}
 							}
 						}
 					}
 					return dbauth;
 				});
 //
+				container.Register<IAdminAuthenticator> (c => {
+					var auth = new ConfigFileAdminAuthenticator ();
+					return auth;
+				});
+
 				container.Register<OAuthHandler> (c => {
 					var auth = c.Resolve<IAuthenticator> ();
 					var factory = c.Resolve<IDbConnectionFactory> ();
