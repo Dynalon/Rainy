@@ -1,0 +1,51 @@
+<!doctype html>
+<html lang="en" ng-app="myApp">
+
+    <head>
+        <meta charset="utf-8">
+        <title>
+            My AngularJS App
+        </title>
+        <link href="//netdna.bootstrapcdn.com/bootswatch/2.1.1/united/bootstrap.min.css"
+        rel="stylesheet"/>
+        <link href="style.css" rel="stylesheet"/>
+    </head>
+
+    <body>
+    <div ng-controller="MainCtrl">
+        <div class="navbar navbar-inverse" bs-navbar ng-show="!hideNav">
+            <div class="navbar-inner">
+                <a class="brand" href="#/">Rainy <span class="label label-important">ADMIN</span></a>
+                <ul class="nav">
+                    <li class="active" data-match-route="/overview">
+                        <a href="#/overview"><i class="icon-signal"></i> Overview</a>
+                    </li>
+                    <li data-match-route="/user">
+                        <a href="#/user"><i class="icon-user"></i> User</a>
+                    </li>
+                </ul>
+            </div>
+    </div>
+    </div>
+        <div class="container">
+            <div class="row">
+                <!-- TOPLINE NAV SELECTION -->
+                <div class="span1">
+                    <div class="span10" ng-View>
+                    </div>
+                    <div class="span1">
+                    </div>
+                </div>
+            </div>
+
+            <script src="//ajax.googleapis.com/ajax/libs/angularjs/1.0.7/angular.min.js">
+            </script>
+            <script src="//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js">
+            </script>
+            <script src="//netdna.bootstrapcdn.com/twitter-bootstrap/2.3.1/js/bootstrap.min.js">
+            </script>
+            <script src="built.js" type="text/javascript">
+            </script>
+    </body>
+
+</html>

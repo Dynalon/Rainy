@@ -1,0 +1,9 @@
+{
+  "name": "Rainy-UI",
+  "version": "0.0.1",
+  "devDependencies": {
+    "jquery": "~2.0.3",
+    "angular-strap": "~0.7.5",
+    "angular": "~1.0.7"
+  }
+}
