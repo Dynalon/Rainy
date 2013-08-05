@@ -51,7 +51,7 @@ namespace Rainy.CustomHandler
 	/// <summary>
 	/// Serves static files that are embedded as a resource into an assembly.
 	/// </summary>
-	class EmbeddedResourceHandler : IHttpHandler, IServiceStackHttpHandler
+	class EmbeddedResourceHandler : IHttpHandler, IServiceStackHttpHandler, IHttpHandlerDecider
 	{
 		public void ProcessRequest(HttpContext context)
 		{

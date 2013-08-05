@@ -43,7 +43,7 @@ using ServiceStack.WebHost.Endpoints;
 
 namespace Rainy.CustomHandler
 {
-	class FilesystemHandler : IHttpHandler, IServiceStackHttpHandler
+	class FilesystemHandler : IHttpHandler, IServiceStackHttpHandler, IHttpHandlerDecider
 	{
 		public void ProcessRequest(HttpContext context)
 		{

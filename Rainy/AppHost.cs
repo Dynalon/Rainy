@@ -4,17 +4,10 @@ using ServiceStack.Api.Swagger;
 using ServiceStack.Common.Web;
 using ServiceStack.Text;
 using ServiceStack.WebHost.Endpoints;
-using log4net;
 using Rainy.CustomHandler;
-using Rainy.Interfaces;
-using Rainy.OAuth;
 using Rainy.WebService;
-using ServiceStack.OrmLite.PostgreSQL;
-using ServiceStack.OrmLite;
-using Rainy.Db;
-using JsonConfig;
-using Rainy.Db.Config;
-using ServiceStack.WebHost.Endpoints.Extensions;
+using System.Web;
+using ServiceStack.WebHost.Endpoints.Support;
 
 namespace Rainy
 {
@@ -43,9 +36,13 @@ namespace Rainy
 			var swagger_path = Path.Combine(Path.GetDirectoryName(this.GetType ().Assembly.Location), "../../swagger-ui/");
 			var swagger_handler = new FilesystemHandler ("/swagger-ui/", swagger_path);
 
-			var adminui_path = Path.Combine(Path.GetDirectoryName(this.GetType ().Assembly.Location), "../../../Rainy.UI/dist/");
-			var adminui_handler = new FilesystemHandler ("/ui/", adminui_path);
-			//var embedded_handler = new EmbeddedResourceHandler ("/adminui/", this.GetType ().Assembly, "Rainy.WebService.Admin.UI");
+			IHttpHandlerDecider uihandler;
+			if (JsonConfig.Config.Global.Development) {
+				var adminui_path = Path.Combine(Path.GetDirectoryName(this.GetType ().Assembly.Location), "../../../Rainy.UI/dist/");
+				uihandler = (IHttpHandlerDecider) new FilesystemHandler ("/ui/", adminui_path);
+			} else {
+				uihandler = (IHttpHandlerDecider) new EmbeddedResourceHandler ("/ui/", this.GetType ().Assembly, "Rainy.WebService.Admin.UI");
+			}
 
 			// BUG HACK
 			// GlobalResponseHeaders are not cleared between creating instances of a new config
@@ -59,7 +56,7 @@ namespace Rainy
 
 				RawHttpHandlers = { 
 					swagger_handler.CheckAndProcess,
-					adminui_handler.CheckAndProcess
+					uihandler.CheckAndProcess
 				},
 
 				// enable cors

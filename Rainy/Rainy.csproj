@@ -143,6 +143,7 @@
     <Compile Include="WebService\OAuth\TokenService.cs" />
     <Compile Include="WebService\NoteHistoryService.cs" />
     <Compile Include="WebService\Admin\StatusService.cs" />
+    <Compile Include="CustomHandler\IHttpHandlerDecider.cs" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="WebService\" />
@@ -179,5 +180,13 @@
     <None Include="sqlite\x86\sqlite3.dll" />
     <None Include="sqlite\x86\sqlite3.exe" />
     <None Include="packages.config" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="..\Rainy.UI\dist\built.js">
+      <Link>WebService\Admin\UI\built.js</Link>
+    </EmbeddedResource>
+    <EmbeddedResource Include="..\Rainy.UI\dist\manage.html">
+      <Link>WebService\Admin\UI\manage.html</Link>
+    </EmbeddedResource>
   </ItemGroup>
 </Project>
