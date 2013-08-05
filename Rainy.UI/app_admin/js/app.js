@@ -3,15 +3,17 @@ var app = angular.module('myApp', [
     'myApp.filters',
     'myApp.services',
     'myApp.directives',
+
+    // anguar-strap.js
     '$strap.directives'
 ])
 .config(['$routeProvider',
     function($routeProvider) {
-        $routeProvider.when('/user', {
+        $routeProvider.when('/admin/user', {
             templateUrl: 'user.html',
             controller: AllUserCtrl
         });
-        $routeProvider.when('/overview', {
+        $routeProvider.when('/admin/overview', {
             templateUrl: 'overview.html',
             controller: StatusCtrl
         });
@@ -20,7 +22,7 @@ var app = angular.module('myApp', [
             controller: LoginCtrl
         });
         $routeProvider.otherwise({
-            redirectTo: '/overview'
+            redirectTo: '/admin/user'
         });
     }
 ])

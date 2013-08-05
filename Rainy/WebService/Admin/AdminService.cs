@@ -121,9 +121,6 @@ namespace Rainy.WebService.Management.Admin
 			// TODO move into API
 			new_user.CreateCryptoFields (user.Password);
 
-			new_user.IsVerified = true;
-			new_user.IsActivated = true;
-
 			using (var conn = connFactory.OpenDbConnection ()) {
 				var existing_user = conn.FirstOrDefault<DBUser> ("Username = {0}", new_user.Username);
 				if (existing_user != null)

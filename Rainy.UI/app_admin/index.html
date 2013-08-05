@@ -4,7 +4,7 @@
     <head>
         <meta charset="utf-8">
         <title>
-            My AngularJS App
+            Rainy
         </title>
         <link href="//netdna.bootstrapcdn.com/bootswatch/2.1.1/united/bootstrap.min.css"
         rel="stylesheet"/>
@@ -13,15 +13,18 @@
 
     <body>
     <div ng-controller="MainCtrl">
-        <div class="navbar navbar-inverse" bs-navbar ng-show="!hideNav">
+        <div class="navbar navbar-inverse" bs-navbar ng-show="!hideAdminNav">
             <div class="navbar-inner">
                 <a class="brand" href="#/">Rainy <span class="label label-important">ADMIN</span></a>
                 <ul class="nav">
-                    <li class="active" data-match-route="/overview">
-                        <a href="#/overview"><i class="icon-signal"></i> Overview</a>
+                    <li class="active" data-match-route="/admin/overview">
+                        <a href="#/admin/overview"><i class="icon-signal"></i> Overview</a>
                     </li>
-                    <li data-match-route="/user">
-                        <a href="#/user"><i class="icon-user"></i> User</a>
+                    <li data-match-route="/admin/user">
+                        <a href="#/admin/user"><i class="icon-user"></i> User</a>
+                    </li>
+                    <li data-match-route="/login">
+                        <a href="#/login"><i class="icon-user"></i> User</a>
                     </li>
                 </ul>
             </div>

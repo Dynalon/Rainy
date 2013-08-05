@@ -1,20 +1,30 @@
 
 function AllUserCtrl($scope, $route) {
+    $scope.currently_edited_user = null;
+    $scope.new_user = {};
+
+    /*$scope.sendMail = true;
+    $scope.sendMailDisabled = true;
+    $scope.$watch('new_user.Password', function() {
+        if ($scope.new_user.Password === undefined) {
+            $scope.sendMail = true;
+            $scope.sendMailDisabled = true;
+        } else {
+            $scope.sendMailDisabled = false;
+        }
+    });*/
 
     $scope.reload_user_list = function() {
         $scope.backend.ajax('api/admin/alluser/').success(function(data) {
             $scope.alluser = data;
-            console.log(data);
             $scope.$apply();
         });
     };
     $scope.reload_user_list();
 
-    $scope.currently_edited_user = null;
-    $scope.new_user = null;
 
     $scope.add_new_user = function() {
-        save_user(new_user, true);
+        save_user(true);
     };
 
     $scope.start_edit = function(user) {
@@ -25,8 +35,10 @@ function AllUserCtrl($scope, $route) {
         $scope.currently_edited_user = null;
     };
 
-    $scope.save_user = function(user, is_new) {
+    $scope.save_user = function(is_new) {
         var ajax_req;
+        $scope.new_user.IsActivated = true;
+        $scope.new_user.IsVerified = true;
         if(is_new === true) {
             ajax_req = $scope.backend.ajax('api/admin/user/', {
                data: JSON.stringify($scope.new_user),

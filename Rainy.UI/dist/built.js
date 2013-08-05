@@ -175,15 +175,17 @@ var app = angular.module('myApp', [
     'myApp.filters',
     'myApp.services',
     'myApp.directives',
+
+    // anguar-strap.js
     '$strap.directives'
 ])
 .config(['$routeProvider',
     function($routeProvider) {
-        $routeProvider.when('/user', {
+        $routeProvider.when('/admin/user', {
             templateUrl: 'user.html',
             controller: AllUserCtrl
         });
-        $routeProvider.when('/overview', {
+        $routeProvider.when('/admin/overview', {
             templateUrl: 'overview.html',
             controller: StatusCtrl
         });
@@ -192,7 +194,7 @@ var app = angular.module('myApp', [
             controller: LoginCtrl
         });
         $routeProvider.otherwise({
-            redirectTo: '/overview'
+            redirectTo: '/admin/user'
         });
     }
 ])
@@ -233,21 +235,31 @@ var app = angular.module('myApp', [
 
 
 function AllUserCtrl($scope, $route) {
+    $scope.currently_edited_user = null;
+    $scope.new_user = {};
+
+    /*$scope.sendMail = true;
+    $scope.sendMailDisabled = true;
+    $scope.$watch('new_user.Password', function() {
+        if ($scope.new_user.Password === undefined) {
+            $scope.sendMail = true;
+            $scope.sendMailDisabled = true;
+        } else {
+            $scope.sendMailDisabled = false;
+        }
+    });*/
 
     $scope.reload_user_list = function() {
         $scope.backend.ajax('api/admin/alluser/').success(function(data) {
             $scope.alluser = data;
-            console.log(data);
             $scope.$apply();
         });
     };
     $scope.reload_user_list();
 
-    $scope.currently_edited_user = null;
-    $scope.new_user = null;
 
     $scope.add_new_user = function() {
-        save_user(new_user, true);
+        save_user(true);
     };
 
     $scope.start_edit = function(user) {
@@ -258,8 +270,10 @@ function AllUserCtrl($scope, $route) {
         $scope.currently_edited_user = null;
     };
 
-    $scope.save_user = function(user, is_new) {
+    $scope.save_user = function(is_new) {
         var ajax_req;
+        $scope.new_user.IsActivated = true;
+        $scope.new_user.IsVerified = true;
         if(is_new === true) {
             ajax_req = $scope.backend.ajax('api/admin/user/', {
                data: JSON.stringify($scope.new_user),
@@ -367,10 +381,28 @@ function LoginCtrl($scope, $rootScope, $http) {
 
 function MainCtrl($scope, $routeParams, $route, $location) {
 
-    if ($location.path() === "/login") {
-        $scope.hideNav = true;
-        $scope.dontAskForPassword = true;
-    }
+    $scope.checkLocation = function() {
+        if ($location.path().startsWith("/admin")) {
+            console.log("_" + $location.path());
+            $scope.hideAdminNav = false;
+            $scope.dontAskForPassword = false;
+        } else {
+            $scope.hideAdminNav = true;
+            $scope.dontAskForPassword = true;
+        }
+    };
+    $scope.checkLocation();
+
+    $scope.$on('$locationChangeStart', function(ev, oldloc, newloc) {
+        console.log("_" + $location.path());
+        $scope.checkLocation();
+    });
+}
+
+if (typeof String.prototype.startsWith !== 'function') {
+    String.prototype.startsWith = function(str) {
+        return this.slice(0, str.length) === str;
+    };
 }
 
 function StatusCtrl($scope, $http, $route) {

@@ -10,8 +10,18 @@
     <input ng-model="new_user.EmailAddress" type="text" required />
 
     <label>Password:</label>
-    <input ng-model="new_user.Password" class="input-small" type="text" placeholder="min. 8 chars" required />
-    <button class="btn pull-right" ng-click="save_user(new_user, true)">
+    <input
+        ng-blur="passwordBlur()",
+        ng-model="new_user.Password"
+        class="input-small"
+        type="text"
+        placeholder="min. 8 chars"
+        required />
+    <!--
+    <label>Send email to user </label>
+    <input type="checkbox" ng-model="sendMail" ng-disabled="sendMailDisabled" />
+    -->
+    <button class="btn pull-right" ng-click="save_user(true)">
         Add
     </button>
 </form>
@@ -86,7 +96,7 @@
             </td>
             <td>
                 <span class="pull-right">
-                    <a class="btn btn-primary" ng-click="save_user(currently_edited_user)"><i class="icon-ok"></i>Save</a>
+                    <a class="btn btn-primary" ng-click="save_user(false)"><i class="icon-ok"></i>Save</a>
                     <a class="btn" ng-click="stop_edit()"><i class="icon-remove"></i> Cancel</a>
                 </span>
             </td>
