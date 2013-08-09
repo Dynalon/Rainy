@@ -11,7 +11,7 @@ MKBUNDLE=$(shell which mkbundle)
 
 UNPACKED_EXE=$(BINDIR)/Rainy.exe
 PACKED_EXE=Rainy.exe
-MIN_MONO_VERSION=2.10.9
+MIN_MONO_VERSION=3.0.0
 
 pack: build
 	@cp Rainy/settings.conf $(RELEASEDIR)/settings.conf
@@ -40,14 +40,21 @@ ifndef TEAMCITY
 endif
 
 deps:
-	@nuget install -o packages Rainy/packages.config
-	@nuget install -o packages Rainy-tests/packages.config
-	@nuget install -o packages tomboy-library-websync/packages.config
+	# if the next steps fails telling about security authentication, make sure
+	# you have imported trusted ssl CA certs with this command and re-run:
+	#
+	# mozroots --import --sync
+	#
+
+	@mono tools/NuGet.exe install -o packages Rainy/packages.config
+	@mono tools/NuGet.exe install -o packages Rainy-tests/packages.config
+	@mono tools/NuGet.exe install -o packages tomboy-library-websync/packages.config
+	@echo "Successfully fetched dependencies."
 
 build: checkout deps
 
 ## this is not working?
-##pkg-config --atleast-version=$(MIN_MONO_VERSION) mono; if [ $$? != "0" ]; then $(error "mono >=2.10.9 is required");
+##pkg-config --atleast-version=$(MIN_MONO_VERSION) mono; if [ $$? != "0" ]; then $(error "mono >=$MIN_MONO_VERSION is required");
 
 	$(XBUILD) $(XBUILD_ARGS) Rainy.sln
 
