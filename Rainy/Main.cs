@@ -281,10 +281,15 @@ namespace Rainy
 				Config.Global.Backend = "filesystem";
 			}
 
+			if (Config.Global.Backend != "filesystem" && string.IsNullOrEmpty (Config.Global.AdminPassword)) {
+				logger.Fatal ("An administrator password must be set");
+				Environment.Exit (-1);
+			}
+
 			string admin_ui_url = listen_url.Replace ("*", "localhost");
 
-			if (open_browser) {
-				admin_ui_url += "admin/#?admin_pw=" + Config.Global.AdminPassword;
+			if (open_browser && !string.IsNullOrEmpty (Config.Global.AdminPassword)) {
+				admin_ui_url += "ui/manage.html";
 			}
 
 			ComposeObjectGraphDelegate object_graph_composer = ComposeObjectGraph;
