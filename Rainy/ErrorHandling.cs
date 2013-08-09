@@ -3,6 +3,7 @@ using System.Net;
 using ServiceStack.ServiceHost;
 using ServiceStack.WebHost.Endpoints.Extensions;
 using log4net;
+using System.Linq;
 
 namespace Rainy.ErrorHandling
 {
@@ -73,10 +74,10 @@ namespace Rainy.ErrorHandling
 			// create appropriate response
 			if (e is UnauthorizedException) {
 				var ex = (UnauthorizedException) e;
-				logger.Debug (ex.ErrorMessage);
-				LogExceptionDetails (logger, e);
+				//logger.Debug (ex.ErrorMessage);
+				//LogExceptionDetails (logger, e);
 				response.StatusCode = 401;
-				response.StatusDescription = "Unauthorized";
+				response.StatusDescription = "Unauthorized.";
 				response.ContentType = request.ContentType;
 				// TODO provide JSON error objects
 			} else if (e is ValidationException) {
@@ -96,6 +97,11 @@ namespace Rainy.ErrorHandling
 				LogExceptionDetails (logger, e);
 				response.StatusCode = 500;
 				response.StatusDescription = "Internal server error.";
+			}
+			// display nice message if viewed in browser
+			if (request.AcceptTypes.Contains ("text/html")) {
+				response.Write ("<h1>" + response.StatusCode + "</h1>" +
+					"<p>" + response.StatusDescription + "</p>");
 			}
 			response.EndServiceStackRequest ();
 			throw e;
