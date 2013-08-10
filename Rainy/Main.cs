@@ -39,8 +39,6 @@ namespace Rainy
 			// console appender
 			log4net.Appender.ConsoleAppender appender;
 			appender = new log4net.Appender.ConsoleAppender ();
-			appender.Layout = new log4net.Layout.PatternLayout
-				("%-4utcdate{yy/MM/dd_HH:mm:ss.fff} [%-5level] %logger->%M - %message%newline");
 
 			switch (loglevel) {
 			case 0: appender.Threshold = log4net.Core.Level.Error; break;
@@ -49,6 +47,14 @@ namespace Rainy
 			case 3: appender.Threshold = log4net.Core.Level.Debug; break;
 			case 4: appender.Threshold = log4net.Core.Level.All; break;
 			}
+
+			string pattern_layout;
+			if (loglevel <= 1) {
+				pattern_layout = "[%-5level] %message%newline";
+			} else {
+				pattern_layout = "%-4utcdate{yy/MM/dd_HH:mm:ss.fff} [%-5level] %logger->%M - %message%newline";
+			}
+			appender.Layout = new log4net.Layout.PatternLayout (pattern_layout);
 
 			log4net.Config.BasicConfigurator.Configure (appender);
 			logger = LogManager.GetLogger("Main");
