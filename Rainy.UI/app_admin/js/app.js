@@ -53,6 +53,7 @@ var app = angular.module('myApp', [
             ret.fail(function(jqxhr, textStatus) {
                 if (jqxhr.status == 401) {
                     $("#loginModal").modal();
+                    $('#loginModal').find(":password").focus();
                 }
             });
             return ret;

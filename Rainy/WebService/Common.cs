@@ -30,9 +30,10 @@ namespace Rainy.WebService
 
 			Logger.Debug ("Received request headers:\n");
 			foreach(var key in req.Headers.AllKeys) {
-				Logger.DebugFormat ("\t {0}: {1}", key, req.Headers[key]);
+				// we don't want to have admin passwords in it
+				if (key != "Authority")
+					Logger.DebugFormat ("\t {0}: {1}", key, req.Headers[key]);
 			}
-
 		}
 		public IHasRequestFilter Copy ()
 		{

@@ -225,6 +225,7 @@ var app = angular.module('myApp', [
             ret.fail(function(jqxhr, textStatus) {
                 if (jqxhr.status == 401) {
                     $("#loginModal").modal();
+                    $('#loginModal').find(":password").focus();
                 }
             });
             return ret;
@@ -342,8 +343,8 @@ function AuthCtrl($scope, $route, $location) {
             admin_pw = $scope.adminPassword;
         }).fail(function () {
             $scope.adminPassword="";
+            $('#loginModal').find(":password").focus();
             $scope.$apply();
-            //$('#loginModal').find(":password").focus();
         });
         $route.reload();
     };
@@ -383,7 +384,6 @@ function MainCtrl($scope, $routeParams, $route, $location) {
 
     $scope.checkLocation = function() {
         if ($location.path().startsWith("/admin")) {
-            console.log("_" + $location.path());
             $scope.hideAdminNav = false;
             $scope.dontAskForPassword = false;
         } else {
@@ -393,8 +393,9 @@ function MainCtrl($scope, $routeParams, $route, $location) {
     };
     $scope.checkLocation();
 
+    // bug in angular prevents this from firing when the back button is used
+    // (fixed in 1.1.5) - see https://github.com/angular/angular.js/pull/2206
     $scope.$on('$locationChangeStart', function(ev, oldloc, newloc) {
-        console.log("_" + $location.path());
         $scope.checkLocation();
     });
 }

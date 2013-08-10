@@ -23,9 +23,6 @@
                     <li data-match-route="/admin/user">
                         <a href="#/admin/user"><i class="icon-user"></i> User</a>
                     </li>
-                    <li data-match-route="/login">
-                        <a href="#/login"><i class="icon-user"></i> User</a>
-                    </li>
                 </ul>
             </div>
     </div>
@@ -90,6 +87,9 @@
     <input ng-model="search_term" type="text" placeholder="Search term..." />
 </div>
 
+<div ng-show="alluser.length == 0">
+    There are no users in the database. Use the above panel to add a user.
+</div>
 
 <!-- ALL USER TABLE -->
 <table class="table table-striped table-bordered table-hover table-condensed" ng-show="alluser.length > 0">
@@ -111,7 +111,7 @@
                 {{ user.EmailAddress }}
             </td>
             <td>
-                {{ user.Password }}
+                ***
             </td>
             <td>
                 {{ user.AdditionalData }}
@@ -161,7 +161,9 @@
 
 </script>
 
-<!-- authentication modal -->
+<!-- authentication modal - intentionally not put into a <script> element so it
+    gets executed on every page load
+-->
 <div ng-controller="AuthCtrl" class="modal fade" id="loginModal">
 <form class="form" ng-submit="doLogin()">
     <div class="modal-header">

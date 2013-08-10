@@ -8,6 +8,12 @@ using Rainy.CustomHandler;
 using Rainy.WebService;
 using System.Web;
 using ServiceStack.WebHost.Endpoints.Support;
+using System.Linq;
+using ServiceStack.ServiceHost;
+
+
+using ServiceStack.ServiceHost;
+using ServiceStack.Common;
 
 namespace Rainy
 {
@@ -50,6 +56,10 @@ namespace Rainy
 			EndpointHostConfig.Instance.GlobalResponseHeaders.Clear ();
 
 			SetConfig (new EndpointHostConfig {
+
+				EnableFeatures = Feature.All.Remove (Feature.Metadata),
+				DefaultRedirectPath = "/ui/manage.html",
+
 				// not all tomboy clients send the correct content-type
 				// so we force application/json
 				DefaultContentType = ContentType.Json,

@@ -23,8 +23,8 @@ function AuthCtrl($scope, $route, $location) {
             admin_pw = $scope.adminPassword;
         }).fail(function () {
             $scope.adminPassword="";
+            $('#loginModal').find(":password").focus();
             $scope.$apply();
-            //$('#loginModal').find(":password").focus();
         });
         $route.reload();
     };

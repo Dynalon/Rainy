@@ -1,4 +1,6 @@
-<!-- authentication modal -->
+<!-- authentication modal - intentionally not put into a <script> element so it
+    gets executed on every page load
+-->
 <div ng-controller="AuthCtrl" class="modal fade" id="loginModal">
 <form class="form" ng-submit="doLogin()">
     <div class="modal-header">
