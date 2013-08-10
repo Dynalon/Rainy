@@ -29,7 +29,9 @@ namespace Rainy.WebService.Admin
 			using (var conn = connFactory.OpenDbConnection ()) {
 				s.NumberOfUser = conn.Scalar<int>("SELECT COUNT(*) FROM DBUser");
 				s.TotalNumberOfNotes = conn.Scalar<int>("SELECT COUNT(*) FROM DBNote");
-				s.AverageNotesPerUser = (float)s.TotalNumberOfNotes / (float)s.NumberOfUser; 
+
+				if (s.NumberOfUser > 0)
+					s.AverageNotesPerUser = (float)s.TotalNumberOfNotes / (float)s.NumberOfUser; 
 			};
 			return s;
 		}
