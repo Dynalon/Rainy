@@ -227,7 +227,7 @@ namespace Rainy
 
 			int loglevel = 0;
 			bool show_help = false;
-			bool open_browser = false;
+			bool open_browser = true;
 
 			var p = new OptionSet () {
 				{ "c|config=", "use config file",
@@ -241,8 +241,8 @@ namespace Rainy
 				{ "pvk=",  "use private key for certSSL", 
 					(string file2) => pvk_file = file2 },
 
-				//{ "b|nobrowser",  "do not open browser window upon start",
-				//	v => { if (v != null) open_browser = false; } },
+				{ "b|nobrowser",  "do not open browser window upon start",
+					v => { if (v != null) open_browser = false; } },
 			};
 			p.Parse (args);
 
@@ -280,8 +280,6 @@ namespace Rainy
 
 			ConfigureSslCerts (listen_url, cert_file, pvk_file);
 
-			var sqlite_file = Path.Combine (DataPath, "rainy.db");
-
 			// by default we use the filesystem backend
 			if (string.IsNullOrEmpty (Config.Global.Backend)) {
 				Config.Global.Backend = "filesystem";
@@ -292,11 +290,11 @@ namespace Rainy
 				Environment.Exit (-1);
 			}
 
+			open_browser = open_browser && !string.IsNullOrEmpty (Environment.GetEnvironmentVariable ("DISPLAY"));
+			open_browser = open_browser && !string.IsNullOrEmpty (Config.Global.AdminPassword);
+			open_browser = open_browser && Config.Global.Backend != "filesystem";
 			string admin_ui_url = listen_url.Replace ("*", "localhost");
-
-			if (open_browser && !string.IsNullOrEmpty (Config.Global.AdminPassword)) {
-				admin_ui_url += "ui/manage.html";
-			}
+			admin_ui_url += "ui/manage.html";
 
 			ComposeObjectGraphDelegate object_graph_composer = ComposeObjectGraph;
 
@@ -315,7 +313,6 @@ namespace Rainy
 					Console.WriteLine ("Press return to stop Rainy");
 					Console.ReadLine ();
 					Environment.Exit(0);
-
 				} else {
 					// we run UNIX
 					UnixSignal [] signals = new UnixSignal[] {
