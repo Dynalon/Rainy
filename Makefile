@@ -11,6 +11,9 @@ MKBUNDLE=$(shell which mkbundle)
 
 UNPACKED_EXE=$(BINDIR)/Rainy.exe
 PACKED_EXE=Rainy.exe
+
+# Note this is the min version for building from source; running might work
+# on older mono versions
 MIN_MONO_VERSION=3.0.0
 
 pack: build
