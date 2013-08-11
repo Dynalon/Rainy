@@ -21,7 +21,6 @@ namespace Rainy.WebService.OAuth
 
 		public OAuthRequiredAttribute ()
 		{
-
 			Logger = LogManager.GetLogger (GetType ());
 		}
 		public IHasRequestFilter Copy ()
@@ -32,6 +31,9 @@ namespace Rainy.WebService.OAuth
 		
 		public void RequestFilter (IHttpRequest request, IHttpResponse response, object requestDto)
 		{
+			bool use_temp_access_token = request.Headers.AllKeys.Contains ("AccessToken");
+			bool check_oauth_signature = request.Headers.AllKeys.Contains ("Authorization");
+
 			string username = "";
 			if (requestDto is UserRequest) {
 				username = ((UserRequest)requestDto).Username;
@@ -39,24 +41,28 @@ namespace Rainy.WebService.OAuth
 				username = ((GetNotesRequest)requestDto).Username;
 			} else if (requestDto is PutNotesRequest) {
 				username = ((PutNotesRequest)requestDto).Username;
-			} else if (!request.Headers.AllKeys.Contains ("Authorization")) {
+			} else if (!check_oauth_signature && !use_temp_access_token) {
 				response.ReturnAuthRequired ();
 				return;
 			}
-			
-			var web_request = ((HttpListenerRequest)request.OriginalRequest).ToWebRequest ();
-			IOAuthContext context = new OAuthContextBuilder ().FromWebRequest (web_request, new MemoryStream ());
+			Logger.Debug ("trying to acquire authorization");
 
-
-			// HACK ServiceStack does not inject into custom attributes
-			var oauthHandler = EndpointHost.Container.Resolve<OAuthHandler> ();
+			IOAuthContext context = null;
+			AccessToken access_token;
 
 			try {
-				Logger.Debug ("trying to acquire authorization");
-				oauthHandler.Provider.AccessProtectedResourceRequest (context);
+				var oauthHandler = EndpointHost.Container.Resolve<OAuthHandler> ();
+				if (check_oauth_signature) {
+					var web_request = ((HttpListenerRequest)request.OriginalRequest).ToWebRequest ();
+					context = new OAuthContextBuilder ().FromWebRequest (web_request, new MemoryStream ());
+					// HACK ServiceStack does not inject into custom attributes
+					oauthHandler.Provider.AccessProtectedResourceRequest (context);
+					// check if the access token matches the username given in an url
+					access_token = oauthHandler.AccessTokens.GetToken (context.Token);
+				} else {
+					access_token = oauthHandler.AccessTokens.GetToken (request.Headers["AccessToken"]);
+				}
 
-				// check if the access token matches the username given in an url
-				var access_token = oauthHandler.AccessTokens.GetToken (context.Token);
 				if (!string.IsNullOrEmpty (username) && access_token.UserName != username) {
 					// forbidden
 					Logger.Debug ("username does not match the one in the access token, denying");
@@ -64,13 +70,18 @@ namespace Rainy.WebService.OAuth
 					return;
 				} else {
 					// TODO remove checks - why is it run twice?
-					if (!request.Items.Keys.Contains ("AccessToken"))
-						request.Items.Add ("AccessToken", context.Token);
+					if (!request.Items.Keys.Contains ("AccessToken")) {
+						if (use_temp_access_token)
+							request.Items.Add ("AccessToken", request.Headers["AccessToken"]);
+						else
+							request.Items.Add ("AccessToken", context.Token);
+					}
 					if (!request.Items.Keys.Contains ("Username"))
 						request.Items.Add ("Username", access_token.UserName);
 				}
 			} catch (Exception e) {
-				Logger.DebugFormat ("failed to obtain authorization, oauth context is: {0}", context.Dump ());
+				if (context != null)
+					Logger.DebugFormat ("failed to obtain authorization, oauth context is: {0}", context.Dump ());
 				response.ReturnAuthRequired ();
 			}
 

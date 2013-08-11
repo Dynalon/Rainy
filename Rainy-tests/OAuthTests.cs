@@ -8,6 +8,7 @@ using Rainy.WebService.Management.Admin;
 using System.Collections.Generic;
 using System.Linq;
 using Rainy.OAuth;
+using Rainy.WebService.OAuth;
 
 namespace Rainy.Tests.OAuth
 {
@@ -69,6 +70,18 @@ namespace Rainy.Tests.OAuth
 			} finally {
 				Assert.AreEqual ("Unauthorized", caught_exception.Message);
 			}
+		}
+
+		[Test]
+		public void BypassOAuthForTemporaryAccessToken ()
+		{
+			var restClient = new JsonServiceClient (testServer.ListenUrl);
+			var req = new OAuthTemporaryAccessTokenRequest ();
+			req.Username = RainyTestServer.TEST_USER;
+			req.Password = RainyTestServer.TEST_PASS;
+			var token = restClient.Post<OAuthTemporaryAccessTokenResponse> ("/oauth/temporary_access_token", req);
+			Assert.That (!token.AccessToken.StartsWith ("oauth_"));
+			Assert.GreaterOrEqual (400, token.AccessToken.Length);
 		}
 	}
 

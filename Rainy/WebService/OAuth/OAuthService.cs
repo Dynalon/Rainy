@@ -59,10 +59,10 @@ namespace Rainy.WebService.OAuth
 		}
 		public object Post (OAuthRequestTokenRequest request)
 		{
-			//return Get (request);
+			return Get (request);
 			// i.e. ConBoy only supported POST Auth which is valid accoding to the OAuth RFC, but not yet
 			// supported in Rainy
-			throw new RainyBaseException () {ErrorMessage = "Usage of POST for OAuth authorization is currently not supported. Use GET instead."};
+			//throw new RainyBaseException () {ErrorMessage = "Usage of POST for OAuth authorization is currently not supported. Use GET instead."};
 		}
 	}
 
@@ -81,15 +81,10 @@ namespace Rainy.WebService.OAuth
 		{
 			// check if the user is authorized
 			string username = request.Username;
-			if (request.Username.Contains ("@")) {
-				// user supplied email address, lookup the username
-				using (var db = connFactory.OpenDbConnection ()) {
-					username = db.FirstOrDefault<DBUser> (u => u.EmailAddress == request.Username).Username;
-				}
-			}
-			if (username == null || !userIsAllowed (username, request.Password)) {
+
+			if (username == null || !userIsAllowed (username, request.Password, out username)) {
 				// unauthorized
-				Logger.WarnFormat ("Failed to authenticate user {0}", request.Username);
+				Logger.WarnFormat ("Failed to authenticate user {0}", username);
 				Response.StatusCode = 403;
 				Response.StatusDescription ="Authorization failed";
 				Response.ApplyGlobalResponseHeaders ();
@@ -102,9 +97,27 @@ namespace Rainy.WebService.OAuth
 				return null;
 			}
 			// authentication successful
-			Logger.InfoFormat ("Successfully authorized user: {0}", request.Username);
+			Logger.InfoFormat ("Successfully authorized user: {0}", username);
 
 			return TokenExchangeAfterAuthentication (username, request.Password, request.RequestToken);
+		}
+		public object Post (OAuthTemporaryAccessTokenRequest request)
+		{
+			string username = request.Username;
+			string password = request.Password;
+			if (userIsAllowed (username, password, out username)) {
+				var access_token = GenerateAccessToken (username, password, DateTime.Now.AddDays (1));
+				// save the access token
+				var db_access_token = access_token.ToDBAccessToken ();
+				// shorten the token for crypto
+				db_access_token.Token = access_token.Token.ToShortToken ();
+				using (var db = connFactory.OpenDbConnection ()) {
+					db.Save<DBAccessToken> (db_access_token);
+				}
+				return new OAuthTemporaryAccessTokenResponse { AccessToken = access_token.Token };
+			} else {
+				throw new UnauthorizedException ();
+			}
 		}
 
 		public object TokenExchangeAfterAuthentication (string username, string password, string token)
@@ -120,26 +133,8 @@ namespace Rainy.WebService.OAuth
 			request_token.Verifier = rng.Create256BitLowerCaseHexKey ();
 			request_token.AccessDenied = false;
 
-			string access_token_secret = rng.Create256BitLowerCaseHexKey ();
-			string token_key = rng.Create256BitLowerCaseHexKey ();
-
-			// the token is the master key encrypted with the token key
-			string access_token_token;
-			using (var db = connFactory.OpenDbConnection ()) {
-				DBUser user = db.First<DBUser> (u => u.Username == username);
-				string master_key = user.GetPlaintextMasterKey (password).ToHexString ();
-				access_token_token = master_key.EncryptWithKey (token_key, user.MasterKeySalt);
-			}
-
-			request_token.AccessToken = new AccessToken () {
-				ConsumerKey = request_token.ConsumerKey,
-				Realm = request_token.Realm,
-				Token = access_token_token,
-				TokenSecret = access_token_secret,
-				UserName = username,
-				ExpiryDate = DateTime.Now.AddYears (99)
-			};
-			request_token.AccessToken.SetTokenKey (token_key);
+			var access_token = GenerateAccessToken (username, password);
+			request_token.AccessToken = access_token;
 
 			oauthHandler.RequestTokens.SaveToken (request_token);
 			Logger.DebugFormat ("created an access token for user {0}: {1}", username, token);
@@ -154,9 +149,45 @@ namespace Rainy.WebService.OAuth
 			// note that the redirect url points to a tomboy listener, or tomdroid listener (tomdroid://...)
 			return response;
 		}
-
-		protected bool userIsAllowed (string username, string password)
+		private AccessToken GenerateAccessToken (string username, string password, DateTime? expiry = null)
 		{
+			if (!expiry.HasValue)
+				expiry = DateTime.Now.AddYears (99);
+
+			var rng = new RNGCryptoServiceProvider ();
+			string access_token_secret = rng.Create256BitLowerCaseHexKey ();
+			string token_key = rng.Create256BitLowerCaseHexKey ();
+
+			// the token is the master key encrypted with the token key
+			string access_token_token;
+			using (var db = connFactory.OpenDbConnection ()) {
+				DBUser user = db.First<DBUser> (u => u.Username == username);
+				string master_key = user.GetPlaintextMasterKey (password).ToHexString ();
+				access_token_token = master_key.EncryptWithKey (token_key, user.MasterKeySalt);
+			}
+
+			var access_token = new AccessToken () {
+				ConsumerKey = "anyone",
+				Realm = "Rainy",
+				Token = access_token_token,
+				TokenSecret = access_token_secret,
+				UserName = username,
+				ExpiryDate = expiry.Value
+			};
+			access_token.SetTokenKey (token_key);
+			return access_token;
+		}
+
+		protected bool userIsAllowed (string username, string password, out string username_out)
+		{
+			if (username.Contains ("@")) {
+				// user supplied email address, lookup the username
+				using (var db = connFactory.OpenDbConnection ()) {
+					username_out = db.FirstOrDefault<DBUser> (u => u.EmailAddress == username).Username;
+				}
+			} else {
+				username_out = username;
+			}
 			return Authenticator.VerifyCredentials (username, password);
 		}
 	}

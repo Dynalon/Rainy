@@ -19,6 +19,7 @@ namespace Rainy.WebService.OAuth
 	}
 
 	[Route("/oauth/access_token", "GET,POST")]
+	// returns void since we will write the access token to the output manually
 	public class OAuthAccessTokenRequest : IReturnVoid
 	{
 	}
@@ -33,9 +34,21 @@ namespace Rainy.WebService.OAuth
 		public string Password { get; set; }
 		public string RequestToken { get; set; }
 	}
+	
 	public class OAuthAuthenticateResponse
 	{
 		public string Verifier { get; set; }
 		public string RedirectUrl { get; set; }
+	}
+
+	[Route("/oauth/temporary_access_token", "POST")]
+	public class OAuthTemporaryAccessTokenRequest : IReturn<OAuthTemporaryAccessTokenResponse>
+	{
+		public string Username { get; set; }
+		public string Password { get; set; }
+	}
+	public class OAuthTemporaryAccessTokenResponse
+	{
+		public string AccessToken { get; set; }
 	}
 }
