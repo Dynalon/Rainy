@@ -181,6 +181,7 @@ var app = angular.module('myApp', [
 ])
 .config(['$routeProvider',
     function($routeProvider) {
+        // admin interface
         $routeProvider.when('/admin/user', {
             templateUrl: 'user.html',
             controller: AllUserCtrl
@@ -189,10 +190,20 @@ var app = angular.module('myApp', [
             templateUrl: 'overview.html',
             controller: StatusCtrl
         });
+
+        // login page for OAUTH
         $routeProvider.when('/login', {
             templateUrl: 'login.html',
             controller: LoginCtrl
         });
+
+        // web client interface
+        $routeProvider.when('/client', {
+            templateUrl: 'client.html',
+            controller: ClientCtrl
+        });
+
+        // default is the admin overview
         $routeProvider.otherwise({
             redirectTo: '/admin/user'
         });
@@ -326,7 +337,7 @@ function AuthCtrl($scope, $route, $location) {
     if (url_pw !== undefined && url_pw.length > 0) {
         // new admin pw, update teh cookie
         admin_pw = url_pw;
-    } else if ($location.path() !== "/login") {
+    } else if ($location.path().startsWith("/admin")) {
         $('#loginModal').modal();
         $('#loginModal').find(":password").focus();
     }
@@ -350,6 +361,58 @@ function AuthCtrl($scope, $route, $location) {
     };
 }
 AuthCtrl.$inject = [ '$scope','$route', '$location' ];
+
+function ClientCtrl ($scope, $http, $q) {
+
+    $scope.notes = [
+        {
+            "Title": "Note1",
+            "Text": "This is a sample note"
+        },
+        {
+            "Title": "Note2",
+            "Text": "This is just another sample note"
+        },
+        {
+            "Title": "Note3",
+            "Text": "This is the third sample note in the notebook"
+        }
+    ];
+    $scope.selectedNote = $scope.notes[1];
+
+    $scope.selectNote = function(index) {
+        console.log("foobar");
+        $scope.selectedNote = $scope.notes[index];
+    };
+
+    $scope.getTemporaryAccessToken = function() {
+
+        var deferred = $q.defer();
+
+        var credentials = { Username: "johndoe", Password: "none" };
+        var token = "";
+
+        $http.post('/oauth/temporary_access_token', credentials)
+        .success(function (data, status, headers, config) {
+            token = data.AccessToken;
+            deferred.resolve(token);
+        });
+        return deferred.promise;
+    };
+
+    $scope.doit = function() {
+        $scope.getTemporaryAccessToken ().then(function(token) {
+            $http({
+                method: 'GET',
+                url: '/api/1.0/johndoe/notes?include_notes=true',
+                headers: { 'AccessToken': token }
+            }).success(function (data, status, headers, config) {
+                console.log(data);
+                $scope.notes = data.notes;
+            });
+        });
+    };
+}
 
 
 function LoginCtrl($scope, $rootScope, $http) {
@@ -400,12 +463,6 @@ function MainCtrl($scope, $routeParams, $route, $location) {
     });
 }
 
-if (typeof String.prototype.startsWith !== 'function') {
-    String.prototype.startsWith = function(str) {
-        return this.slice(0, str.length) === str;
-    };
-}
-
 function StatusCtrl($scope, $http, $route) {
     $scope.serverStatus = {};
 
@@ -440,6 +497,12 @@ angular.module('myApp.directives', [])
         }
     ])
 ;
+
+if (typeof String.prototype.startsWith !== 'function') {
+    String.prototype.startsWith = function(str) {
+        return this.slice(0, str.length) === str;
+    };
+}
 
 /*global $:false */
 /*global angular:false */

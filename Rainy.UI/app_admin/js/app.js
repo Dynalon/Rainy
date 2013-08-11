@@ -9,6 +9,7 @@ var app = angular.module('myApp', [
 ])
 .config(['$routeProvider',
     function($routeProvider) {
+        // admin interface
         $routeProvider.when('/admin/user', {
             templateUrl: 'user.html',
             controller: AllUserCtrl
@@ -17,10 +18,20 @@ var app = angular.module('myApp', [
             templateUrl: 'overview.html',
             controller: StatusCtrl
         });
+
+        // login page for OAUTH
         $routeProvider.when('/login', {
             templateUrl: 'login.html',
             controller: LoginCtrl
         });
+
+        // web client interface
+        $routeProvider.when('/client', {
+            templateUrl: 'client.html',
+            controller: ClientCtrl
+        });
+
+        // default is the admin overview
         $routeProvider.otherwise({
             redirectTo: '/admin/user'
         });

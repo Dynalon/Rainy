@@ -6,7 +6,7 @@ function AuthCtrl($scope, $route, $location) {
     if (url_pw !== undefined && url_pw.length > 0) {
         // new admin pw, update teh cookie
         admin_pw = url_pw;
-    } else if ($location.path() !== "/login") {
+    } else if ($location.path().startsWith("/admin")) {
         $('#loginModal').modal();
         $('#loginModal').find(":password").focus();
     }
