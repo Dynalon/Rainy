@@ -53,7 +53,7 @@ namespace Rainy.Tests.Management
 		}
 
 		[Test]
-		[ExpectedException(typeof(WebServiceException),ExpectedMessage="Unauthorized")]
+		[ExpectedException(typeof(WebServiceException),ExpectedMessage="Unauthorized.")]
 		public void UnauthorizedAccessFails ()
 		{
 			var alluser_url = new AllUserRequest ().ToUrl("GET");
