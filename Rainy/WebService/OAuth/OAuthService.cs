@@ -41,13 +41,14 @@ namespace Rainy.WebService.OAuth
 		}
 		public object Get (OAuthRequestTokenRequest request)
 		{
-			// keep this line to inspect the Request in monodevelop's debugger 
-			// really helps debugging API calls
-			var servicestack_http_request = Request;
-
 			HttpWebRequest original_request = ((HttpListenerRequest)Request.OriginalRequest).ToWebRequest ();
 
-			IOAuthContext context = new OAuthContextBuilder ().FromWebRequest (original_request, request.RequestStream);
+			// it is not fatal that we do not really check the oauth signature for the request token request 
+			// all it takes to sign such a request is the consumer secret, which is "anyone" and hard-coded
+			// into the tomboy and rainy source code - and we are open source so everybody knows it anyways
+			IOAuthContext context;
+			context = new OAuthContextBuilder ().FromWebRequest (original_request, request.RequestStream);
+
 			IToken token = oauthHandler.Provider.GrantRequestToken (context);
 			Logger.DebugFormat ("granting request token {0} to consumer", token);
 			Response.StatusCode = 200;
@@ -58,10 +59,10 @@ namespace Rainy.WebService.OAuth
 		}
 		public object Post (OAuthRequestTokenRequest request)
 		{
-			return Get (request);
+			//return Get (request);
 			// i.e. ConBoy only supported POST Auth which is valid accoding to the OAuth RFC, but not yet
 			// supported in Rainy
-			//throw new RainyBaseException () {ErrorMessage = "Usage of POST for OAuth authorization is currently not supported. Use GET instead."};
+			throw new RainyBaseException () {ErrorMessage = "Usage of POST for OAuth authorization is currently not supported. Use GET instead."};
 		}
 	}
 
