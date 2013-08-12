@@ -1,0 +1,47 @@
+<!doctype html>
+<html lang="en" ng-app="clientApp">
+
+<head>
+    <meta charset="utf-8">
+    <title>
+        Rainy - 2 GO 
+    </title>
+    <link href="//netdna.bootstrapcdn.com/bootswatch/2.3.2/united/bootstrap.min.css"
+    rel="stylesheet"/>
+    <link href="client.css" rel="stylesheet"/>
+</head>
+
+<body>
+	<div>
+	    <div class="navbar navbar-inverse" bs-navbar>
+	        <div class="navbar-inner">
+	            <a class="brand" href="#/">Rainy <span class="label label-important">2 GO</span></a>
+	            <ul class="nav">
+	                <li data-match-route="/main">
+	                    <a href="#/main"><i class="icon-edit icon-white"></i> Notes</a>
+	                </li>
+	                <li data-match-route="/account">
+	                    <a href="#/account"><i class="icon-user icon-white"></i> Account</a>
+	                </li>
+	                <li data-match-route="/logout">
+	                    <a href="#/logout"><i class="icon-circle-arrow-right icon-white"></i> Logout</a>
+	                </li>
+	            </ul>
+	        </div>
+	    </div>
+	</div>
+    <div class="container">
+        <div class="row">
+            <!-- TOPLINE NAV SELECTION -->
+            <div class="span12" ng-View>
+            </div>
+        </div>
+
+        <script src="common.js" type="text/javascript">
+        </script>
+        <script src="client.js" type="text/javascript">
+        </script>
+    </div>
+</body>
+
+</html>

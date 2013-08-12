@@ -30,8 +30,8 @@
                 <div class="control-group">
                     <h2>{{ selectedNote.Title }}</h2>
                     <div class="controls">
-                        <textarea style="margin: 0px 0px 10px; height: 348px; width: 979px;">{{ selectedNote["note-content"] }}</textarea>
-                        <a ng-click="doit()" class="btn btn-success">Save</a>
+                        <textarea id="txtarea" style="margin: 0px 0px 10px; height: 348px; width: 979px;" ng-model="selectedNote['note-content']"></textarea>
+                        <a ng-click="saveNote()" class="btn btn-success">Save</a>
                         <a class="btn btn-danger">Cancel</a>
                     </div>
                 </div>

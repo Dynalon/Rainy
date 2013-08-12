@@ -12,27 +12,46 @@ module.exports = function (grunt) {
             options: {
                 separator: '\n'
             },
-            scripts: {
+            scripts_common: {
                 src: [
+                	'bower_components/jquery/jquery.min.js',
+                	'bower_components/bootstrap.zip/js/bootstrap.min.js',
                     'bower_components/angular/angular.min.js',
                     'bower_components/angular-strap/dist/angular-strap.min.js',
-                    'app_admin/js/**/*.js',
                 ],
-                dest: 'dist/built.js'
+                dest: 'dist/common.js'
             },
-            css: {
+            scripts_admin: {
                 src: [
-                    'lib/*.css'
+                    'app_admin/js/admin/**/*.js',
                 ],
-                dest: 'dist/style.css'
+                dest: 'dist/admin.js'
+            },
+            scripts_client: {
+                src: [
+                    'bower_components/wysihtml5/dist/wysihtml5-0.3.0.min.js',
+                    'bower_components/bootstrap-wysihtml5/dist/bootstrap-wysihtml5-0.0.2.min.js',
+                    'app_admin/js/client/**/*.js',
+                ],
+                dest: 'dist/client.js'
+            },
+            css_client: {
+                src: [
+                    'bower_components/bootstrap-wysihtml5/dist/bootstrap-wysihtml5-0.0.2.css'
+                ],
+                dest: 'dist/client.css'
             },
             admin_ui: {
-                src: ['app_admin/index.html', 'app_admin/html/*.html'],
+                src: ['app_admin/admin.html', 'app_admin/html/views_admin/*.html'],
                 dest: 'dist/manage.html'
             },
+            client_ui: {
+            	src: ['app_admin/client.html', 'app_admin/html/views_client/*.html'],
+                dest: 'dist/client.html'
+            }
         },
         watch: {
-            files: ['app_*/**/*.js', 'app_*/**/*.html'],
+            files: ['app_admin/**/*.js', 'app_admin/**/*.html', 'Gruntfile.js'],
             tasks: ['default']
         },
         reload: {
