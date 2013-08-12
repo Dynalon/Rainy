@@ -1,61 +1,35 @@
-function ClientCtrl ($scope, $http, $q) {
+function ClientCtrl ($scope, $http, $q, clientService) {
 
-    $scope.notes = [];
+    $scope.notes = clientService.notes;
+
+    // TODO find a better way to watch on that service
+    $scope.clientService = clientService;
+    $scope.$watch('clientService.notes', function (oldval, newval) {
+        $scope.notes = clientService.notes;
+    });
+    $scope.getTemporaryAccessToken = 
+
+    clientService.fetchNotes();
+
+}
+
+function NoteCtrl($scope, clientService) {
+
+    // TODO find a better way to watch on that service
+    $scope.clientService = clientService;
+    $scope.$watch('clientService.notes', function (oldval, newval) {
+        $scope.notes = clientService.notes;
+    });
     $scope.selectedNote = null;
-    $scope.accessToken = '';
+
+    $scope.saveNote = function() {
+        console.log("attempting to save note");
+        clientService.saveNote($scope.selectedNote);
+    };
 
     $scope.selectNote = function(index) {
         $scope.selectedNote = $scope.notes[index];
-    	//$("#txtarea").wysihtml5();
+        //$("#txtarea").wysihtml5();
     };
 
-    $scope.getTemporaryAccessToken = function() {
-
-        var deferred = $q.defer();
-
-        var credentials = { Username: "johndoe", Password: "none" };
-
-        $http.post('/oauth/temporary_access_token', credentials)
-        .success(function (data, status, headers, config) {
-            $scope.accessToken = data.AccessToken;
-            deferred.resolve($scope.accessToken);
-        });
-        return deferred.promise;
-    };
-
-    $scope.doit = function() {
-        $scope.getTemporaryAccessToken ().then(function() {
-            $http({
-                method: 'GET',
-                url: '/api/1.0/johndoe/notes?include_notes=true',
-                headers: { 'AccessToken': $scope.accessToken }
-            }).success(function (data, status, headers, config) {
-                console.log(data);
-                $scope.notes = data.notes;
-            });
-        });
-    };
-
-    $scope.saveNote = function() {
-    	var note = $scope.selectedNote;
-
-    	var req = {
-    		"latest-sync-revision": $scope.notes['latest-sync-revision'] + 1,
-    	}
-    	req['note-changes'] = [ note ];
-
-    	console.log(req);
-
-    	$http({
-    		method: 'PUT',
-    		url: '/api/1.0/johndoe/notes',
-    		headers: { 'AccessToken': $scope.accessToken },
-    		data: req
-    	}).success(function (data, status, headers, config) {
-    		console.log(data);
-    		console.log(status);
-    	});
-    };
-
-    $scope.doit();
 }

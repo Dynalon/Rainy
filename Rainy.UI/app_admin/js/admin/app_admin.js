@@ -25,12 +25,6 @@ var app = angular.module('myApp', [
             controller: LoginCtrl
         });
 
-        // web client interface
-        $routeProvider.when('/client', {
-            templateUrl: 'client.html',
-            controller: ClientCtrl
-        });
-
         // default is the admin overview
         $routeProvider.otherwise({
             redirectTo: '/admin/user'
