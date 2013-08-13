@@ -14,10 +14,11 @@ module.exports = function (grunt) {
             },
             scripts_common: {
                 src: [
-                	'bower_components/jquery/jquery.min.js',
-                	'bower_components/bootstrap.zip/js/bootstrap.min.js',
+                    'bower_components/jquery/jquery.min.js',
+                    'bower_components/bootstrap.zip/js/bootstrap.min.js',
                     'bower_components/angular/angular.min.js',
                     'bower_components/angular-strap/dist/angular-strap.min.js',
+                    'bower_components/underscore/underscore-min.js'
                 ],
                 dest: 'dist/common.js'
             },
@@ -46,7 +47,7 @@ module.exports = function (grunt) {
                 dest: 'dist/manage.html'
             },
             client_ui: {
-            	src: ['app_admin/client.html', 'app_admin/html/views_client/*.html'],
+                src: ['app_admin/client.html', 'app_admin/html/views_client/*.html'],
                 dest: 'dist/client.html'
             }
         },

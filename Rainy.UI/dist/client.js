@@ -274,20 +274,18 @@ var app = angular.module('clientApp', [
     function($routeProvider) {
         // login page
         $routeProvider.when('/login', {
-            templateUrl: 'login_client.html',
+            templateUrl: 'login.html',
             controller: LoginCtrl
         });
 
-        // web client interface
-        $routeProvider.when('/main', {
-            templateUrl: 'client.html',
-            controller: NoteCtrl 
+        $routeProvider.when('/notes/:guid', {
+            templateUrl: 'notes.html',
+            controller: NoteCtrl
         });
 
-        // default is the admin overview
-        $routeProvider.otherwise({
-            redirectTo: '/main'
-        });
+        /*$routeProvider.otherwise({
+            redirectTo: '/login'
+        }); */
     }
 ])
 // disable the X-Requested-With header
@@ -297,18 +295,32 @@ var app = angular.module('clientApp', [
 ])
 .config(['$locationProvider',
     function($locationProvider) {
-        //      $locationProvider.html5Mode(true);
+        //$locationProvider.html5Mode(true);
     }
 ])
 ;
 
-// FILTERS
-angular.module('clientApp.filters', []).
-  filter('interpolate', ['version', function(version) {
-    return function(text) {
-      return String(text).replace(/\%VERSION\%/mg, version);
+// register the interceptor as a service
+app.factory('loginInterceptor', function($q) {
+    return function(promise) {
+        return promise.then(function(response) {
+            // do something on success
+            console.log('intercepted and $http success');
+        }, function(response) {
+            // do something on error
+            console.log('intercepted and $http error');
+            return $q.reject(response);
+        });
     };
-  }]);
+});
+
+// FILTERS
+angular.module('clientApp.filters', [])
+    .filter('interpolate', ['version', function(version) {
+        return function(text) {
+            return String(text).replace(/\%VERSION\%/mg, version);
+        };
+    }]);
 
 // SERVICES
 angular.module('clientApp.services', [])
@@ -321,30 +333,31 @@ app.factory('clientService', function($q, $http) {
         accessToken: '',
         userDetails: {
             username: 'johndoe'
-        } 
+        }
     };
 
-    clientService.getTemporaryAccessToken = function() {
+    clientService.getTemporaryAccessToken = function(user, pass) {
         var deferred = $q.defer();
-        var credentials = { Username: "johndoe", Password: "none" };
+        var credentials = { Username: user, Password: pass };
 
         $http.post('/oauth/temporary_access_token', credentials)
         .success(function (data, status, headers, config) {
             clientService.accessToken = data.AccessToken;
             deferred.resolve(clientService.accessToken);
+        })
+        .error(function (data, status) {
+            deferred.reject(status);
         });
         return deferred.promise;
     };
 
     clientService.fetchNotes = function() {
-        clientService.getTemporaryAccessToken().then(function() {
-            $http({
-                method: 'GET',
-                url: '/api/1.0/johndoe/notes?include_notes=true',
-                headers: { 'AccessToken': clientService.accessToken }
-            }).success(function (data, status, headers, config) {
-                clientService.notes = data.notes;
-            });
+        $http({
+            method: 'GET',
+            url: '/api/1.0/johndoe/notes?include_notes=true',
+            headers: { 'AccessToken': clientService.accessToken }
+        }).success(function (data, status, headers, config) {
+            clientService.notes = data.notes;
         });
     };
 
@@ -353,7 +366,7 @@ app.factory('clientService', function($q, $http) {
         clientService.latest_sync_revision++;
         var req = {
             "latest-sync-revision": clientService.latest_sync_revision,
-        }
+        };
         req['note-changes'] = [ note ];
 
         $http({
@@ -379,6 +392,31 @@ angular.module('clientApp.directives', [])
         }
     ])
 ;
+
+if (typeof String.prototype.startsWith !== 'function') {
+    String.prototype.startsWith = function(str) {
+        return this.slice(0, str.length) === str;
+    };
+}
+
+function LoginCtrl($scope, clientService, $location) {
+
+    $scope.username = "";
+    $scope.password = "";
+
+    $scope.doLogin = function () {
+        clientService.getTemporaryAccessToken($scope.username, $scope.password)
+        .then(function (token) {
+            console.log('login ok, token is ' + token);
+            clientService.accessToken = token;
+            $location.path('/notes/');
+        }, function (error) {
+            console.log("auth failed: " + error);
+        });
+    };
+}
+//LoginCtrl.$inject = [ '$scope','$http' ];
+
 function ClientCtrl ($scope, $http, $q, clientService) {
 
     $scope.notes = clientService.notes;
@@ -388,34 +426,71 @@ function ClientCtrl ($scope, $http, $q, clientService) {
     $scope.$watch('clientService.notes', function (oldval, newval) {
         $scope.notes = clientService.notes;
     });
-    $scope.getTemporaryAccessToken = 
-
     clientService.fetchNotes();
-
 }
 
-function NoteCtrl($scope, clientService) {
+function NoteCtrl($scope, clientService, $routeParams, $location) {
 
+    $scope.notebooks = [ 'None' ];
     // TODO find a better way to watch on that service
     $scope.clientService = clientService;
     $scope.$watch('clientService.notes', function (oldval, newval) {
         $scope.notes = clientService.notes;
+        $scope.selectedNote = _.findWhere($scope.notes, {guid: $routeParams.guid});
+        $scope.notebooks = buildNotebooks($scope.notes);
     });
-    $scope.selectedNote = null;
+
+    function getNotebookFromNote (note) {
+        var nb_name = null;
+        _.each(note.tags, function (tag) {
+            if (tag.startsWith('system:notebook:')) {
+                nb_name = tag.substring(16);
+            }
+        });
+        return nb_name;
+    }
+
+    function notesByNotebook (notes, notebook_name) {
+        if (notebook_name) {
+            return _.filter(notes, function (note) {
+                var nb = getNotebookFromNote(note);
+                return nb == notebook_name;
+            });
+        } else {
+            // return notes that don't have a notebook
+            return _.filter(notes, function (note) {
+                return getNotebookFromNote(note) === null;
+            });
+        }
+    }
 
     $scope.saveNote = function() {
         console.log("attempting to save note");
         clientService.saveNote($scope.selectedNote);
     };
 
-    $scope.selectNote = function(index) {
-        $scope.selectedNote = $scope.notes[index];
+    $scope.selectNote = function(note) {
+        var guid = note.guid;
+        $location.path('/main/' + guid);
         //$("#txtarea").wysihtml5();
     };
 
-}
+    function buildNotebooks (notes) {
+        var notebooks = {};
+        var notebook_names = [];
+        
+        notebooks.All = notesByNotebook(notes);
+        
+        _.each(notes, function (note) {
+            var nb = getNotebookFromNote (note);
+            if (nb)
+                notebook_names.push(nb);
+        });
+        notebook_names = _.uniq(notebook_names);
 
-function LoginCtrl($scope, $rootScope, $http) {
-
+        _.each(notebook_names, function(name) {
+            notebooks[name] = notesByNotebook(notes, name);
+        });
+        return notebooks;
+    }
 }
-//LoginCtrl.$inject = [ '$scope','$http' ];

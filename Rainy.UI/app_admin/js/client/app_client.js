@@ -11,20 +11,18 @@ var app = angular.module('clientApp', [
     function($routeProvider) {
         // login page
         $routeProvider.when('/login', {
-            templateUrl: 'login_client.html',
+            templateUrl: 'login.html',
             controller: LoginCtrl
         });
 
-        // web client interface
-        $routeProvider.when('/main', {
-            templateUrl: 'client.html',
-            controller: NoteCtrl 
+        $routeProvider.when('/notes/:guid', {
+            templateUrl: 'notes.html',
+            controller: NoteCtrl
         });
 
-        // default is the admin overview
-        $routeProvider.otherwise({
-            redirectTo: '/main'
-        });
+        /*$routeProvider.otherwise({
+            redirectTo: '/login'
+        }); */
     }
 ])
 // disable the X-Requested-With header
@@ -34,18 +32,32 @@ var app = angular.module('clientApp', [
 ])
 .config(['$locationProvider',
     function($locationProvider) {
-        //      $locationProvider.html5Mode(true);
+        //$locationProvider.html5Mode(true);
     }
 ])
 ;
 
-// FILTERS
-angular.module('clientApp.filters', []).
-  filter('interpolate', ['version', function(version) {
-    return function(text) {
-      return String(text).replace(/\%VERSION\%/mg, version);
+// register the interceptor as a service
+app.factory('loginInterceptor', function($q) {
+    return function(promise) {
+        return promise.then(function(response) {
+            // do something on success
+            console.log('intercepted and $http success');
+        }, function(response) {
+            // do something on error
+            console.log('intercepted and $http error');
+            return $q.reject(response);
+        });
     };
-  }]);
+});
+
+// FILTERS
+angular.module('clientApp.filters', [])
+    .filter('interpolate', ['version', function(version) {
+        return function(text) {
+            return String(text).replace(/\%VERSION\%/mg, version);
+        };
+    }]);
 
 // SERVICES
 angular.module('clientApp.services', [])
@@ -58,30 +70,31 @@ app.factory('clientService', function($q, $http) {
         accessToken: '',
         userDetails: {
             username: 'johndoe'
-        } 
+        }
     };
 
-    clientService.getTemporaryAccessToken = function() {
+    clientService.getTemporaryAccessToken = function(user, pass) {
         var deferred = $q.defer();
-        var credentials = { Username: "johndoe", Password: "none" };
+        var credentials = { Username: user, Password: pass };
 
         $http.post('/oauth/temporary_access_token', credentials)
         .success(function (data, status, headers, config) {
             clientService.accessToken = data.AccessToken;
             deferred.resolve(clientService.accessToken);
+        })
+        .error(function (data, status) {
+            deferred.reject(status);
         });
         return deferred.promise;
     };
 
     clientService.fetchNotes = function() {
-        clientService.getTemporaryAccessToken().then(function() {
-            $http({
-                method: 'GET',
-                url: '/api/1.0/johndoe/notes?include_notes=true',
-                headers: { 'AccessToken': clientService.accessToken }
-            }).success(function (data, status, headers, config) {
-                clientService.notes = data.notes;
-            });
+        $http({
+            method: 'GET',
+            url: '/api/1.0/johndoe/notes?include_notes=true',
+            headers: { 'AccessToken': clientService.accessToken }
+        }).success(function (data, status, headers, config) {
+            clientService.notes = data.notes;
         });
     };
 
@@ -90,7 +103,7 @@ app.factory('clientService', function($q, $http) {
         clientService.latest_sync_revision++;
         var req = {
             "latest-sync-revision": clientService.latest_sync_revision,
-        }
+        };
         req['note-changes'] = [ note ];
 
         $http({
@@ -116,3 +129,9 @@ angular.module('clientApp.directives', [])
         }
     ])
 ;
+
+if (typeof String.prototype.startsWith !== 'function') {
+    String.prototype.startsWith = function(str) {
+        return this.slice(0, str.length) === str;
+    };
+}

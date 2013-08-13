@@ -6,6 +6,7 @@
     "angular-strap": "~0.7.5",
     "angular": "~1.0.7",
     "bootstrap.zip": "http://getbootstrap.com/2.3.2/assets/bootstrap.zip",
-	"bootswatch-united": "http://netdna.bootstrapcdn.com/bootswatch/2.3.2/united/bootstrap.min.css"
+    "bootswatch-united": "http://netdna.bootstrapcdn.com/bootswatch/2.3.2/united/bootstrap.min.css",
+    "underscore": "~1.5.1"
   }
 }

@@ -105,17 +105,20 @@ namespace Rainy.WebService.OAuth
 		{
 			string username = request.Username;
 			string password = request.Password;
-			if (userIsAllowed (username, password, out username)) {
-				var access_token = GenerateAccessToken (username, password, DateTime.Now.AddDays (1));
-				// save the access token
-				var db_access_token = access_token.ToDBAccessToken ();
-				// shorten the token for crypto
-				db_access_token.Token = access_token.Token.ToShortToken ();
-				using (var db = connFactory.OpenDbConnection ()) {
-					db.Save<DBAccessToken> (db_access_token);
-				}
-				return new OAuthTemporaryAccessTokenResponse { AccessToken = access_token.Token };
-			} else {
+			try {
+				if (userIsAllowed (username, password, out username)) {
+					var access_token = GenerateAccessToken (username, password, DateTime.Now.AddDays (1));
+					// save the access token
+					var db_access_token = access_token.ToDBAccessToken ();
+					// shorten the token for crypto
+					db_access_token.Token = access_token.Token.ToShortToken ();
+					using (var db = connFactory.OpenDbConnection ()) {
+						db.Save<DBAccessToken> (db_access_token);
+					}
+					return new OAuthTemporaryAccessTokenResponse { AccessToken = access_token.Token };
+				} else
+					throw new UnauthorizedException ();
+			} catch {
 				throw new UnauthorizedException ();
 			}
 		}
