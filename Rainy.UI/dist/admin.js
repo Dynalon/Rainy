@@ -12,17 +12,17 @@ var app = angular.module('myApp', [
         // admin interface
         $routeProvider.when('/admin/user', {
             templateUrl: 'user.html',
-            controller: AllUserCtrl
+            controller: 'AllUserCtrl'
         });
         $routeProvider.when('/admin/overview', {
             templateUrl: 'overview.html',
-            controller: StatusCtrl
+            controller: 'StatusCtrl'
         });
 
         // login page for OAUTH
         $routeProvider.when('/login', {
             templateUrl: 'login.html',
-            controller: LoginCtrl
+            controller: 'LoginCtrl'
         });
 
         // default is the admin overview
@@ -33,32 +33,32 @@ var app = angular.module('myApp', [
 ])
 // disable the X-Requested-With header
 .config(['$httpProvider', function($httpProvider) {
-        delete $httpProvider.defaults.headers.common["X-Requested-With"];
+        delete $httpProvider.defaults.headers.common['X-Requested-With'];
     }
 ])
 .config(['$locationProvider',
     function($locationProvider) {
-        //      $locationProvider.html5Mode(true);
+        $locationProvider.html5Mode(false);
     }
 ])
 .run(['$rootScope', '$modal', '$route', '$q', function($rootScope, $modal, $route, $q)  {
     var backend = {
         ajax: function(rel_url, options) {
-            var backend_url = "/";
+            var backend_url = '/';
 
             if (options === undefined)
                 options = {};
 
             var abs_url = backend_url + rel_url;
             options.beforeSend = function(request) {
-                request.setRequestHeader("Authority", admin_pw);
+                request.setRequestHeader('Authority', admin_pw);
             };
             var ret = $.ajax(abs_url, options);
 
             ret.fail(function(jqxhr, textStatus) {
-                if (jqxhr.status == 401) {
-                    $("#loginModal").modal();
-                    $('#loginModal').find(":password").focus();
+                if (jqxhr.status === 401) {
+                    $('#loginModal').modal();
+                    $('#loginModal').find(':password').focus();
                 }
             });
             return ret;
@@ -91,14 +91,9 @@ function AllUserCtrl($scope, $route) {
     };
     $scope.reload_user_list();
 
-
-    $scope.add_new_user = function() {
-        save_user(true);
-    };
-
     $scope.start_edit = function(user) {
         $scope.currently_edited_user = jQuery.extend(true, {}, user);
-        $scope.currently_edited_user.Password = "";
+        $scope.currently_edited_user.Password = '';
     };
     $scope.stop_edit = function() {
         $scope.currently_edited_user = null;
@@ -110,18 +105,18 @@ function AllUserCtrl($scope, $route) {
         $scope.new_user.IsVerified = true;
         if(is_new === true) {
             ajax_req = $scope.backend.ajax('api/admin/user/', {
-               data: JSON.stringify($scope.new_user),
-               type:"POST",
-               contentType:"application/json; charset=utf-8",
-               dataType:"json"
+                data: JSON.stringify($scope.new_user),
+                type:'POST',
+                contentType:'application/json; charset=utf-8',
+                dataType:'json'
             });
         } else {
             // update user is done via PUT request
             ajax_req = $scope.backend.ajax('api/admin/user/', {
-               data: JSON.stringify($scope.currently_edited_user),
-               type:"PUT",
-               contentType:"application/json; charset=utf-8",
-               dataType:"json"
+                data: JSON.stringify($scope.currently_edited_user),
+                type:'PUT',
+                contentType:'application/json; charset=utf-8',
+                dataType:'json'
             });
         }
         ajax_req.done(function() {
@@ -131,19 +126,20 @@ function AllUserCtrl($scope, $route) {
                 $scope.stop_edit();
             }
             $scope.reload_user_list();
-       });
+        });
     };
 
     $scope.delete_user = function(user, $event) {
         $event.stopPropagation();
-        if(!confirm("Really delete user \"" + user.Username + "\" ?")) {
+        /* global confirm: true */
+        if(!confirm('Really delete user \'' + user.Username + '\' ?')) {
             return;
         }
         $scope.backend.ajax('api/admin/user/' + user.Username, {
-            type:"DELETE",
+            type:'DELETE',
             data: JSON.stringify(user),
-            contentType:"application/json; charset=utf-8",
-            dataType:"json"
+            contentType:'application/json; charset=utf-8',
+            dataType:'json'
         }).done(function() {
             $scope.reload_user_list();
         });
@@ -152,16 +148,16 @@ function AllUserCtrl($scope, $route) {
 AllUserCtrl.$inject = [ '$scope','$route' ];
 
 /*global admin_pw:true*/
-var admin_pw="";
+var admin_pw='';
 function AuthCtrl($scope, $route, $location) {
 
     var url_pw = ($location.search()).password;
     if (url_pw !== undefined && url_pw.length > 0) {
         // new admin pw, update teh cookie
         admin_pw = url_pw;
-    } else if ($location.path().startsWith("/admin")) {
+    } else if ($location.path().startsWith('/admin')) {
         $('#loginModal').modal();
-        $('#loginModal').find(":password").focus();
+        $('#loginModal').find(':password').focus();
     }
 
     $scope.doLogin = function() {
@@ -175,8 +171,8 @@ function AuthCtrl($scope, $route, $location) {
             $('#loginModal').modal('hide');
             admin_pw = $scope.adminPassword;
         }).fail(function () {
-            $scope.adminPassword="";
-            $('#loginModal').find(":password").focus();
+            $scope.adminPassword='';
+            $('#loginModal').find(':password').focus();
             $scope.$apply();
         });
         $route.reload();
@@ -201,7 +197,7 @@ function LoginCtrl($scope, $rootScope, $http) {
 
     var url_vars = $scope.getUrlVars();
 
-    $scope.authData = { Username: "", Password: "", RequestToken: "" };
+    $scope.authData = { Username: '', Password: '', RequestToken: '' };
     $scope.authData.RequestToken = url_vars['oauth_token'];
 
     $scope.doLogin = function () {
@@ -216,7 +212,7 @@ function LoginCtrl($scope, $rootScope, $http) {
 function MainCtrl($scope, $routeParams, $route, $location) {
 
     $scope.checkLocation = function() {
-        if ($location.path().startsWith("/admin")) {
+        if ($location.path().startsWith('/admin')) {
             $scope.hideAdminNav = false;
             $scope.dontAskForPassword = false;
         } else {
@@ -278,11 +274,11 @@ if (typeof String.prototype.startsWith !== 'function') {
 /*global angular:false */
 
 angular.module('myApp.filters', []).
-  filter('interpolate', ['version', function(version) {
+    filter('interpolate', ['version', function(version) {
     return function(text) {
-      return String(text).replace(/\%VERSION\%/mg, version);
+        return String(text).replace(/\%VERSION\%/mg, version);
     };
-  }]);
+}]);
 
 /*global $:false */
 /*global angular:false */

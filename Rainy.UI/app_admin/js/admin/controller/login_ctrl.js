@@ -15,7 +15,7 @@ function LoginCtrl($scope, $rootScope, $http) {
 
     var url_vars = $scope.getUrlVars();
 
-    $scope.authData = { Username: "", Password: "", RequestToken: "" };
+    $scope.authData = { Username: '', Password: '', RequestToken: '' };
     $scope.authData.RequestToken = url_vars['oauth_token'];
 
     $scope.doLogin = function () {

@@ -275,44 +275,51 @@ var app = angular.module('clientApp', [
         // login page
         $routeProvider.when('/login', {
             templateUrl: 'login.html',
-            controller: LoginCtrl
+            controller: 'LoginCtrl'
         });
 
         $routeProvider.when('/notes/:guid', {
             templateUrl: 'notes.html',
-            controller: NoteCtrl
+            controller: 'NoteCtrl'
         });
 
-        /*$routeProvider.otherwise({
+        $routeProvider.otherwise({
             redirectTo: '/login'
-        }); */
+        });
     }
 ])
 // disable the X-Requested-With header
 .config(['$httpProvider', function($httpProvider) {
-        delete $httpProvider.defaults.headers.common["X-Requested-With"];
+        delete $httpProvider.defaults.headers.common['X-Requested-With'];
     }
 ])
 .config(['$locationProvider',
     function($locationProvider) {
-        //$locationProvider.html5Mode(true);
+        $locationProvider.html5Mode(false);
     }
-])
-;
+]);
 
 // register the interceptor as a service
-app.factory('loginInterceptor', function($q) {
+app.factory('loginInterceptor', function($q, $location) {
     return function(promise) {
         return promise.then(function(response) {
             // do something on success
-            console.log('intercepted and $http success');
+            return response;
         }, function(response) {
+            console.log(response);
             // do something on error
-            console.log('intercepted and $http error');
+            if (response.status === 401) {
+                $location.path('/login');
+            }
             return $q.reject(response);
         });
     };
 });
+app.config(['$httpProvider', function($httpProvider) {
+        $httpProvider.responseInterceptors.push('loginInterceptor');
+    }
+]);
+
 
 // FILTERS
 angular.module('clientApp.filters', [])
@@ -352,6 +359,7 @@ app.factory('clientService', function($q, $http) {
     };
 
     clientService.fetchNotes = function() {
+        console.log('using token: ' + clientService.accessToken);
         $http({
             method: 'GET',
             url: '/api/1.0/johndoe/notes?include_notes=true',
@@ -365,7 +373,7 @@ app.factory('clientService', function($q, $http) {
 
         clientService.latest_sync_revision++;
         var req = {
-            "latest-sync-revision": clientService.latest_sync_revision,
+            'latest-sync-revision': clientService.latest_sync_revision,
         };
         req['note-changes'] = [ note ];
 
@@ -401,8 +409,8 @@ if (typeof String.prototype.startsWith !== 'function') {
 
 function LoginCtrl($scope, clientService, $location) {
 
-    $scope.username = "";
-    $scope.password = "";
+    $scope.username = '';
+    $scope.password = '';
 
     $scope.doLogin = function () {
         clientService.getTemporaryAccessToken($scope.username, $scope.password)
@@ -411,23 +419,11 @@ function LoginCtrl($scope, clientService, $location) {
             clientService.accessToken = token;
             $location.path('/notes/');
         }, function (error) {
-            console.log("auth failed: " + error);
+            console.log('auth failed: ' + error);
         });
     };
 }
 //LoginCtrl.$inject = [ '$scope','$http' ];
-
-function ClientCtrl ($scope, $http, $q, clientService) {
-
-    $scope.notes = clientService.notes;
-
-    // TODO find a better way to watch on that service
-    $scope.clientService = clientService;
-    $scope.$watch('clientService.notes', function (oldval, newval) {
-        $scope.notes = clientService.notes;
-    });
-    clientService.fetchNotes();
-}
 
 function NoteCtrl($scope, clientService, $routeParams, $location) {
 
@@ -439,6 +435,9 @@ function NoteCtrl($scope, clientService, $routeParams, $location) {
         $scope.selectedNote = _.findWhere($scope.notes, {guid: $routeParams.guid});
         $scope.notebooks = buildNotebooks($scope.notes);
     });
+
+    if (clientService.notes && clientService.notes.length === 0)
+        clientService.fetchNotes();
 
     function getNotebookFromNote (note) {
         var nb_name = null;
@@ -454,7 +453,7 @@ function NoteCtrl($scope, clientService, $routeParams, $location) {
         if (notebook_name) {
             return _.filter(notes, function (note) {
                 var nb = getNotebookFromNote(note);
-                return nb == notebook_name;
+                return nb === notebook_name;
             });
         } else {
             // return notes that don't have a notebook
@@ -465,13 +464,12 @@ function NoteCtrl($scope, clientService, $routeParams, $location) {
     }
 
     $scope.saveNote = function() {
-        console.log("attempting to save note");
         clientService.saveNote($scope.selectedNote);
     };
 
     $scope.selectNote = function(note) {
         var guid = note.guid;
-        $location.path('/main/' + guid);
+        $location.path('/notes/' + guid);
         //$("#txtarea").wysihtml5();
     };
 

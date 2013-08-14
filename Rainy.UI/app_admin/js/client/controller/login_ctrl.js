@@ -1,7 +1,7 @@
 function LoginCtrl($scope, clientService, $location) {
 
-    $scope.username = "";
-    $scope.password = "";
+    $scope.username = '';
+    $scope.password = '';
 
     $scope.doLogin = function () {
         clientService.getTemporaryAccessToken($scope.username, $scope.password)
@@ -10,7 +10,7 @@ function LoginCtrl($scope, clientService, $location) {
             clientService.accessToken = token;
             $location.path('/notes/');
         }, function (error) {
-            console.log("auth failed: " + error);
+            console.log('auth failed: ' + error);
         });
     };
 }

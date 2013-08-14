@@ -4,9 +4,9 @@ module.exports = function (grunt) {
     grunt.initConfig({
         jshint: {
             options: {
-                browser: true
+                jshintrc: '.jshintrc'
             },
-            files: ['app_*/js/*.js']
+            files: [ 'app_admin/**/*.js' ]
         },
         concat: {
             options: {

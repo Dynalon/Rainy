@@ -1,15 +1,3 @@
-function ClientCtrl ($scope, $http, $q, clientService) {
-
-    $scope.notes = clientService.notes;
-
-    // TODO find a better way to watch on that service
-    $scope.clientService = clientService;
-    $scope.$watch('clientService.notes', function (oldval, newval) {
-        $scope.notes = clientService.notes;
-    });
-    clientService.fetchNotes();
-}
-
 function NoteCtrl($scope, clientService, $routeParams, $location) {
 
     $scope.notebooks = [ 'None' ];
@@ -20,6 +8,9 @@ function NoteCtrl($scope, clientService, $routeParams, $location) {
         $scope.selectedNote = _.findWhere($scope.notes, {guid: $routeParams.guid});
         $scope.notebooks = buildNotebooks($scope.notes);
     });
+
+    if (clientService.notes && clientService.notes.length === 0)
+        clientService.fetchNotes();
 
     function getNotebookFromNote (note) {
         var nb_name = null;
@@ -35,7 +26,7 @@ function NoteCtrl($scope, clientService, $routeParams, $location) {
         if (notebook_name) {
             return _.filter(notes, function (note) {
                 var nb = getNotebookFromNote(note);
-                return nb == notebook_name;
+                return nb === notebook_name;
             });
         } else {
             // return notes that don't have a notebook
@@ -46,13 +37,12 @@ function NoteCtrl($scope, clientService, $routeParams, $location) {
     }
 
     $scope.saveNote = function() {
-        console.log("attempting to save note");
         clientService.saveNote($scope.selectedNote);
     };
 
     $scope.selectNote = function(note) {
         var guid = note.guid;
-        $location.path('/main/' + guid);
+        $location.path('/notes/' + guid);
         //$("#txtarea").wysihtml5();
     };
 

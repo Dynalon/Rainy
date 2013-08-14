@@ -12,17 +12,17 @@ var app = angular.module('myApp', [
         // admin interface
         $routeProvider.when('/admin/user', {
             templateUrl: 'user.html',
-            controller: AllUserCtrl
+            controller: 'AllUserCtrl'
         });
         $routeProvider.when('/admin/overview', {
             templateUrl: 'overview.html',
-            controller: StatusCtrl
+            controller: 'StatusCtrl'
         });
 
         // login page for OAUTH
         $routeProvider.when('/login', {
             templateUrl: 'login.html',
-            controller: LoginCtrl
+            controller: 'LoginCtrl'
         });
 
         // default is the admin overview
@@ -33,32 +33,32 @@ var app = angular.module('myApp', [
 ])
 // disable the X-Requested-With header
 .config(['$httpProvider', function($httpProvider) {
-        delete $httpProvider.defaults.headers.common["X-Requested-With"];
+        delete $httpProvider.defaults.headers.common['X-Requested-With'];
     }
 ])
 .config(['$locationProvider',
     function($locationProvider) {
-        //      $locationProvider.html5Mode(true);
+        $locationProvider.html5Mode(false);
     }
 ])
 .run(['$rootScope', '$modal', '$route', '$q', function($rootScope, $modal, $route, $q)  {
     var backend = {
         ajax: function(rel_url, options) {
-            var backend_url = "/";
+            var backend_url = '/';
 
             if (options === undefined)
                 options = {};
 
             var abs_url = backend_url + rel_url;
             options.beforeSend = function(request) {
-                request.setRequestHeader("Authority", admin_pw);
+                request.setRequestHeader('Authority', admin_pw);
             };
             var ret = $.ajax(abs_url, options);
 
             ret.fail(function(jqxhr, textStatus) {
-                if (jqxhr.status == 401) {
-                    $("#loginModal").modal();
-                    $('#loginModal').find(":password").focus();
+                if (jqxhr.status === 401) {
+                    $('#loginModal').modal();
+                    $('#loginModal').find(':password').focus();
                 }
             });
             return ret;

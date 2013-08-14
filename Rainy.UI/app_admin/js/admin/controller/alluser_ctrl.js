@@ -22,14 +22,9 @@ function AllUserCtrl($scope, $route) {
     };
     $scope.reload_user_list();
 
-
-    $scope.add_new_user = function() {
-        save_user(true);
-    };
-
     $scope.start_edit = function(user) {
         $scope.currently_edited_user = jQuery.extend(true, {}, user);
-        $scope.currently_edited_user.Password = "";
+        $scope.currently_edited_user.Password = '';
     };
     $scope.stop_edit = function() {
         $scope.currently_edited_user = null;
@@ -41,18 +36,18 @@ function AllUserCtrl($scope, $route) {
         $scope.new_user.IsVerified = true;
         if(is_new === true) {
             ajax_req = $scope.backend.ajax('api/admin/user/', {
-               data: JSON.stringify($scope.new_user),
-               type:"POST",
-               contentType:"application/json; charset=utf-8",
-               dataType:"json"
+                data: JSON.stringify($scope.new_user),
+                type:'POST',
+                contentType:'application/json; charset=utf-8',
+                dataType:'json'
             });
         } else {
             // update user is done via PUT request
             ajax_req = $scope.backend.ajax('api/admin/user/', {
-               data: JSON.stringify($scope.currently_edited_user),
-               type:"PUT",
-               contentType:"application/json; charset=utf-8",
-               dataType:"json"
+                data: JSON.stringify($scope.currently_edited_user),
+                type:'PUT',
+                contentType:'application/json; charset=utf-8',
+                dataType:'json'
             });
         }
         ajax_req.done(function() {
@@ -62,19 +57,20 @@ function AllUserCtrl($scope, $route) {
                 $scope.stop_edit();
             }
             $scope.reload_user_list();
-       });
+        });
     };
 
     $scope.delete_user = function(user, $event) {
         $event.stopPropagation();
-        if(!confirm("Really delete user \"" + user.Username + "\" ?")) {
+        /* global confirm: true */
+        if(!confirm('Really delete user \'' + user.Username + '\' ?')) {
             return;
         }
         $scope.backend.ajax('api/admin/user/' + user.Username, {
-            type:"DELETE",
+            type:'DELETE',
             data: JSON.stringify(user),
-            contentType:"application/json; charset=utf-8",
-            dataType:"json"
+            contentType:'application/json; charset=utf-8',
+            dataType:'json'
         }).done(function() {
             $scope.reload_user_list();
         });

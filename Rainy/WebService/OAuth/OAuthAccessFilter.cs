@@ -11,6 +11,8 @@ using Rainy.OAuth;
 using ServiceStack.WebHost.Endpoints;
 using Rainy.Crypto;
 using System.Linq;
+using Rainy.ErrorHandling;
+using System.Threading;
 
 namespace Rainy.WebService.OAuth
 {
@@ -42,8 +44,7 @@ namespace Rainy.WebService.OAuth
 			} else if (requestDto is PutNotesRequest) {
 				username = ((PutNotesRequest)requestDto).Username;
 			} else if (!check_oauth_signature && !use_temp_access_token) {
-				response.ReturnAuthRequired ();
-				return;
+				throw new UnauthorizedException ();
 			}
 			Logger.Debug ("trying to acquire authorization");
 
@@ -66,8 +67,7 @@ namespace Rainy.WebService.OAuth
 				if (!string.IsNullOrEmpty (username) && access_token.UserName != username) {
 					// forbidden
 					Logger.Debug ("username does not match the one in the access token, denying");
-					response.ReturnAuthRequired ();
-					return;
+					throw new UnauthorizedException ();
 				} else {
 					// TODO remove checks - why is it run twice?
 					if (!request.Items.Keys.Contains ("AccessToken")) {
@@ -82,7 +82,7 @@ namespace Rainy.WebService.OAuth
 			} catch (Exception e) {
 				if (context != null)
 					Logger.DebugFormat ("failed to obtain authorization, oauth context is: {0}", context.Dump ());
-				response.ReturnAuthRequired ();
+				throw new UnauthorizedException ();
 			}
 
 			Logger.DebugFormat ("authorization granted for user {0}", username);

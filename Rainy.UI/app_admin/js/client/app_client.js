@@ -12,44 +12,51 @@ var app = angular.module('clientApp', [
         // login page
         $routeProvider.when('/login', {
             templateUrl: 'login.html',
-            controller: LoginCtrl
+            controller: 'LoginCtrl'
         });
 
         $routeProvider.when('/notes/:guid', {
             templateUrl: 'notes.html',
-            controller: NoteCtrl
+            controller: 'NoteCtrl'
         });
 
-        /*$routeProvider.otherwise({
+        $routeProvider.otherwise({
             redirectTo: '/login'
-        }); */
+        });
     }
 ])
 // disable the X-Requested-With header
 .config(['$httpProvider', function($httpProvider) {
-        delete $httpProvider.defaults.headers.common["X-Requested-With"];
+        delete $httpProvider.defaults.headers.common['X-Requested-With'];
     }
 ])
 .config(['$locationProvider',
     function($locationProvider) {
-        //$locationProvider.html5Mode(true);
+        $locationProvider.html5Mode(false);
     }
-])
-;
+]);
 
 // register the interceptor as a service
-app.factory('loginInterceptor', function($q) {
+app.factory('loginInterceptor', function($q, $location) {
     return function(promise) {
         return promise.then(function(response) {
             // do something on success
-            console.log('intercepted and $http success');
+            return response;
         }, function(response) {
+            console.log(response);
             // do something on error
-            console.log('intercepted and $http error');
+            if (response.status === 401) {
+                $location.path('/login');
+            }
             return $q.reject(response);
         });
     };
 });
+app.config(['$httpProvider', function($httpProvider) {
+        $httpProvider.responseInterceptors.push('loginInterceptor');
+    }
+]);
+
 
 // FILTERS
 angular.module('clientApp.filters', [])
@@ -89,6 +96,7 @@ app.factory('clientService', function($q, $http) {
     };
 
     clientService.fetchNotes = function() {
+        console.log('using token: ' + clientService.accessToken);
         $http({
             method: 'GET',
             url: '/api/1.0/johndoe/notes?include_notes=true',
@@ -102,7 +110,7 @@ app.factory('clientService', function($q, $http) {
 
         clientService.latest_sync_revision++;
         var req = {
-            "latest-sync-revision": clientService.latest_sync_revision,
+            'latest-sync-revision': clientService.latest_sync_revision,
         };
         req['note-changes'] = [ note ];
 

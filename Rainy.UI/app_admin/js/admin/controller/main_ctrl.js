@@ -1,7 +1,7 @@
 function MainCtrl($scope, $routeParams, $route, $location) {
 
     $scope.checkLocation = function() {
-        if ($location.path().startsWith("/admin")) {
+        if ($location.path().startsWith('/admin')) {
             $scope.hideAdminNav = false;
             $scope.dontAskForPassword = false;
         } else {

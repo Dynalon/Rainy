@@ -1,0 +1,19 @@
+{
+    "sub": true,
+    "indent": 4,
+    "curly": false,
+    "eqnull": true,
+    "eqeqeq": true,
+    "undef": true,
+    "browser": true,
+    "quotmark": "single",
+
+    "globals": {
+        "jQuery": true,
+        "$": true,
+        "console": true,
+        "angular": true,
+        "module": true,
+        "_": true
+    }
+}

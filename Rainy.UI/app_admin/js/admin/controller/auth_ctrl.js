@@ -1,14 +1,14 @@
 /*global admin_pw:true*/
-var admin_pw="";
+var admin_pw='';
 function AuthCtrl($scope, $route, $location) {
 
     var url_pw = ($location.search()).password;
     if (url_pw !== undefined && url_pw.length > 0) {
         // new admin pw, update teh cookie
         admin_pw = url_pw;
-    } else if ($location.path().startsWith("/admin")) {
+    } else if ($location.path().startsWith('/admin')) {
         $('#loginModal').modal();
-        $('#loginModal').find(":password").focus();
+        $('#loginModal').find(':password').focus();
     }
 
     $scope.doLogin = function() {
@@ -22,8 +22,8 @@ function AuthCtrl($scope, $route, $location) {
             $('#loginModal').modal('hide');
             admin_pw = $scope.adminPassword;
         }).fail(function () {
-            $scope.adminPassword="";
-            $('#loginModal').find(":password").focus();
+            $scope.adminPassword='';
+            $('#loginModal').find(':password').focus();
             $scope.$apply();
         });
         $route.reload();
