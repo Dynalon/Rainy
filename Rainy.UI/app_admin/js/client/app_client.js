@@ -19,6 +19,10 @@ var app = angular.module('clientApp', [
             templateUrl: 'notes.html',
             controller: 'NoteCtrl'
         });
+        $routeProvider.when('/logout', {
+            template: '<div ng-controller="LogoutCtrl"></div>',
+            controller: 'LogoutCtrl'
+        });
 
         $routeProvider.otherwise({
             redirectTo: '/login'
@@ -43,9 +47,10 @@ app.factory('loginInterceptor', function($q, $location) {
             // do something on success
             return response;
         }, function(response) {
-            console.log(response);
             // do something on error
             if (response.status === 401) {
+                if (window.localStorage)
+                    window.localStorage.removeItem('accessToken');
                 $location.path('/login');
             }
             return $q.reject(response);
@@ -70,62 +75,6 @@ angular.module('clientApp.filters', [])
 angular.module('clientApp.services', [])
     .value('version', '0.1');
 
-app.factory('clientService', function($q, $http) {
-    var clientService = {
-        notes: [],
-        last_sync_revision: 0,
-        accessToken: '',
-        userDetails: {
-            username: 'johndoe'
-        }
-    };
-
-    clientService.getTemporaryAccessToken = function(user, pass) {
-        var deferred = $q.defer();
-        var credentials = { Username: user, Password: pass };
-
-        $http.post('/oauth/temporary_access_token', credentials)
-        .success(function (data, status, headers, config) {
-            clientService.accessToken = data.AccessToken;
-            deferred.resolve(clientService.accessToken);
-        })
-        .error(function (data, status) {
-            deferred.reject(status);
-        });
-        return deferred.promise;
-    };
-
-    clientService.fetchNotes = function() {
-        console.log('using token: ' + clientService.accessToken);
-        $http({
-            method: 'GET',
-            url: '/api/1.0/johndoe/notes?include_notes=true',
-            headers: { 'AccessToken': clientService.accessToken }
-        }).success(function (data, status, headers, config) {
-            clientService.notes = data.notes;
-        });
-    };
-
-    clientService.saveNote = function(note) {
-
-        clientService.latest_sync_revision++;
-        var req = {
-            'latest-sync-revision': clientService.latest_sync_revision,
-        };
-        req['note-changes'] = [ note ];
-
-        $http({
-            method: 'PUT',
-            url: '/api/1.0/johndoe/notes',
-            headers: { 'AccessToken': clientService.accessToken },
-            data: req
-        }).success(function (data, status, headers, config) {
-            console.log('successfully saved note');
-        });
-    };
-
-    return clientService;
-});
 
 // DIRECTIVES 
 angular.module('clientApp.directives', [])

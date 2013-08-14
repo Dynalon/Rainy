@@ -282,6 +282,10 @@ var app = angular.module('clientApp', [
             templateUrl: 'notes.html',
             controller: 'NoteCtrl'
         });
+        $routeProvider.when('/logout', {
+            template: '<div ng-controller="LogoutCtrl"></div>',
+            controller: 'LogoutCtrl'
+        });
 
         $routeProvider.otherwise({
             redirectTo: '/login'
@@ -306,9 +310,10 @@ app.factory('loginInterceptor', function($q, $location) {
             // do something on success
             return response;
         }, function(response) {
-            console.log(response);
             // do something on error
             if (response.status === 401) {
+                if (window.localStorage)
+                    window.localStorage.removeItem('accessToken');
                 $location.path('/login');
             }
             return $q.reject(response);
@@ -333,7 +338,25 @@ angular.module('clientApp.filters', [])
 angular.module('clientApp.services', [])
     .value('version', '0.1');
 
-app.factory('clientService', function($q, $http) {
+
+// DIRECTIVES 
+angular.module('clientApp.directives', [])
+    .directive('appVersion', ['version',
+        function(version) {
+            return function(scope, elm, attrs) {
+                elm.text(version);
+            };
+        }
+    ])
+;
+
+if (typeof String.prototype.startsWith !== 'function') {
+    String.prototype.startsWith = function(str) {
+        return this.slice(0, str.length) === str;
+    };
+}
+
+app.factory('clientService', function($q, $http, $rootScope) {
     var clientService = {
         notes: [],
         last_sync_revision: 0,
@@ -343,23 +366,59 @@ app.factory('clientService', function($q, $http) {
         }
     };
 
-    clientService.getTemporaryAccessToken = function(user, pass) {
+    var useStorage = window.sessionStorage && window.localStorage;
+    if (useStorage) {
+        clientService.accessToken = window.localStorage.getItem ('accessToken');
+    } 
+
+    clientService.login = function (user, pass, remember) {
         var deferred = $q.defer();
-        var credentials = { Username: user, Password: pass };
+        var expiry = 1440; // 1d
+
+        if (remember)
+            expiry = 14 * 1440; // 14d
+
+        var credentials = {
+            Username: user,
+            Password: pass,
+            Expiry: expiry
+        };
 
         $http.post('/oauth/temporary_access_token', credentials)
         .success(function (data, status, headers, config) {
             clientService.accessToken = data.AccessToken;
-            deferred.resolve(clientService.accessToken);
+            if (useStorage && remember) {
+                window.localStorage.setItem('accessToken', data.AccessToken);
+            }
+            $rootScope.$broadcast('loginStatus', true);
+            deferred.resolve();
         })
         .error(function (data, status) {
             deferred.reject(status);
+            $rootScope.$broadcast('loginStatus', false);
         });
         return deferred.promise;
     };
 
+    clientService.logout = function () {
+        clientService.accessToken = '';
+        if (useStorage) {
+            window.localStorage.removeItem('accessToken');
+        }
+        $rootScope.$broadcast('loginStatus', false);
+    };
+
+    clientService.userIsLoggedIn = function () {
+        // TODO check for expiry
+        var logged = !(clientService.accessToken === '' ||
+            clientService.accessToken === undefined);
+
+        if (useStorage && logged)
+            return window.localStorage.getItem('accessToken') || false;  
+        else return logged;
+    };
+
     clientService.fetchNotes = function() {
-        console.log('using token: ' + clientService.accessToken);
         $http({
             method: 'GET',
             url: '/api/1.0/johndoe/notes?include_notes=true',
@@ -389,51 +448,64 @@ app.factory('clientService', function($q, $http) {
 
     return clientService;
 });
-
-// DIRECTIVES 
-angular.module('clientApp.directives', [])
-    .directive('appVersion', ['version',
-        function(version) {
-            return function(scope, elm, attrs) {
-                elm.text(version);
-            };
-        }
-    ])
-;
-
-if (typeof String.prototype.startsWith !== 'function') {
-    String.prototype.startsWith = function(str) {
-        return this.slice(0, str.length) === str;
-    };
-}
-
-function LoginCtrl($scope, clientService, $location) {
+function LoginCtrl($scope, $location, clientService, notyService, $rootScope) {
 
     $scope.username = '';
     $scope.password = '';
+    $scope.rememberMe = false;
 
-    $scope.doLogin = function () {
-        clientService.getTemporaryAccessToken($scope.username, $scope.password)
-        .then(function (token) {
-            console.log('login ok, token is ' + token);
-            clientService.accessToken = token;
-            $location.path('/notes/');
-        }, function (error) {
-            notifiyLoginFailed();
+    $scope.allowSignup = true;
+    $scope.allowRememberMe = true;
+
+    if (clientService.userIsLoggedIn()) {
+        $location.path('/notes/');
+    }
+
+    var useStorage = window.localStorage && window.sessionStorage;
+    if (useStorage) {
+        $scope.username = window.sessionStorage.getItem('username');
+        $scope.$watch('username', function (newval, oldval) {
+            window.sessionStorage.setItem('username', newval);
         });
-    };
 
-    function notifiyLoginFailed () {
-        var n = noty({
-            text: 'Login failed. Check username and password',
-            layout: 'topCenter',
-            timeout: 5000,
-            type: 'error' 
+
+        $scope.rememberMe = window.sessionStorage.getItem('rememberMe') === 'true';
+        $scope.$watch('rememberMe', function (newval, oldval) {
+            window.sessionStorage.setItem('rememberMe', newval);
         });
     }
+
+    if ($scope.username.length === 0)
+        $('#inputUsername').focus();
+    else
+        $('#inputPassword').focus();
+
+    $scope.doLogin = function () {
+        var remember = $scope.allowRememberMe && $scope.rememberMe;
+
+        clientService.login($scope.username, $scope.password, remember)
+        .then(function () {
+            $location.path('/notes/');
+        }, function (error) {
+            notyService.error('Login failed. Check username and password.');
+        });
+    };
 }
 //LoginCtrl.$inject = [ '$scope','$http' ];
 
+function LogoutCtrl($scope, clientService, $location) {
+    
+    clientService.logout();
+    $location.path('/login/');
+}
+
+function MainCtrl ($scope, clientService) {
+    $scope.isLoggedIn = clientService.userIsLoggedIn();
+
+    $scope.$on('loginStatus', function(ev, isLoggedIn) {
+        $scope.isLoggedIn = isLoggedIn;
+    });
+}
 function NoteCtrl($scope, clientService, $routeParams, $location) {
 
     $scope.notebooks = [ 'None' ];
@@ -501,3 +573,29 @@ function NoteCtrl($scope, clientService, $routeParams, $location) {
         return notebooks;
     }
 }
+app.factory('notyService', function($rootScope) {
+    var notyService = {};
+
+    function showNoty (msg, type, timeout) {
+        timeout = timeout || 5000;
+        var n = noty({
+            text: msg,
+            layout: 'topCenter',
+            timeout: 13000,
+            type: 'error' 
+        });
+    }
+
+    $rootScope.$on('$routeChangeStart', function() {
+        $.noty.clearQueue();
+        $.noty.closeAll();
+    });
+    notyService.error = function (msg, timeout) {
+        return showNoty(msg, 'error', timeout);
+    };
+    notyService.warn = function (msg, timeout) {
+        return showNoty(msg, 'warn', timeout);
+    };
+
+    return notyService;
+});

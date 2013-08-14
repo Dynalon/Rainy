@@ -1,5 +1,6 @@
 using ServiceStack.ServiceHost;
 using System.IO;
+using System;
 
 namespace Rainy.WebService.OAuth
 {
@@ -44,11 +45,21 @@ namespace Rainy.WebService.OAuth
 	[Route("/oauth/temporary_access_token", "POST")]
 	public class OAuthTemporaryAccessTokenRequest : IReturn<OAuthTemporaryAccessTokenResponse>
 	{
+		[ApiMember (Description="Can either be the username or email the user is registered with",
+		            DataType="string")]
 		public string Username { get; set; }
+
+		[ApiMember (Description="Password", DataType="string")]
 		public string Password { get; set; }
+	
+		[ApiMember (Description="Amount of minutes after issuing after which the token will become invalid.",
+		            DataType="integer")]
+		public int Expiry { get; set; }
+
 	}
 	public class OAuthTemporaryAccessTokenResponse
 	{
 		public string AccessToken { get; set; }
+		public DateTime ValidUntil { get; set; }
 	}
 }

@@ -105,9 +105,17 @@ namespace Rainy.WebService.OAuth
 		{
 			string username = request.Username;
 			string password = request.Password;
+
+			if (request.Expiry == 0)
+				request.Expiry = 60 * 24; // expiry = 1d
+			if (request.Expiry >= 43200) // >= 30d
+				throw new InvalidRequestDtoException {ErrorMessage = "Expiry cannot exceed 30 days (43200 minutes)"};
+
+			DateTime expiry = DateTime.Now.AddMinutes (request.Expiry);
+
 			try {
 				if (userIsAllowed (username, password, out username)) {
-					var access_token = GenerateAccessToken (username, password, DateTime.Now.AddDays (1));
+					var access_token = GenerateAccessToken (username, password, expiry);
 					// save the access token
 					var db_access_token = access_token.ToDBAccessToken ();
 					// shorten the token for crypto
@@ -115,7 +123,10 @@ namespace Rainy.WebService.OAuth
 					using (var db = connFactory.OpenDbConnection ()) {
 						db.Save<DBAccessToken> (db_access_token);
 					}
-					return new OAuthTemporaryAccessTokenResponse { AccessToken = access_token.Token };
+					return new OAuthTemporaryAccessTokenResponse {
+						AccessToken = access_token.Token,
+						ValidUntil = expiry
+					};
 				} else
 					throw new UnauthorizedException ();
 			} catch {
@@ -202,7 +213,8 @@ namespace Rainy.WebService.OAuth
 		OAuthHandler oauthHandler;
 		IAuthenticator authenticator;
 		IDbConnectionFactory connFactory;
-		public OAuthAuthorizeService (IDbConnectionFactory factory, OAuthHandler oauthHandler, IAuthenticator auth) : base ()
+		public OAuthAuthorizeService (IDbConnectionFactory factory, OAuthHandler oauthHandler, IAuthenticator auth)
+			: base ()
 		{
 			this.connFactory = factory;
 			this.authenticator = auth;
@@ -265,14 +277,18 @@ namespace Rainy.WebService.OAuth
 				var context = new OAuthContextBuilder ()
 					.FromWebRequest (original_request, new MemoryStream ());
 
-				AccessToken access_token = (AccessToken) oauthHandler.Provider.ExchangeRequestTokenForAccessToken (context);
+				AccessToken access_token =
+					(AccessToken) oauthHandler.Provider.ExchangeRequestTokenForAccessToken (context);
+
 				Logger.DebugFormat ("permanently authorizing access token: {0}", access_token);
 				oauthHandler.AccessTokens.SaveToken (access_token);
 
 				Response.Write (access_token.ToString ());
 				Response.End ();
 			} catch (Exception e) {
-				throw new UnauthorizedException (){ ErrorMessage = "failed to exchange request token for access token: {0}".Fmt(e.Message)};
+				throw new UnauthorizedException {
+					ErrorMessage = "failed to exchange request token for access token: {0}".Fmt(e.Message)
+				};
 			}
 			return null;
 		}

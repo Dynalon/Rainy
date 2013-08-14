@@ -14,6 +14,8 @@
         "console": true,
         "angular": true,
         "module": true,
+        "noty": true,
+        "app": true,
         "_": true
     }
 }
