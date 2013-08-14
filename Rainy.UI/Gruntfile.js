@@ -18,7 +18,10 @@ module.exports = function (grunt) {
                     'bower_components/bootstrap.zip/js/bootstrap.min.js',
                     'bower_components/angular/angular.min.js',
                     'bower_components/angular-strap/dist/angular-strap.min.js',
-                    'bower_components/underscore/underscore-min.js'
+                    'bower_components/underscore/underscore-min.js',
+                    'bower_components/noty/js/noty/jquery.noty.js',
+                    'bower_components/noty/js/noty/themes/default.js',
+                    'bower_components/noty/js/noty/layouts/topCenter.js'
                 ],
                 dest: 'dist/common.js'
             },

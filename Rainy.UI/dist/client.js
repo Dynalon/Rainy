@@ -419,9 +419,18 @@ function LoginCtrl($scope, clientService, $location) {
             clientService.accessToken = token;
             $location.path('/notes/');
         }, function (error) {
-            console.log('auth failed: ' + error);
+            notifiyLoginFailed();
         });
     };
+
+    function notifiyLoginFailed () {
+        var n = noty({
+            text: 'Login failed. Check username and password',
+            layout: 'topCenter',
+            timeout: 5000,
+            type: 'error' 
+        });
+    }
 }
 //LoginCtrl.$inject = [ '$scope','$http' ];
 

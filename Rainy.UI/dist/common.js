@@ -189,3 +189,749 @@ angular.module("$strap.config",[]).value("$strapConfig",{}),angular.module("$str
 //     Underscore may be freely distributed under the MIT license.
 !function(){var n=this,t=n._,r={},e=Array.prototype,u=Object.prototype,i=Function.prototype,a=e.push,o=e.slice,c=e.concat,l=u.toString,f=u.hasOwnProperty,s=e.forEach,p=e.map,v=e.reduce,h=e.reduceRight,d=e.filter,g=e.every,m=e.some,y=e.indexOf,b=e.lastIndexOf,x=Array.isArray,_=Object.keys,w=i.bind,j=function(n){return n instanceof j?n:this instanceof j?(this._wrapped=n,void 0):new j(n)};"undefined"!=typeof exports?("undefined"!=typeof module&&module.exports&&(exports=module.exports=j),exports._=j):n._=j,j.VERSION="1.5.1";var A=j.each=j.forEach=function(n,t,e){if(null!=n)if(s&&n.forEach===s)n.forEach(t,e);else if(n.length===+n.length){for(var u=0,i=n.length;i>u;u++)if(t.call(e,n[u],u,n)===r)return}else for(var a in n)if(j.has(n,a)&&t.call(e,n[a],a,n)===r)return};j.map=j.collect=function(n,t,r){var e=[];return null==n?e:p&&n.map===p?n.map(t,r):(A(n,function(n,u,i){e.push(t.call(r,n,u,i))}),e)};var E="Reduce of empty array with no initial value";j.reduce=j.foldl=j.inject=function(n,t,r,e){var u=arguments.length>2;if(null==n&&(n=[]),v&&n.reduce===v)return e&&(t=j.bind(t,e)),u?n.reduce(t,r):n.reduce(t);if(A(n,function(n,i,a){u?r=t.call(e,r,n,i,a):(r=n,u=!0)}),!u)throw new TypeError(E);return r},j.reduceRight=j.foldr=function(n,t,r,e){var u=arguments.length>2;if(null==n&&(n=[]),h&&n.reduceRight===h)return e&&(t=j.bind(t,e)),u?n.reduceRight(t,r):n.reduceRight(t);var i=n.length;if(i!==+i){var a=j.keys(n);i=a.length}if(A(n,function(o,c,l){c=a?a[--i]:--i,u?r=t.call(e,r,n[c],c,l):(r=n[c],u=!0)}),!u)throw new TypeError(E);return r},j.find=j.detect=function(n,t,r){var e;return O(n,function(n,u,i){return t.call(r,n,u,i)?(e=n,!0):void 0}),e},j.filter=j.select=function(n,t,r){var e=[];return null==n?e:d&&n.filter===d?n.filter(t,r):(A(n,function(n,u,i){t.call(r,n,u,i)&&e.push(n)}),e)},j.reject=function(n,t,r){return j.filter(n,function(n,e,u){return!t.call(r,n,e,u)},r)},j.every=j.all=function(n,t,e){t||(t=j.identity);var u=!0;return null==n?u:g&&n.every===g?n.every(t,e):(A(n,function(n,i,a){return(u=u&&t.call(e,n,i,a))?void 0:r}),!!u)};var O=j.some=j.any=function(n,t,e){t||(t=j.identity);var u=!1;return null==n?u:m&&n.some===m?n.some(t,e):(A(n,function(n,i,a){return u||(u=t.call(e,n,i,a))?r:void 0}),!!u)};j.contains=j.include=function(n,t){return null==n?!1:y&&n.indexOf===y?n.indexOf(t)!=-1:O(n,function(n){return n===t})},j.invoke=function(n,t){var r=o.call(arguments,2),e=j.isFunction(t);return j.map(n,function(n){return(e?t:n[t]).apply(n,r)})},j.pluck=function(n,t){return j.map(n,function(n){return n[t]})},j.where=function(n,t,r){return j.isEmpty(t)?r?void 0:[]:j[r?"find":"filter"](n,function(n){for(var r in t)if(t[r]!==n[r])return!1;return!0})},j.findWhere=function(n,t){return j.where(n,t,!0)},j.max=function(n,t,r){if(!t&&j.isArray(n)&&n[0]===+n[0]&&n.length<65535)return Math.max.apply(Math,n);if(!t&&j.isEmpty(n))return-1/0;var e={computed:-1/0,value:-1/0};return A(n,function(n,u,i){var a=t?t.call(r,n,u,i):n;a>e.computed&&(e={value:n,computed:a})}),e.value},j.min=function(n,t,r){if(!t&&j.isArray(n)&&n[0]===+n[0]&&n.length<65535)return Math.min.apply(Math,n);if(!t&&j.isEmpty(n))return 1/0;var e={computed:1/0,value:1/0};return A(n,function(n,u,i){var a=t?t.call(r,n,u,i):n;a<e.computed&&(e={value:n,computed:a})}),e.value},j.shuffle=function(n){var t,r=0,e=[];return A(n,function(n){t=j.random(r++),e[r-1]=e[t],e[t]=n}),e};var F=function(n){return j.isFunction(n)?n:function(t){return t[n]}};j.sortBy=function(n,t,r){var e=F(t);return j.pluck(j.map(n,function(n,t,u){return{value:n,index:t,criteria:e.call(r,n,t,u)}}).sort(function(n,t){var r=n.criteria,e=t.criteria;if(r!==e){if(r>e||r===void 0)return 1;if(e>r||e===void 0)return-1}return n.index<t.index?-1:1}),"value")};var k=function(n,t,r,e){var u={},i=F(null==t?j.identity:t);return A(n,function(t,a){var o=i.call(r,t,a,n);e(u,o,t)}),u};j.groupBy=function(n,t,r){return k(n,t,r,function(n,t,r){(j.has(n,t)?n[t]:n[t]=[]).push(r)})},j.countBy=function(n,t,r){return k(n,t,r,function(n,t){j.has(n,t)||(n[t]=0),n[t]++})},j.sortedIndex=function(n,t,r,e){r=null==r?j.identity:F(r);for(var u=r.call(e,t),i=0,a=n.length;a>i;){var o=i+a>>>1;r.call(e,n[o])<u?i=o+1:a=o}return i},j.toArray=function(n){return n?j.isArray(n)?o.call(n):n.length===+n.length?j.map(n,j.identity):j.values(n):[]},j.size=function(n){return null==n?0:n.length===+n.length?n.length:j.keys(n).length},j.first=j.head=j.take=function(n,t,r){return null==n?void 0:null==t||r?n[0]:o.call(n,0,t)},j.initial=function(n,t,r){return o.call(n,0,n.length-(null==t||r?1:t))},j.last=function(n,t,r){return null==n?void 0:null==t||r?n[n.length-1]:o.call(n,Math.max(n.length-t,0))},j.rest=j.tail=j.drop=function(n,t,r){return o.call(n,null==t||r?1:t)},j.compact=function(n){return j.filter(n,j.identity)};var R=function(n,t,r){return t&&j.every(n,j.isArray)?c.apply(r,n):(A(n,function(n){j.isArray(n)||j.isArguments(n)?t?a.apply(r,n):R(n,t,r):r.push(n)}),r)};j.flatten=function(n,t){return R(n,t,[])},j.without=function(n){return j.difference(n,o.call(arguments,1))},j.uniq=j.unique=function(n,t,r,e){j.isFunction(t)&&(e=r,r=t,t=!1);var u=r?j.map(n,r,e):n,i=[],a=[];return A(u,function(r,e){(t?e&&a[a.length-1]===r:j.contains(a,r))||(a.push(r),i.push(n[e]))}),i},j.union=function(){return j.uniq(j.flatten(arguments,!0))},j.intersection=function(n){var t=o.call(arguments,1);return j.filter(j.uniq(n),function(n){return j.every(t,function(t){return j.indexOf(t,n)>=0})})},j.difference=function(n){var t=c.apply(e,o.call(arguments,1));return j.filter(n,function(n){return!j.contains(t,n)})},j.zip=function(){for(var n=j.max(j.pluck(arguments,"length").concat(0)),t=new Array(n),r=0;n>r;r++)t[r]=j.pluck(arguments,""+r);return t},j.object=function(n,t){if(null==n)return{};for(var r={},e=0,u=n.length;u>e;e++)t?r[n[e]]=t[e]:r[n[e][0]]=n[e][1];return r},j.indexOf=function(n,t,r){if(null==n)return-1;var e=0,u=n.length;if(r){if("number"!=typeof r)return e=j.sortedIndex(n,t),n[e]===t?e:-1;e=0>r?Math.max(0,u+r):r}if(y&&n.indexOf===y)return n.indexOf(t,r);for(;u>e;e++)if(n[e]===t)return e;return-1},j.lastIndexOf=function(n,t,r){if(null==n)return-1;var e=null!=r;if(b&&n.lastIndexOf===b)return e?n.lastIndexOf(t,r):n.lastIndexOf(t);for(var u=e?r:n.length;u--;)if(n[u]===t)return u;return-1},j.range=function(n,t,r){arguments.length<=1&&(t=n||0,n=0),r=arguments[2]||1;for(var e=Math.max(Math.ceil((t-n)/r),0),u=0,i=new Array(e);e>u;)i[u++]=n,n+=r;return i};var M=function(){};j.bind=function(n,t){var r,e;if(w&&n.bind===w)return w.apply(n,o.call(arguments,1));if(!j.isFunction(n))throw new TypeError;return r=o.call(arguments,2),e=function(){if(!(this instanceof e))return n.apply(t,r.concat(o.call(arguments)));M.prototype=n.prototype;var u=new M;M.prototype=null;var i=n.apply(u,r.concat(o.call(arguments)));return Object(i)===i?i:u}},j.partial=function(n){var t=o.call(arguments,1);return function(){return n.apply(this,t.concat(o.call(arguments)))}},j.bindAll=function(n){var t=o.call(arguments,1);if(0===t.length)throw new Error("bindAll must be passed function names");return A(t,function(t){n[t]=j.bind(n[t],n)}),n},j.memoize=function(n,t){var r={};return t||(t=j.identity),function(){var e=t.apply(this,arguments);return j.has(r,e)?r[e]:r[e]=n.apply(this,arguments)}},j.delay=function(n,t){var r=o.call(arguments,2);return setTimeout(function(){return n.apply(null,r)},t)},j.defer=function(n){return j.delay.apply(j,[n,1].concat(o.call(arguments,1)))},j.throttle=function(n,t,r){var e,u,i,a=null,o=0;r||(r={});var c=function(){o=r.leading===!1?0:new Date,a=null,i=n.apply(e,u)};return function(){var l=new Date;o||r.leading!==!1||(o=l);var f=t-(l-o);return e=this,u=arguments,0>=f?(clearTimeout(a),a=null,o=l,i=n.apply(e,u)):a||r.trailing===!1||(a=setTimeout(c,f)),i}},j.debounce=function(n,t,r){var e,u=null;return function(){var i=this,a=arguments,o=function(){u=null,r||(e=n.apply(i,a))},c=r&&!u;return clearTimeout(u),u=setTimeout(o,t),c&&(e=n.apply(i,a)),e}},j.once=function(n){var t,r=!1;return function(){return r?t:(r=!0,t=n.apply(this,arguments),n=null,t)}},j.wrap=function(n,t){return function(){var r=[n];return a.apply(r,arguments),t.apply(this,r)}},j.compose=function(){var n=arguments;return function(){for(var t=arguments,r=n.length-1;r>=0;r--)t=[n[r].apply(this,t)];return t[0]}},j.after=function(n,t){return function(){return--n<1?t.apply(this,arguments):void 0}},j.keys=_||function(n){if(n!==Object(n))throw new TypeError("Invalid object");var t=[];for(var r in n)j.has(n,r)&&t.push(r);return t},j.values=function(n){var t=[];for(var r in n)j.has(n,r)&&t.push(n[r]);return t},j.pairs=function(n){var t=[];for(var r in n)j.has(n,r)&&t.push([r,n[r]]);return t},j.invert=function(n){var t={};for(var r in n)j.has(n,r)&&(t[n[r]]=r);return t},j.functions=j.methods=function(n){var t=[];for(var r in n)j.isFunction(n[r])&&t.push(r);return t.sort()},j.extend=function(n){return A(o.call(arguments,1),function(t){if(t)for(var r in t)n[r]=t[r]}),n},j.pick=function(n){var t={},r=c.apply(e,o.call(arguments,1));return A(r,function(r){r in n&&(t[r]=n[r])}),t},j.omit=function(n){var t={},r=c.apply(e,o.call(arguments,1));for(var u in n)j.contains(r,u)||(t[u]=n[u]);return t},j.defaults=function(n){return A(o.call(arguments,1),function(t){if(t)for(var r in t)n[r]===void 0&&(n[r]=t[r])}),n},j.clone=function(n){return j.isObject(n)?j.isArray(n)?n.slice():j.extend({},n):n},j.tap=function(n,t){return t(n),n};var S=function(n,t,r,e){if(n===t)return 0!==n||1/n==1/t;if(null==n||null==t)return n===t;n instanceof j&&(n=n._wrapped),t instanceof j&&(t=t._wrapped);var u=l.call(n);if(u!=l.call(t))return!1;switch(u){case"[object String]":return n==String(t);case"[object Number]":return n!=+n?t!=+t:0==n?1/n==1/t:n==+t;case"[object Date]":case"[object Boolean]":return+n==+t;case"[object RegExp]":return n.source==t.source&&n.global==t.global&&n.multiline==t.multiline&&n.ignoreCase==t.ignoreCase}if("object"!=typeof n||"object"!=typeof t)return!1;for(var i=r.length;i--;)if(r[i]==n)return e[i]==t;var a=n.constructor,o=t.constructor;if(a!==o&&!(j.isFunction(a)&&a instanceof a&&j.isFunction(o)&&o instanceof o))return!1;r.push(n),e.push(t);var c=0,f=!0;if("[object Array]"==u){if(c=n.length,f=c==t.length)for(;c--&&(f=S(n[c],t[c],r,e)););}else{for(var s in n)if(j.has(n,s)&&(c++,!(f=j.has(t,s)&&S(n[s],t[s],r,e))))break;if(f){for(s in t)if(j.has(t,s)&&!c--)break;f=!c}}return r.pop(),e.pop(),f};j.isEqual=function(n,t){return S(n,t,[],[])},j.isEmpty=function(n){if(null==n)return!0;if(j.isArray(n)||j.isString(n))return 0===n.length;for(var t in n)if(j.has(n,t))return!1;return!0},j.isElement=function(n){return!(!n||1!==n.nodeType)},j.isArray=x||function(n){return"[object Array]"==l.call(n)},j.isObject=function(n){return n===Object(n)},A(["Arguments","Function","String","Number","Date","RegExp"],function(n){j["is"+n]=function(t){return l.call(t)=="[object "+n+"]"}}),j.isArguments(arguments)||(j.isArguments=function(n){return!(!n||!j.has(n,"callee"))}),"function"!=typeof/./&&(j.isFunction=function(n){return"function"==typeof n}),j.isFinite=function(n){return isFinite(n)&&!isNaN(parseFloat(n))},j.isNaN=function(n){return j.isNumber(n)&&n!=+n},j.isBoolean=function(n){return n===!0||n===!1||"[object Boolean]"==l.call(n)},j.isNull=function(n){return null===n},j.isUndefined=function(n){return n===void 0},j.has=function(n,t){return f.call(n,t)},j.noConflict=function(){return n._=t,this},j.identity=function(n){return n},j.times=function(n,t,r){for(var e=Array(Math.max(0,n)),u=0;n>u;u++)e[u]=t.call(r,u);return e},j.random=function(n,t){return null==t&&(t=n,n=0),n+Math.floor(Math.random()*(t-n+1))};var I={escape:{"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#x27;","/":"&#x2F;"}};I.unescape=j.invert(I.escape);var T={escape:new RegExp("["+j.keys(I.escape).join("")+"]","g"),unescape:new RegExp("("+j.keys(I.unescape).join("|")+")","g")};j.each(["escape","unescape"],function(n){j[n]=function(t){return null==t?"":(""+t).replace(T[n],function(t){return I[n][t]})}}),j.result=function(n,t){if(null==n)return void 0;var r=n[t];return j.isFunction(r)?r.call(n):r},j.mixin=function(n){A(j.functions(n),function(t){var r=j[t]=n[t];j.prototype[t]=function(){var n=[this._wrapped];return a.apply(n,arguments),z.call(this,r.apply(j,n))}})};var N=0;j.uniqueId=function(n){var t=++N+"";return n?n+t:t},j.templateSettings={evaluate:/<%([\s\S]+?)%>/g,interpolate:/<%=([\s\S]+?)%>/g,escape:/<%-([\s\S]+?)%>/g};var q=/(.)^/,B={"'":"'","\\":"\\","\r":"r","\n":"n","	":"t","\u2028":"u2028","\u2029":"u2029"},D=/\\|'|\r|\n|\t|\u2028|\u2029/g;j.template=function(n,t,r){var e;r=j.defaults({},r,j.templateSettings);var u=new RegExp([(r.escape||q).source,(r.interpolate||q).source,(r.evaluate||q).source].join("|")+"|$","g"),i=0,a="__p+='";n.replace(u,function(t,r,e,u,o){return a+=n.slice(i,o).replace(D,function(n){return"\\"+B[n]}),r&&(a+="'+\n((__t=("+r+"))==null?'':_.escape(__t))+\n'"),e&&(a+="'+\n((__t=("+e+"))==null?'':__t)+\n'"),u&&(a+="';\n"+u+"\n__p+='"),i=o+t.length,t}),a+="';\n",r.variable||(a="with(obj||{}){\n"+a+"}\n"),a="var __t,__p='',__j=Array.prototype.join,"+"print=function(){__p+=__j.call(arguments,'');};\n"+a+"return __p;\n";try{e=new Function(r.variable||"obj","_",a)}catch(o){throw o.source=a,o}if(t)return e(t,j);var c=function(n){return e.call(this,n,j)};return c.source="function("+(r.variable||"obj")+"){\n"+a+"}",c},j.chain=function(n){return j(n).chain()};var z=function(n){return this._chain?j(n).chain():n};j.mixin(j),A(["pop","push","reverse","shift","sort","splice","unshift"],function(n){var t=e[n];j.prototype[n]=function(){var r=this._wrapped;return t.apply(r,arguments),"shift"!=n&&"splice"!=n||0!==r.length||delete r[0],z.call(this,r)}}),A(["concat","join","slice"],function(n){var t=e[n];j.prototype[n]=function(){return z.call(this,t.apply(this._wrapped,arguments))}}),j.extend(j.prototype,{chain:function(){return this._chain=!0,this},value:function(){return this._wrapped}})}.call(this);
 //# sourceMappingURL=underscore-min.map
+/**
+ * noty - jQuery Notification Plugin v2.1.0
+ * Contributors: https://github.com/needim/noty/graphs/contributors
+ *
+ * Examples and Documentation - http://needim.github.com/noty/
+ *
+ * Licensed under the MIT licenses:
+ * http://www.opensource.org/licenses/mit-license.php
+ *
+ **/
+
+if (typeof Object.create !== 'function') {
+    Object.create = function (o) {
+        function F() {
+        }
+
+        F.prototype = o;
+        return new F();
+    };
+}
+
+(function ($) {
+
+    var NotyObject = {
+
+        init:function (options) {
+
+            // Mix in the passed in options with the default options
+            this.options = $.extend({}, $.noty.defaults, options);
+
+            this.options.layout = (this.options.custom) ? $.noty.layouts['inline'] : $.noty.layouts[this.options.layout];
+            this.options.theme = $.noty.themes[this.options.theme];
+
+            delete options.layout;
+            delete options.theme;
+
+            this.options = $.extend({}, this.options, this.options.layout.options);
+            this.options.id = 'noty_' + (new Date().getTime() * Math.floor(Math.random() * 1000000));
+
+            this.options = $.extend({}, this.options, options);
+
+            // Build the noty dom initial structure
+            this._build();
+
+            // return this so we can chain/use the bridge with less code.
+            return this;
+        }, // end init
+
+        _build:function () {
+
+            // Generating noty bar
+            var $bar = $('<div class="noty_bar"></div>').attr('id', this.options.id);
+            $bar.append(this.options.template).find('.noty_text').html(this.options.text);
+
+            this.$bar = (this.options.layout.parent.object !== null) ? $(this.options.layout.parent.object).css(this.options.layout.parent.css).append($bar) : $bar;
+
+            // Set buttons if available
+            if (this.options.buttons) {
+
+                // If we have button disable closeWith & timeout options
+                this.options.closeWith = [];
+                this.options.timeout = false;
+
+                var $buttons = $('<div/>').addClass('noty_buttons');
+
+                (this.options.layout.parent.object !== null) ? this.$bar.find('.noty_bar').append($buttons) : this.$bar.append($buttons);
+
+                var self = this;
+
+                $.each(this.options.buttons, function (i, button) {
+                    var $button = $('<button/>').addClass((button.addClass) ? button.addClass : 'gray').html(button.text)
+                        .appendTo(self.$bar.find('.noty_buttons'))
+                        .bind('click', function () {
+                            if ($.isFunction(button.onClick)) {
+                                button.onClick.call($button, self);
+                            }
+                        });
+                });
+            }
+
+            // For easy access
+            this.$message = this.$bar.find('.noty_message');
+            this.$closeButton = this.$bar.find('.noty_close');
+            this.$buttons = this.$bar.find('.noty_buttons');
+
+            $.noty.store[this.options.id] = this; // store noty for api
+
+        }, // end _build
+
+        show:function () {
+
+            var self = this;
+
+            $(self.options.layout.container.selector).append(self.$bar);
+
+            self.options.theme.style.apply(self);
+
+            ($.type(self.options.layout.css) === 'function') ? this.options.layout.css.apply(self.$bar) : self.$bar.css(this.options.layout.css || {});
+
+            self.$bar.addClass(self.options.layout.addClass);
+
+            self.options.layout.container.style.apply($(self.options.layout.container.selector));
+
+            self.options.theme.callback.onShow.apply(this);
+
+            if ($.inArray('click', self.options.closeWith) > -1)
+                self.$bar.css('cursor', 'pointer').one('click', function (evt) {
+                    self.stopPropagation(evt);
+                    if (self.options.callback.onCloseClick) {
+                        self.options.callback.onCloseClick.apply(self);
+                    }
+                    self.close();
+                });
+
+            if ($.inArray('hover', self.options.closeWith) > -1)
+                self.$bar.one('mouseenter', function () {
+                    self.close();
+                });
+
+            if ($.inArray('button', self.options.closeWith) > -1)
+                self.$closeButton.one('click', function (evt) {
+                    self.stopPropagation(evt);
+                    self.close();
+                });
+
+            if ($.inArray('button', self.options.closeWith) == -1)
+                self.$closeButton.remove();
+
+            if (self.options.callback.onShow)
+                self.options.callback.onShow.apply(self);
+
+            self.$bar.animate(
+                self.options.animation.open,
+                self.options.animation.speed,
+                self.options.animation.easing,
+                function () {
+                    if (self.options.callback.afterShow) self.options.callback.afterShow.apply(self);
+                    self.shown = true;
+                });
+
+            // If noty is have a timeout option
+            if (self.options.timeout)
+                self.$bar.delay(self.options.timeout).promise().done(function () {
+                    self.close();
+                });
+
+            return this;
+
+        }, // end show
+
+        close:function () {
+
+            if (this.closed) return;
+            if (this.$bar && this.$bar.hasClass('i-am-closing-now')) return;
+
+            var self = this;
+
+            if (!this.shown) { // If we are still waiting in the queue just delete from queue
+                var queue = [];
+                $.each($.noty.queue, function (i, n) {
+                    if (n.options.id != self.options.id) {
+                        queue.push(n);
+                    }
+                });
+                $.noty.queue = queue;
+                return;
+            }
+
+            self.$bar.addClass('i-am-closing-now');
+
+            if (self.options.callback.onClose) {
+                self.options.callback.onClose.apply(self);
+            }
+
+            self.$bar.clearQueue().stop().animate(
+                self.options.animation.close,
+                self.options.animation.speed,
+                self.options.animation.easing,
+                function () {
+                    if (self.options.callback.afterClose) self.options.callback.afterClose.apply(self);
+                })
+                .promise().done(function () {
+
+                    // Modal Cleaning
+                    if (self.options.modal) {
+                        $.notyRenderer.setModalCount(-1);
+                        if ($.notyRenderer.getModalCount() == 0) $('.noty_modal').fadeOut('fast', function () {
+                            $(this).remove();
+                        });
+                    }
+
+                    // Layout Cleaning
+                    $.notyRenderer.setLayoutCountFor(self, -1);
+                    if ($.notyRenderer.getLayoutCountFor(self) == 0) $(self.options.layout.container.selector).remove();
+
+                    // Make sure self.$bar has not been removed before attempting to remove it
+                    if (typeof self.$bar !== 'undefined' && self.$bar !== null ) {
+                        self.$bar.remove();
+                        self.$bar = null;
+                        self.closed = true;
+                    }
+
+                    delete $.noty.store[self.options.id]; // deleting noty from store
+
+                    self.options.theme.callback.onClose.apply(self);
+
+                    if (!self.options.dismissQueue) {
+                        // Queue render
+                        $.noty.ontap = true;
+
+                        $.notyRenderer.render();
+                    }
+
+					if (self.options.maxVisible > 0 && self.options.dismissQueue) {
+						$.notyRenderer.render();
+					}
+                })
+
+        }, // end close
+
+        setText:function (text) {
+            if (!this.closed) {
+                this.options.text = text;
+                this.$bar.find('.noty_text').html(text);
+            }
+            return this;
+        },
+
+        setType:function (type) {
+            if (!this.closed) {
+                this.options.type = type;
+                this.options.theme.style.apply(this);
+                this.options.theme.callback.onShow.apply(this);
+            }
+            return this;
+        },
+
+        setTimeout:function (time) {
+            if (!this.closed) {
+                var self = this;
+                this.options.timeout = time;
+                self.$bar.delay(self.options.timeout).promise().done(function () {
+                    self.close();
+                });
+            }
+            return this;
+        },
+
+        stopPropagation:function (evt) {
+            evt = evt || window.event;
+            if (typeof evt.stopPropagation !== "undefined") {
+                evt.stopPropagation();
+            } else {
+                evt.cancelBubble = true;
+            }
+        },
+
+        closed:false,
+        shown:false
+
+    }; // end NotyObject
+
+    $.notyRenderer = {};
+
+    $.notyRenderer.init = function (options) {
+
+        // Renderer creates a new noty
+        var notification = Object.create(NotyObject).init(options);
+
+        (notification.options.force) ? $.noty.queue.unshift(notification) : $.noty.queue.push(notification);
+
+        $.notyRenderer.render();
+
+        return ($.noty.returns == 'object') ? notification : notification.options.id;
+    };
+
+    $.notyRenderer.render = function () {
+
+        var instance = $.noty.queue[0];
+
+        if ($.type(instance) === 'object') {
+            if (instance.options.dismissQueue) {
+				if (instance.options.maxVisible > 0) {
+					if ($(instance.options.layout.container.selector + ' li').length < instance.options.maxVisible) {
+						$.notyRenderer.show($.noty.queue.shift());
+					} else {
+
+					}
+				} else {
+					$.notyRenderer.show($.noty.queue.shift());
+				}
+            } else {
+                if ($.noty.ontap) {
+                    $.notyRenderer.show($.noty.queue.shift());
+                    $.noty.ontap = false;
+                }
+            }
+        } else {
+            $.noty.ontap = true; // Queue is over
+        }
+
+    };
+
+    $.notyRenderer.show = function (notification) {
+
+        if (notification.options.modal) {
+            $.notyRenderer.createModalFor(notification);
+            $.notyRenderer.setModalCount(+1);
+        }
+
+        // Where is the container?
+        if ($(notification.options.layout.container.selector).length == 0) {
+            if (notification.options.custom) {
+                notification.options.custom.append($(notification.options.layout.container.object).addClass('i-am-new'));
+            } else {
+                $('body').append($(notification.options.layout.container.object).addClass('i-am-new'));
+            }
+        } else {
+            $(notification.options.layout.container.selector).removeClass('i-am-new');
+        }
+
+        $.notyRenderer.setLayoutCountFor(notification, +1);
+
+        notification.show();
+    };
+
+    $.notyRenderer.createModalFor = function (notification) {
+        if ($('.noty_modal').length == 0)
+            $('<div/>').addClass('noty_modal').data('noty_modal_count', 0).css(notification.options.theme.modal.css).prependTo($('body')).fadeIn('fast');
+    };
+
+    $.notyRenderer.getLayoutCountFor = function (notification) {
+        return $(notification.options.layout.container.selector).data('noty_layout_count') || 0;
+    };
+
+    $.notyRenderer.setLayoutCountFor = function (notification, arg) {
+        return $(notification.options.layout.container.selector).data('noty_layout_count', $.notyRenderer.getLayoutCountFor(notification) + arg);
+    };
+
+    $.notyRenderer.getModalCount = function () {
+        return $('.noty_modal').data('noty_modal_count') || 0;
+    };
+
+    $.notyRenderer.setModalCount = function (arg) {
+        return $('.noty_modal').data('noty_modal_count', $.notyRenderer.getModalCount() + arg);
+    };
+
+    // This is for custom container
+    $.fn.noty = function (options) {
+        options.custom = $(this);
+        return $.notyRenderer.init(options);
+    };
+
+    $.noty = {};
+    $.noty.queue = [];
+    $.noty.ontap = true;
+    $.noty.layouts = {};
+    $.noty.themes = {};
+    $.noty.returns = 'object';
+    $.noty.store = {};
+
+    $.noty.get = function (id) {
+        return $.noty.store.hasOwnProperty(id) ? $.noty.store[id] : false;
+    };
+
+    $.noty.close = function (id) {
+        return $.noty.get(id) ? $.noty.get(id).close() : false;
+    };
+
+    $.noty.setText = function (id, text) {
+        return $.noty.get(id) ? $.noty.get(id).setText(text) : false;
+    };
+
+    $.noty.setType = function (id, type) {
+        return $.noty.get(id) ? $.noty.get(id).setType(type) : false;
+    };
+
+    $.noty.clearQueue = function () {
+        $.noty.queue = [];
+    };
+
+    $.noty.closeAll = function () {
+        $.noty.clearQueue();
+        $.each($.noty.store, function (id, noty) {
+            noty.close();
+        });
+    };
+
+    var windowAlert = window.alert;
+
+    $.noty.consumeAlert = function (options) {
+        window.alert = function (text) {
+            if (options)
+                options.text = text;
+            else
+                options = {text:text};
+
+            $.notyRenderer.init(options);
+        };
+    };
+
+    $.noty.stopConsumeAlert = function () {
+        window.alert = windowAlert;
+    };
+
+    $.noty.defaults = {
+        layout:'top',
+        theme:'defaultTheme',
+        type:'alert',
+        text:'',
+        dismissQueue:true,
+        template:'<div class="noty_message"><span class="noty_text"></span><div class="noty_close"></div></div>',
+        animation:{
+            open:{height:'toggle'},
+            close:{height:'toggle'},
+            easing:'swing',
+            speed:500
+        },
+        timeout:false,
+        force:false,
+        modal:false,
+        maxVisible:5,
+        closeWith:['click'],
+        callback:{
+            onShow:function () {
+            },
+            afterShow:function () {
+            },
+            onClose:function () {
+            },
+            afterClose:function () {
+            },
+            onCloseClick:function () {
+            }
+        },
+        buttons:false
+    };
+
+    $(window).resize(function () {
+        $.each($.noty.layouts, function (index, layout) {
+            layout.container.style.apply($(layout.container.selector));
+        });
+    });
+
+})(jQuery);
+
+// Helpers
+window.noty = function noty(options) {
+
+    // This is for BC  -  Will be deleted on v2.2.0
+    var using_old = 0
+        , old_to_new = {
+            'animateOpen':'animation.open',
+            'animateClose':'animation.close',
+            'easing':'animation.easing',
+            'speed':'animation.speed',
+            'onShow':'callback.onShow',
+            'onShown':'callback.afterShow',
+            'onClose':'callback.onClose',
+            'onCloseClick':'callback.onCloseClick',
+            'onClosed':'callback.afterClose'
+        };
+
+    jQuery.each(options, function (key, value) {
+        if (old_to_new[key]) {
+            using_old++;
+            var _new = old_to_new[key].split('.');
+
+            if (!options[_new[0]]) options[_new[0]] = {};
+
+            options[_new[0]][_new[1]] = (value) ? value : function () {
+            };
+            delete options[key];
+        }
+    });
+
+    if (!options.closeWith) {
+        options.closeWith = jQuery.noty.defaults.closeWith;
+    }
+
+    if (options.hasOwnProperty('closeButton')) {
+        using_old++;
+        if (options.closeButton) options.closeWith.push('button');
+        delete options.closeButton;
+    }
+
+    if (options.hasOwnProperty('closeOnSelfClick')) {
+        using_old++;
+        if (options.closeOnSelfClick) options.closeWith.push('click');
+        delete options.closeOnSelfClick;
+    }
+
+    if (options.hasOwnProperty('closeOnSelfOver')) {
+        using_old++;
+        if (options.closeOnSelfOver) options.closeWith.push('hover');
+        delete options.closeOnSelfOver;
+    }
+
+    if (options.hasOwnProperty('custom')) {
+        using_old++;
+        if (options.custom.container != 'null') options.custom = options.custom.container;
+    }
+
+    if (options.hasOwnProperty('cssPrefix')) {
+        using_old++;
+        delete options.cssPrefix;
+    }
+
+    if (options.theme == 'noty_theme_default') {
+        using_old++;
+        options.theme = 'defaultTheme';
+    }
+
+    if (!options.hasOwnProperty('dismissQueue')) {
+        options.dismissQueue = jQuery.noty.defaults.dismissQueue;
+    }
+
+    if (!options.hasOwnProperty('maxVisible')) {
+        options.maxVisible = jQuery.noty.defaults.maxVisible;
+    }
+
+    if (options.buttons) {
+        jQuery.each(options.buttons, function (i, button) {
+            if (button.click) {
+                using_old++;
+                button.onClick = button.click;
+                delete button.click;
+            }
+            if (button.type) {
+                using_old++;
+                button.addClass = button.type;
+                delete button.type;
+            }
+        });
+    }
+
+    if (using_old) {
+        if (typeof console !== "undefined" && console.warn) {
+            console.warn('You are using noty v2 with v1.x.x options. @deprecated until v2.2.0 - Please update your options.');
+        }
+    }
+
+    // console.log(options);
+    // End of the BC
+
+    return jQuery.notyRenderer.init(options);
+}
+
+;(function($) {
+
+	$.noty.themes.defaultTheme = {
+		name: 'defaultTheme',
+		helpers: {
+			borderFix: function() {
+				if (this.options.dismissQueue) {
+					var selector = this.options.layout.container.selector + ' ' + this.options.layout.parent.selector;
+					switch (this.options.layout.name) {
+						case 'top':
+							$(selector).css({borderRadius: '0px 0px 0px 0px'});
+							$(selector).last().css({borderRadius: '0px 0px 5px 5px'}); break;
+						case 'topCenter': case 'topLeft': case 'topRight':
+						case 'bottomCenter': case 'bottomLeft': case 'bottomRight':
+						case 'center': case 'centerLeft': case 'centerRight': case 'inline':
+							$(selector).css({borderRadius: '0px 0px 0px 0px'});
+							$(selector).first().css({'border-top-left-radius': '5px', 'border-top-right-radius': '5px'});
+							$(selector).last().css({'border-bottom-left-radius': '5px', 'border-bottom-right-radius': '5px'}); break;
+						case 'bottom':
+							$(selector).css({borderRadius: '0px 0px 0px 0px'});
+							$(selector).first().css({borderRadius: '5px 5px 0px 0px'}); break;
+						default: break;
+					}
+				}
+			}
+		},
+		modal: {
+			css: {
+				position: 'fixed',
+				width: '100%',
+				height: '100%',
+				backgroundColor: '#000',
+				zIndex: 10000,
+				opacity: 0.6,
+				display: 'none',
+				left: 0,
+				top: 0
+			}
+		},
+		style: function() {
+
+			this.$bar.css({
+				overflow: 'hidden',
+				background: "url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABsAAAAoCAYAAAAPOoFWAAAAGXRFWHRTb2Z0d2FyZQBBZG9iZSBJbWFnZVJlYWR5ccllPAAAAPZJREFUeNq81tsOgjAMANB2ov7/7ypaN7IlIwi9rGuT8QSc9EIDAsAznxvY4pXPKr05RUE5MEVB+TyWfCEl9LZApYopCmo9C4FKSMtYoI8Bwv79aQJU4l6hXXCZrQbokJEksxHo9KMOgc6w1atHXM8K9DVC7FQnJ0i8iK3QooGgbnyKgMDygBWyYFZoqx4qS27KqLZJjA1D0jK6QJcYEQEiWv9PGkTsbqxQ8oT+ZtZB6AkdsJnQDnMoHXHLGKOgDYuCWmYhEERCI5gaamW0bnHdA3k2ltlIN+2qKRyCND0bhqSYCyTB3CAOc4WusBEIpkeBuPgJMAAX8Hs1NfqHRgAAAABJRU5ErkJggg==') repeat-x scroll left top #fff"
+			});
+
+			this.$message.css({
+				fontSize: '13px',
+				lineHeight: '16px',
+				textAlign: 'center',
+				padding: '8px 10px 9px',
+				width: 'auto',
+				position: 'relative'
+			});
+
+			this.$closeButton.css({
+				position: 'absolute',
+				top: 4, right: 4,
+				width: 10, height: 10,
+				background: "url(data:image/png;base64,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)",
+				display: 'none',
+				cursor: 'pointer'
+			});
+
+			this.$buttons.css({
+				padding: 5,
+				textAlign: 'right',
+				borderTop: '1px solid #ccc',
+				backgroundColor: '#fff'
+			});
+
+			this.$buttons.find('button').css({
+				marginLeft: 5
+			});
+
+			this.$buttons.find('button:first').css({
+				marginLeft: 0
+			});
+
+			this.$bar.bind({
+				mouseenter: function() { $(this).find('.noty_close').stop().fadeTo('normal',1); },
+				mouseleave: function() { $(this).find('.noty_close').stop().fadeTo('normal',0); }
+			});
+
+			switch (this.options.layout.name) {
+				case 'top':
+					this.$bar.css({
+						borderRadius: '0px 0px 5px 5px',
+						borderBottom: '2px solid #eee',
+						borderLeft: '2px solid #eee',
+						borderRight: '2px solid #eee',
+						boxShadow: "0 2px 4px rgba(0, 0, 0, 0.1)"
+					});
+				break;
+				case 'topCenter': case 'center': case 'bottomCenter': case 'inline':
+					this.$bar.css({
+						borderRadius: '5px',
+						border: '1px solid #eee',
+						boxShadow: "0 2px 4px rgba(0, 0, 0, 0.1)"
+					});
+					this.$message.css({fontSize: '13px', textAlign: 'center'});
+				break;
+				case 'topLeft': case 'topRight':
+				case 'bottomLeft': case 'bottomRight':
+				case 'centerLeft': case 'centerRight':
+					this.$bar.css({
+						borderRadius: '5px',
+						border: '1px solid #eee',
+						boxShadow: "0 2px 4px rgba(0, 0, 0, 0.1)"
+					});
+					this.$message.css({fontSize: '13px', textAlign: 'left'});
+				break;
+				case 'bottom':
+					this.$bar.css({
+						borderRadius: '5px 5px 0px 0px',
+						borderTop: '2px solid #eee',
+						borderLeft: '2px solid #eee',
+						borderRight: '2px solid #eee',
+						boxShadow: "0 -2px 4px rgba(0, 0, 0, 0.1)"
+					});
+				break;
+				default:
+					this.$bar.css({
+						border: '2px solid #eee',
+						boxShadow: "0 2px 4px rgba(0, 0, 0, 0.1)"
+					});
+				break;
+			}
+
+			switch (this.options.type) {
+				case 'alert': case 'notification':
+					this.$bar.css({backgroundColor: '#FFF', borderColor: '#CCC', color: '#444'}); break;
+				case 'warning':
+					this.$bar.css({backgroundColor: '#FFEAA8', borderColor: '#FFC237', color: '#826200'});
+					this.$buttons.css({borderTop: '1px solid #FFC237'}); break;
+				case 'error':
+					this.$bar.css({backgroundColor: 'red', borderColor: 'darkred', color: '#FFF'});
+					this.$message.css({fontWeight: 'bold'});
+					this.$buttons.css({borderTop: '1px solid darkred'}); break;
+				case 'information':
+					this.$bar.css({backgroundColor: '#57B7E2', borderColor: '#0B90C4', color: '#FFF'});
+					this.$buttons.css({borderTop: '1px solid #0B90C4'}); break;
+				case 'success':
+					this.$bar.css({backgroundColor: 'lightgreen', borderColor: '#50C24E', color: 'darkgreen'});
+					this.$buttons.css({borderTop: '1px solid #50C24E'});break;
+				default:
+					this.$bar.css({backgroundColor: '#FFF', borderColor: '#CCC', color: '#444'}); break;
+			}
+		},
+		callback: {
+			onShow: function() { $.noty.themes.defaultTheme.helpers.borderFix.apply(this); },
+			onClose: function() { $.noty.themes.defaultTheme.helpers.borderFix.apply(this); }
+		}
+	};
+
+})(jQuery);
+
+;(function($) {
+
+	$.noty.layouts.topCenter = {
+		name: 'topCenter',
+		options: { // overrides options
+
+		},
+		container: {
+			object: '<ul id="noty_topCenter_layout_container" />',
+			selector: 'ul#noty_topCenter_layout_container',
+			style: function() {
+				$(this).css({
+					top: 20,
+					left: 0,
+					position: 'fixed',
+					width: '310px',
+					height: 'auto',
+					margin: 0,
+					padding: 0,
+					listStyleType: 'none',
+					zIndex: 10000000
+				});
+
+				$(this).css({
+					left: ($(window).width() - $(this).outerWidth(false)) / 2 + 'px'
+				});
+			}
+		},
+		parent: {
+			object: '<li />',
+			selector: 'li',
+			css: {}
+		},
+		css: {
+			display: 'none',
+			width: '310px'
+		},
+		addClass: ''
+	};
+
+})(jQuery);
