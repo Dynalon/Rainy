@@ -50,6 +50,13 @@ namespace Rainy
 				uihandler = (IHttpHandlerDecider) new EmbeddedResourceHandler ("/ui/", this.GetType ().Assembly, "Rainy.WebService.Admin.UI");
 			}
 
+			this.RequestFilters.Add ((req, resp, dto) => {
+				if (req.HttpMethod == "OPTIONS") {
+					resp.StatusCode = 200;
+					resp.End ();
+				}
+			});
+
 			// BUG HACK
 			// GlobalResponseHeaders are not cleared between creating instances of a new config
 			// this will be fatal (duplicate key error) for unit tests so we clear the headers
@@ -79,7 +86,7 @@ namespace Rainy
 
 					// the Authority header must be whitelisted; it is sent be the rainy-ui
 					// for authentication
-					{ "Access-Control-Allow-Headers", "Content-Type, Authority" },
+					{ "Access-Control-Allow-Headers", "Content-Type, Authority, AccessToken" },
 				}, 
 			});
 			
