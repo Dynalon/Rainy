@@ -14,8 +14,12 @@ function LoginCtrl($scope, $location, clientService, notyService, $rootScope) {
     var useStorage = window.localStorage && window.sessionStorage;
     if (useStorage) {
         $scope.username = window.sessionStorage.getItem('username');
+
         $scope.$watch('username', function (newval, oldval) {
-            window.sessionStorage.setItem('username', newval);
+            if (!newval)
+                window.sessionStorage.removeItem('username');
+            else
+                window.sessionStorage.setItem('username', newval);
         });
 
 
@@ -25,7 +29,7 @@ function LoginCtrl($scope, $location, clientService, notyService, $rootScope) {
         });
     }
 
-    if ($scope.username.length === 0)
+    if (!$scope.username || $scope.username.length === 0)
         $('#inputUsername').focus();
     else
         $('#inputPassword').focus();

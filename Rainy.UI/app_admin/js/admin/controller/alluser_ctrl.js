@@ -57,6 +57,7 @@ function AllUserCtrl($scope, $route) {
                 $scope.stop_edit();
             }
             $scope.reload_user_list();
+            $('#inputUsername').focus();
         });
     };
 

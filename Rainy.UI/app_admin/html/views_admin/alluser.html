@@ -2,9 +2,14 @@
 
 <!-- ADD NEW USER DIALOG -->
 <h3> Add a new user </h3>
-<form class="form-inline" id="new_user_form">
+<form class="form-inline" name="formNewUser" ng-submit="save_user(true)">
     <label>Username:</label>
-    <input ng-model="new_user.Username" class="input-small" type="text" required />
+    <input ng-model="new_user.Username"
+        class="input-small"
+        type="text"
+        id="inputUsername"
+        autofocus
+        required />
 
     <label>Email address:</label>
     <input ng-model="new_user.EmailAddress" type="text" required />
@@ -16,12 +21,13 @@
         class="input-small"
         type="text"
         placeholder="min. 8 chars"
+        ng-minLength="8"
         required />
     <!--
     <label>Send email to user </label>
     <input type="checkbox" ng-model="sendMail" ng-disabled="sendMailDisabled" />
     -->
-    <button class="btn pull-right" ng-click="save_user(true)">
+    <button type="submit" class="btn pull-right" ng-disabled="!formNewUser.$valid">
         Add
     </button>
 </form>
