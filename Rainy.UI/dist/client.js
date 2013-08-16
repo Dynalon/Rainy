@@ -356,99 +356,7 @@ if (typeof String.prototype.startsWith !== 'function') {
     };
 }
 
-app.factory('clientService', function($q, $http, $rootScope) {
-    var clientService = {
-        notes: [],
-        last_sync_revision: 0,
-        accessToken: '',
-        userDetails: {
-            username: 'johndoe'
-        }
-    };
-
-    var useStorage = window.sessionStorage && window.localStorage;
-    if (useStorage) {
-        clientService.accessToken = window.localStorage.getItem ('accessToken');
-    } 
-
-    clientService.login = function (user, pass, remember) {
-        var deferred = $q.defer();
-        var expiry = 1440; // 1d
-
-        if (remember)
-            expiry = 14 * 1440; // 14d
-
-        var credentials = {
-            Username: user,
-            Password: pass,
-            Expiry: expiry
-        };
-
-        $http.post('/oauth/temporary_access_token', credentials)
-        .success(function (data, status, headers, config) {
-            clientService.accessToken = data.AccessToken;
-            if (useStorage && remember) {
-                window.localStorage.setItem('accessToken', data.AccessToken);
-            }
-            $rootScope.$broadcast('loginStatus', true);
-            deferred.resolve();
-        })
-        .error(function (data, status) {
-            deferred.reject(status);
-            $rootScope.$broadcast('loginStatus', false);
-        });
-        return deferred.promise;
-    };
-
-    clientService.logout = function () {
-        clientService.accessToken = '';
-        if (useStorage) {
-            window.localStorage.removeItem('accessToken');
-        }
-        $rootScope.$broadcast('loginStatus', false);
-    };
-
-    clientService.userIsLoggedIn = function () {
-        // TODO check for expiry
-        var logged = !(clientService.accessToken === '' ||
-            clientService.accessToken === undefined);
-
-        if (useStorage && logged)
-            return window.localStorage.getItem('accessToken') || false;  
-        else return logged;
-    };
-
-    clientService.fetchNotes = function() {
-        $http({
-            method: 'GET',
-            url: '/api/1.0/johndoe/notes?include_notes=true',
-            headers: { 'AccessToken': clientService.accessToken }
-        }).success(function (data, status, headers, config) {
-            clientService.notes = data.notes;
-        });
-    };
-
-    clientService.saveNote = function(note) {
-
-        clientService.latest_sync_revision++;
-        var req = {
-            'latest-sync-revision': clientService.latest_sync_revision,
-        };
-        req['note-changes'] = [ note ];
-
-        $http({
-            method: 'PUT',
-            url: '/api/1.0/johndoe/notes',
-            headers: { 'AccessToken': clientService.accessToken },
-            data: req
-        }).success(function (data, status, headers, config) {
-            console.log('successfully saved note');
-        });
-    };
-
-    return clientService;
-});
-function LoginCtrl($scope, $location, clientService, notyService, $rootScope) {
+function LoginCtrl($scope, $location, loginService, notyService, $rootScope) {
 
     $scope.username = '';
     $scope.password = '';
@@ -457,7 +365,7 @@ function LoginCtrl($scope, $location, clientService, notyService, $rootScope) {
     $scope.allowSignup = true;
     $scope.allowRememberMe = true;
 
-    if (clientService.userIsLoggedIn()) {
+    if (loginService.userIsLoggedIn()) {
         $location.path('/notes/');
     }
 
@@ -487,7 +395,7 @@ function LoginCtrl($scope, $location, clientService, notyService, $rootScope) {
     $scope.doLogin = function () {
         var remember = $scope.allowRememberMe && $scope.rememberMe;
 
-        clientService.login($scope.username, $scope.password, remember)
+        loginService.login($scope.username, $scope.password, remember)
         .then(function () {
             $location.path('/notes/');
         }, function (error) {
@@ -497,32 +405,156 @@ function LoginCtrl($scope, $location, clientService, notyService, $rootScope) {
 }
 //LoginCtrl.$inject = [ '$scope','$http' ];
 
-function LogoutCtrl($scope, clientService, $location) {
+function LogoutCtrl($location, loginService) {
     
-    clientService.logout();
+    loginService.logout();
     $location.path('/login/');
 }
 
-function MainCtrl ($scope, clientService) {
-    $scope.isLoggedIn = clientService.userIsLoggedIn();
+function MainCtrl ($scope, loginService) {
+    $scope.isLoggedIn = loginService.userIsLoggedIn();
 
     $scope.$on('loginStatus', function(ev, isLoggedIn) {
         $scope.isLoggedIn = isLoggedIn;
     });
 }
-function NoteCtrl($scope, clientService, $routeParams, $location) {
+function NoteCtrl($scope, $location, $routeParams, noteService) {
 
-    $scope.notebooks = [ 'None' ];
-    // TODO find a better way to watch on that service
-    $scope.clientService = clientService;
-    $scope.$watch('clientService.notes', function (oldval, newval) {
-        $scope.notes = clientService.notes;
-        $scope.selectedNote = _.findWhere($scope.notes, {guid: $routeParams.guid});
-        $scope.notebooks = buildNotebooks($scope.notes);
+    $scope.notebooks = {};
+    $scope.selectedNote = null;
+
+    $scope.d = noteService.fetchNotes();
+    $scope.d.then(function() {
+        $scope.notebooks = noteService.notebooks; 
+        $scope.selectedNote = noteService.getNoteByGuid($routeParams.guid);
     });
 
-    if (clientService.notes && clientService.notes.length === 0)
-        clientService.fetchNotes();
+    if ($routeParams.guid) 
+        $scope.selectedNote = noteService.getNoteByGuid($routeParams.guid);
+
+
+    $scope.saveNote = function() {
+        noteService.saveNote($scope.selectedNote);
+    };
+
+    $scope.selectNote = function(note) {
+        var guid = note.guid;
+        $location.path('/notes/' + guid);
+        //$("#txtarea").wysihtml5();
+    };
+
+    $scope.sync = function () {
+        //noteService.uploadChanges();
+    };
+
+    $scope.deleteNote = function () {
+        noteService.deleteNote($scope.selectedNote);
+        $scope.notebooks = noteService.notebooks;
+    };
+
+    $scope.newNote = function () {
+        var note = noteService.newNote();
+        $scope.notebooks = noteService.notebooks;
+        $scope.selectedNote = note;
+    };
+}
+app.factory('loginService', function($q, $http, $rootScope) {
+    var loginService = {
+        username: '',
+        accessToken: ''
+    };
+
+    var useStorage = window.sessionStorage && window.localStorage;
+    if (useStorage) {
+        loginService.accessToken = window.localStorage.getItem('accessToken');
+        loginService.username = window.localStorage.getItem('username');
+    } 
+
+    loginService.login = function (user, pass, remember) {
+        var deferred = $q.defer();
+        var expiry = 1440; // 1d
+
+        if (remember)
+            expiry = 14 * 1440; // 14d
+
+        var credentials = {
+            Username: user,
+            Password: pass,
+            Expiry: expiry
+        };
+
+        $http.post('/oauth/temporary_access_token', credentials)
+        .success(function (data, status, headers, config) {
+            loginService.accessToken = data.AccessToken;
+            loginService.username = user;
+
+            if (useStorage && remember) {
+                window.localStorage.setItem('username', user);
+                window.localStorage.setItem('accessToken', data.AccessToken);
+            }
+            $rootScope.$broadcast('loginStatus', true);
+            deferred.resolve();
+        })
+        .error(function (data, status) {
+            deferred.reject(status);
+            $rootScope.$broadcast('loginStatus', false);
+        });
+        return deferred.promise;
+    };
+
+    loginService.logout = function () {
+        loginService.accessToken = '';
+        loginService.username = '';
+        loginService.notes = [];
+
+        if (useStorage) {
+            window.localStorage.removeItem('accessToken');
+        }
+        $rootScope.$broadcast('loginStatus', false);
+    };
+
+    loginService.userIsLoggedIn = function () {
+        // TODO check for expiry
+        var logged = !(loginService.accessToken === '' ||
+            loginService.accessToken === undefined);
+
+        if (useStorage && logged) {
+            var ret = window.localStorage.getItem('accessToken') && true;  
+            return ret;
+        }
+        else return logged;
+    };
+
+    loginService.isLoggedIn = loginService.userIsLoggedIn();
+
+    return loginService;
+});
+
+app.factory('noteService', function($http, $q, $rootScope, loginService) {
+
+    var notes = [];
+    var noteService = {};
+
+    Object.defineProperty(noteService, 'notebooks', {
+        get: function () {
+            return buildNotebooks(notes);
+        }
+    });
+
+    var latest_sync_revision = 0;
+
+    var manifest = {
+        taintedNotes: [],
+        deletedNotes: [],
+    };
+
+    $rootScope.$on('loginStatus', function(ev, isLoggedIn) {
+        // TODO is this needed at all?
+        if (!isLoggedIn) {
+            //noteService.notes = [];
+            latest_sync_revision = 0;
+        }
+    });
 
     function getNotebookFromNote (note) {
         var nb_name = null;
@@ -548,22 +580,18 @@ function NoteCtrl($scope, clientService, $routeParams, $location) {
         }
     }
 
-    $scope.saveNote = function() {
-        clientService.saveNote($scope.selectedNote);
-    };
-
-    $scope.selectNote = function(note) {
-        var guid = note.guid;
-        $location.path('/notes/' + guid);
-        //$("#txtarea").wysihtml5();
-    };
-
     function buildNotebooks (notes) {
         var notebooks = {};
         var notebook_names = [];
         
-        notebooks.All = notesByNotebook(notes);
-        
+        var unassigned_notes = notesByNotebook(notes);
+
+        if (unassigned_notes.length > 0) {
+            notebooks.All = _.filter(unassigned_notes, function(note) {
+                return !_.contains(manifest.deletedNotes, note);
+            });
+        }
+
         _.each(notes, function (note) {
             var nb = getNotebookFromNote (note);
             if (nb)
@@ -576,7 +604,85 @@ function NoteCtrl($scope, clientService, $routeParams, $location) {
         });
         return notebooks;
     }
-}
+
+    function guid () {
+        return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
+            var r = Math.random()*16|0, v = c === 'x' ? r : (r&0x3|0x8);
+            return v.toString(16);
+        });
+    }
+
+    noteService.getNoteByGuid = function (guid) {
+        return _.findWhere(notes, {guid: guid});
+    };
+
+    noteService.fetchNotes = function() {
+        var defered = $q.defer();
+        $http({
+            method: 'GET',
+            url: '/api/1.0/' + loginService.username + '/notes?include_notes=true',
+            headers: { 'AccessToken': loginService.accessToken }
+        }).success(function (data, status, headers, config) {
+            notes = data.notes;
+            defered.resolve();
+        }).error(function () {
+            // console.log('fail');
+            defered.reject();
+        });
+        return defered.promise;
+    };
+
+    noteService.uploadChanges = function () {
+        var note_changes = [];
+        _.each(manifest.taintedNotes, function(note) {
+            note_changes.push(note); 
+        });
+        _.each(manifest.deletedNotes, function(note) {
+            note.command = 'delete';
+            note_changes.push(note);
+        });
+
+        if (note_changes.length > 0) {
+            latest_sync_revision++;
+            var req = {
+                'latest-sync-revision': latest_sync_revision,
+            };
+            req['note-changes'] = note_changes;
+
+            $http({
+                method: 'PUT',
+                url: '/api/1.0/' + loginService.username + '/notes',
+                headers: { 'AccessToken': loginService.accessToken },
+                data: req
+            }).success(function (data, status, headers, config) {
+                console.log('successfully synced');
+            });
+        } else {
+            console.log ('no changes, not syncing');
+        }
+    };
+
+    noteService.deleteNote = function (note) {
+        if (!_.contains(manifest.deletedNotes, note)) {
+            manifest.deletedNotes.push(note);
+        }
+    };
+
+    noteService.newNote = function (initial_note) {
+        var proto = {};
+        proto.title = 'New note';
+        proto['note-content'] = 'Enter your note.';
+        proto.guid = guid();
+        proto.tags = [];
+
+        var note = $.extend(proto, initial_note);
+
+        notes.push(note); 
+        return note;
+    };
+
+    return noteService;
+});
 app.factory('notyService', function($rootScope) {
     var notyService = {};
 

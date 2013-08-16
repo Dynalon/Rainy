@@ -1,5 +1,5 @@
-function LogoutCtrl($scope, clientService, $location) {
+function LogoutCtrl($location, loginService) {
     
-    clientService.logout();
+    loginService.logout();
     $location.path('/login/');
 }
