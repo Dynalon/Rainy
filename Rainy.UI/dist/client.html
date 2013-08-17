@@ -116,9 +116,9 @@
                     <i class="icon-plus"></i>
                     New note
                 </button>
-                <button class="btn btn-danger" ng-click="deleteNote()">
+                <button class="btn btn-danger" ng-click="deleteNote()" ng-disabled="selectedNote == null">
                     <i class="icon-trash"></i>
-                    Delete note 
+                    Delete note
                 </button>
                 <button class="btn pull-right" ng-click="sync()">
                     <i class="icon-refresh"></i>
@@ -130,22 +130,20 @@
                 <div class="sidebar-nav">
                     <ul class="nav nav-list">
                         <div ng-repeat="(name,notes) in notebooks">
-                        <li class="nav-header">{{ name }}</li>
+                        <li class="nav-header" ng-show="(notes | filter: search_term).length > 0">{{ name }}</li>
                             <li ng-repeat="note in notes | filter: search_term">
-                            <a ng-click="selectNote(note)">{{ note.title }} </a>
+                            <a href="#/notes/{{ note.guid }}">{{ note.title }} </a>
                             </li>
                         </div>
                     </ul>
                 </div><!--/.well -->
             </div><!--/span-->
 
-            <div class="span5">
+            <div class="span5" ng-show="selectedNote">
                 <div class="control-group">
                     <h2>{{ selectedNote.title }}</h2>
                     <div class="controls">
                         <textarea id="txtarea" style="margin: 0px 0px 10px; height: 348px; width: 979px;" ng-model="selectedNote['note-content']"></textarea>
-                        <a ng-click="saveNote()" class="btn btn-success">Save</a>
-                        <a class="btn btn-danger">Cancel</a>
                     </div>
                 </div>
             </div><!--/span-->

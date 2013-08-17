@@ -1,7 +1,13 @@
 app.factory('noteService', function($http, $q, $rootScope, loginService) {
 
-    var notes = [];
     var noteService = {};
+    var notes = [];
+
+    var latest_sync_revision = 0;
+    var manifest = {
+        taintedNotes: [],
+        deletedNotes: [],
+    };
 
     Object.defineProperty(noteService, 'notebooks', {
         get: function () {
@@ -9,12 +15,11 @@ app.factory('noteService', function($http, $q, $rootScope, loginService) {
         }
     });
 
-    var latest_sync_revision = 0;
-
-    var manifest = {
-        taintedNotes: [],
-        deletedNotes: [],
-    };
+    Object.defineProperty(noteService, 'notes', {
+        get: function () {
+            return filterDeletedNotes(notes);
+        }
+    });
 
     $rootScope.$on('loginStatus', function(ev, isLoggedIn) {
         // TODO is this needed at all?
@@ -51,14 +56,9 @@ app.factory('noteService', function($http, $q, $rootScope, loginService) {
     function buildNotebooks (notes) {
         var notebooks = {};
         var notebook_names = [];
-        
-        var unassigned_notes = notesByNotebook(notes);
 
-        if (unassigned_notes.length > 0) {
-            notebooks.All = _.filter(unassigned_notes, function(note) {
-                return !_.contains(manifest.deletedNotes, note);
-            });
-        }
+        notebooks.All = notesByNotebook(notes);
+
 
         _.each(notes, function (note) {
             var nb = getNotebookFromNote (note);
@@ -70,7 +70,23 @@ app.factory('noteService', function($http, $q, $rootScope, loginService) {
         _.each(notebook_names, function(name) {
             notebooks[name] = notesByNotebook(notes, name);
         });
-        return notebooks;
+
+        // filter out notes marked as deleted & empty notebooks
+        var filtered_nb = {};
+        for (var nb in notebooks) {
+            var filtered = filterDeletedNotes(notebooks[nb]);
+            if (filtered.length > 0)
+                filtered_nb[nb] =  filtered;
+        }
+
+        return filtered_nb;
+    }
+
+    function filterDeletedNotes(notes) {
+        var filtered = _.filter(notes, function(note) {
+            return !_.contains(manifest.deletedNotes, note.guid);
+        });
+        return filtered;
     }
 
     function guid () {
@@ -81,7 +97,9 @@ app.factory('noteService', function($http, $q, $rootScope, loginService) {
     }
 
     noteService.getNoteByGuid = function (guid) {
-        return _.findWhere(notes, {guid: guid});
+        if (noteService.notes.length === 0)
+            return null;
+        return _.findWhere(noteService.notes, {guid: guid});
     };
 
     noteService.fetchNotes = function() {
@@ -103,7 +121,7 @@ app.factory('noteService', function($http, $q, $rootScope, loginService) {
     noteService.uploadChanges = function () {
         var note_changes = [];
         _.each(manifest.taintedNotes, function(note) {
-            note_changes.push(note); 
+            note_changes.push(note);
         });
         _.each(manifest.deletedNotes, function(note) {
             note.command = 'delete';
@@ -132,7 +150,7 @@ app.factory('noteService', function($http, $q, $rootScope, loginService) {
 
     noteService.deleteNote = function (note) {
         if (!_.contains(manifest.deletedNotes, note)) {
-            manifest.deletedNotes.push(note);
+            manifest.deletedNotes.push(note.guid);
         }
     };
 
@@ -145,9 +163,11 @@ app.factory('noteService', function($http, $q, $rootScope, loginService) {
 
         var note = $.extend(proto, initial_note);
 
-        notes.push(note); 
+        notes.push(note);
         return note;
     };
+
+    noteService.fetchNotes();
 
     return noteService;
 });

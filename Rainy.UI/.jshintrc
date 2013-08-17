@@ -9,6 +9,7 @@
     "quotmark": "single",
 
     "globals": {
+        "admin_pw": true,
         "jQuery": true,
         "$": true,
         "console": true,
