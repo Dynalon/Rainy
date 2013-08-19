@@ -4,11 +4,16 @@
 <head>
     <meta charset="utf-8">
     <title>
-        Rainy - 2 GO 
+        Rainy - 2 GO
     </title>
     <link href="//netdna.bootstrapcdn.com/bootswatch/2.3.2/united/bootstrap.min.css"
     rel="stylesheet"/>
     <link href="client.css" rel="stylesheet"/>
+    <style>
+        .mainContent {
+            margin-left: 10px;
+        }
+    </style>
 </head>
 
 <body>
@@ -29,18 +34,15 @@
 	        </div>
 	    </div>
 	</div>
-    <div class="container">
-        <div class="row">
-            <!-- TOPLINE NAV SELECTION -->
-            <div class="span12" ng-View>
-            </div>
-        </div>
+
+    <div class="mainContent" ng-view>
+    <!-- MAIN VIEW CONTENT-->
+    </div>
 
         <script src="common.js" type="text/javascript">
         </script>
         <script src="client.js" type="text/javascript">
         </script>
-    </div>
 </body>
 
 </html>

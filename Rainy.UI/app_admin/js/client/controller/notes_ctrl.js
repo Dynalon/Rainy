@@ -9,13 +9,23 @@ function NoteCtrl($scope, $location, $routeParams, noteService) {
         $scope.notebooks = noteService.notebooks;
         $scope.notes = newval;
 
-        if ($routeParams.guid) {
-            var n = noteService.getNoteByGuid($routeParams.guid);
-            $scope.selectNote(n);
+        var guid = $routeParams.guid;
+        if (guid) {
+            if ($scope.selectedNote === null || guid !== $scope.selectedNote.guid) {
+                var n = noteService.getNoteByGuid($routeParams.guid);
+                $scope.selectNote(n);
+            }
         }
 
     }, true);
 
+    function checkIfTainted (newval, oldval, dereg) {
+        if (newval === oldval)
+            return;
+        // mark this note as tainted
+        noteService.markAsTainted($scope.selectedNote);
+        dereg();
+    }
 
     $scope.saveNote = function () {
         noteService.saveNote($scope.selectedNote);
@@ -24,6 +34,11 @@ function NoteCtrl($scope, $location, $routeParams, noteService) {
     $scope.selectNote = function (note) {
         if (!!note) {
             $scope.selectedNote = note;
+
+            var dereg_watcher = $scope.$watch('selectedNote["note-content"]', function (newval, oldval) {
+                checkIfTainted (newval, oldval, dereg_watcher);
+            });
+
             var guid = note.guid;
             $location.path('/notes/' + guid);
         } else
@@ -32,7 +47,8 @@ function NoteCtrl($scope, $location, $routeParams, noteService) {
     };
 
     $scope.sync = function () {
-        //noteService.uploadChanges();
+        //noteService.debug();
+        noteService.uploadChanges();
     };
 
     $scope.deleteNote = function () {

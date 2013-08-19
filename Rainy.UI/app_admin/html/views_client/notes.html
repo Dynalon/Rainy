@@ -4,14 +4,14 @@
 
     <div class="container-fluid">
         <div class="row-fluid">
-            <div class="span4">
+            <div class="span3">
                 <!-- SEARCH INPUT -->
                 <div class="input-prepend pull-left">
                     <span class="add-on"><i class="icon-search"></i></span>
                     <input ng-model="search_term" type="text" placeholder="Search notes..." />
                 </div>
             </div>
-            <div class="span4">
+            <div class="span3">
             <!-- CONTROLLS -->
                 <button class="btn btn-primary" ng-click="newNote()">
                     <i class="icon-plus"></i>
@@ -25,9 +25,9 @@
                     <i class="icon-refresh"></i>
                 </button>
             </div>
-        </div>
+        </div><!-- /row -->
         <div class="row-fluid">
-            <div class="span4">
+            <div class="span3">
                 <div class="sidebar-nav">
                     <ul class="nav nav-list">
                         <div ng-repeat="(name,notes) in notebooks">
@@ -40,11 +40,16 @@
                 </div><!--/.well -->
             </div><!--/span-->
 
-            <div class="span5" ng-show="selectedNote">
+            <div class="span9" ng-show="selectedNote">
                 <div class="control-group">
                     <h2>{{ selectedNote.title }}</h2>
                     <div class="controls">
-                        <textarea id="txtarea" style="margin: 0px 0px 10px; height: 348px; width: 979px;" ng-model="selectedNote['note-content']"></textarea>
+                        <textarea id="txtarea"
+                            style=""
+                            rows="20"
+                            class="span10"
+                            ng-model="selectedNote['note-content']"
+                            ng-trim="false"></textarea>
                     </div>
                 </div>
             </div><!--/span-->

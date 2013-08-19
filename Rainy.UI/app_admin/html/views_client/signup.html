@@ -1,0 +1,85 @@
+<script type="text/ng-template" id="signup.html">
+
+<div class="row">
+    <div class="span3"></div>
+    <div class="span6">
+        <!-- login form -->
+        <h2>Signup</h2><hr />
+        <form name="formSignup" ng-submit="signup()">
+            <div class="row">
+                <div class="span3">
+                    <div class="control-group">
+                        <label class="control-label" for="email">Email address</label>
+                        <div class="controls">
+                            <input type="email" ng-model="email" name="email" id="email" placeholder="Email" required>
+                        </div>
+                    </div>
+                </div>
+                <div class="span3">
+                    <div class="control-group">
+                        <label class="control-label" for="username">Username</label>
+                        <div class="controls">
+                          <input type="text" ng-model="username" name="username" id="username" placeholder="Username" required ng-minLength="4" ng-maxLength="20">
+                        </div>
+                    </div>
+                </div>
+            </div> <!-- /row -->
+            <div class="row">
+                <div class="span3">
+                    <div class="control-group">
+                        <label class="control-label" for="password1">Password</label>
+                        <div class="controls">
+                            <input type="password"
+                                ng-model="password1"
+                                name="password1"
+                                id="password1"
+                                placeholder="Password"
+                                required ng-minLength="8">
+                        </div>
+                    </div>
+                </div>
+                <div class="span3">
+                    <div class="control-group">
+                        <label class="control-label" for="password2">Password verification</label>
+                        <div class="controls">
+                          <input type="password" ng-model="password2" name="password2" id="password2" placeholder="Password verification" required ng-minLength="8">
+                        </div>
+                    </div>
+                </div>
+            </div> <!-- /row -->
+
+            <div class="row">
+                <div class="span6"
+                    <div class="control-group">
+                        <div class="controls">
+                            <label class="checkbox" >
+                                <input type="checkbox" ng-model="toc"> Accept Terms &amp; Conditions
+                            </label>
+                            <div class="alert alert-error" ng-show="formSignup.$invalid">
+                                <ul>
+                                    <li ng-show="formSignup.$error.passwdmatch">Passwords don't match</li>
+                                    <li ng-show="formSignup.password1.$error.minlength || formSignup.password1.$error.required">Password length >= 8</li>
+                                    <li ng-show="formSignup.email.$error.required || formSignup.email.$error.email">Valid email address is required</li>
+                                    <li ng-show="formSignup.username.$error.minlength || formSignup.username.$error.maxlength">Username length between 4 and 20 chars</li>
+                                    <li ng-show="formSignup.$error.toc">Accept Terms and Conditions</li>
+                                </ul>
+                            </div>
+
+                            <button type="submit" ng-disabled="!formSignup.$valid" class="btn">Sign in</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </form>
+        <div class="span3"></div>
+    </div>
+</div><!-- /row -->
+
+<div class="row">
+    <div class="span3"><!-- SPACING --> </div>
+    <div class="span6">
+        <div class="alert">Don&quot;t have an account yet? Click <a href="register">here to sign up!</a>
+    </div>
+    <div class="span3"><!-- SPACING --> </div>
+</div>
+</script>

@@ -23,6 +23,10 @@ var app = angular.module('clientApp', [
             template: '<div ng-controller="LogoutCtrl"></div>',
             controller: 'LogoutCtrl'
         });
+        $routeProvider.when('/signup', {
+            templateUrl: 'signup.html',
+            controller: 'SignupCtrl'
+        });
 
         $routeProvider.otherwise({
             redirectTo: '/login'
@@ -76,7 +80,7 @@ angular.module('clientApp.services', [])
     .value('version', '0.1');
 
 
-// DIRECTIVES 
+// DIRECTIVES
 angular.module('clientApp.directives', [])
     .directive('appVersion', ['version',
         function(version) {

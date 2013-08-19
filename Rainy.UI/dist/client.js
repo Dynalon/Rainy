@@ -23,6 +23,10 @@ var app = angular.module('clientApp', [
             template: '<div ng-controller="LogoutCtrl"></div>',
             controller: 'LogoutCtrl'
         });
+        $routeProvider.when('/signup', {
+            templateUrl: 'signup.html',
+            controller: 'SignupCtrl'
+        });
 
         $routeProvider.otherwise({
             redirectTo: '/login'
@@ -76,7 +80,7 @@ angular.module('clientApp.services', [])
     .value('version', '0.1');
 
 
-// DIRECTIVES 
+// DIRECTIVES
 angular.module('clientApp.directives', [])
     .directive('appVersion', ['version',
         function(version) {
@@ -91,41 +95,6 @@ if (typeof String.prototype.startsWith !== 'function') {
     String.prototype.startsWith = function(str) {
         return this.slice(0, str.length) === str;
     };
-}
-
-function ClientCtrl ($scope, $http, $q, clientService) {
-
-    $scope.notes = clientService.notes;
-
-    // TODO find a better way to watch on that service
-    $scope.clientService = clientService;
-    $scope.$watch('clientService.notes', function (oldval, newval) {
-        $scope.notes = clientService.notes;
-        console.log($scope.notes);
-    });
-    clientService.fetchNotes();
-
-}
-
-function NoteCtrl($scope, clientService) {
-
-    // TODO find a better way to watch on that service
-    $scope.clientService = clientService;
-    $scope.$watch('clientService.notes', function (oldval, newval) {
-        $scope.notes = clientService.notes;
-    });
-    $scope.selectedNote = null;
-
-    $scope.saveNote = function() {
-        console.log('attempting to save note');
-        clientService.saveNote($scope.selectedNote);
-    };
-
-    $scope.selectNote = function(index) {
-        $scope.selectedNote = $scope.notes[index];
-        //$("#txtarea").wysihtml5();
-    };
-
 }
 
 function LoginCtrl($scope, $location, loginService, notyService, $rootScope) {
@@ -201,13 +170,23 @@ function NoteCtrl($scope, $location, $routeParams, noteService) {
         $scope.notebooks = noteService.notebooks;
         $scope.notes = newval;
 
-        if ($routeParams.guid) {
-            var n = noteService.getNoteByGuid($routeParams.guid);
-            $scope.selectNote(n);
+        var guid = $routeParams.guid;
+        if (guid) {
+            if ($scope.selectedNote === null || guid !== $scope.selectedNote.guid) {
+                var n = noteService.getNoteByGuid($routeParams.guid);
+                $scope.selectNote(n);
+            }
         }
 
     }, true);
 
+    function checkIfTainted (newval, oldval, dereg) {
+        if (newval === oldval)
+            return;
+        // mark this note as tainted
+        noteService.markAsTainted($scope.selectedNote);
+        dereg();
+    }
 
     $scope.saveNote = function () {
         noteService.saveNote($scope.selectedNote);
@@ -216,6 +195,11 @@ function NoteCtrl($scope, $location, $routeParams, noteService) {
     $scope.selectNote = function (note) {
         if (!!note) {
             $scope.selectedNote = note;
+
+            var dereg_watcher = $scope.$watch('selectedNote["note-content"]', function (newval, oldval) {
+                checkIfTainted (newval, oldval, dereg_watcher);
+            });
+
             var guid = note.guid;
             $location.path('/notes/' + guid);
         } else
@@ -224,7 +208,8 @@ function NoteCtrl($scope, $location, $routeParams, noteService) {
     };
 
     $scope.sync = function () {
-        //noteService.uploadChanges();
+        //noteService.debug();
+        noteService.uploadChanges();
     };
 
     $scope.deleteNote = function () {
@@ -236,6 +221,39 @@ function NoteCtrl($scope, $location, $routeParams, noteService) {
         var note = noteService.newNote();
         $scope.selectNote(note);
     };
+}
+
+function SignupCtrl($scope, $location) {
+    $scope.username = '';
+    $scope.usernameOk = true;
+    $scope.password1 = '';
+    $scope.password2 = '';
+    $scope.email = '';
+    $scope.toc = false;
+
+    $scope.$watch(combinedPassword, function (newval, oldval) {
+        console.log(newval);
+        if (newval === oldval) return;
+        passwordMatch();
+    });
+
+    $scope.$watch('toc', function (newval) {
+        if (newval === true)
+            $scope.formSignup.$setValidity('toc', true);
+        else
+            $scope.formSignup.$setValidity('toc', false);
+    });
+
+    function combinedPassword () {
+        return $scope.password1 + ' ' + $scope.password2;
+    }
+
+    function passwordMatch () {
+        if ($scope.password1 !== $scope.password2)
+            $scope.formSignup.$setValidity('passwdmatch', false);
+        else
+            $scope.formSignup.$setValidity('passwdmatch', true);
+    }
 }
 
 app.factory('loginService', function($q, $http, $rootScope) {
@@ -310,7 +328,7 @@ app.factory('loginService', function($q, $http, $rootScope) {
     return loginService;
 });
 
-app.factory('noteService', function($http, $q, $rootScope, loginService) {
+app.factory('noteService', function($http, $rootScope, loginService) {
 
     var noteService = {};
     var notes = [];
@@ -411,33 +429,34 @@ app.factory('noteService', function($http, $q, $rootScope, loginService) {
     noteService.getNoteByGuid = function (guid) {
         if (noteService.notes.length === 0)
             return null;
-        return _.findWhere(noteService.notes, {guid: guid});
+        return _.findWhere(notes, {guid: guid});
     };
 
     noteService.fetchNotes = function() {
-        var defered = $q.defer();
+        manifest.taintedNotes = [];
+        manifest.deletedNotes = [];
+
         $http({
             method: 'GET',
             url: '/api/1.0/' + loginService.username + '/notes?include_notes=true',
             headers: { 'AccessToken': loginService.accessToken }
         }).success(function (data, status, headers, config) {
             notes = data.notes;
-            defered.resolve();
         }).error(function () {
             // console.log('fail');
-            defered.reject();
         });
-        return defered.promise;
     };
 
     noteService.uploadChanges = function () {
         var note_changes = [];
-        _.each(manifest.taintedNotes, function(note) {
-            note_changes.push(note);
+        _.each(manifest.taintedNotes, function(guid) {
+            var n = noteService.getNoteByGuid(guid);
+            note_changes.push(n);
         });
-        _.each(manifest.deletedNotes, function(note) {
-            note.command = 'delete';
-            note_changes.push(note);
+        _.each(manifest.deletedNotes, function(guid) {
+            var n = noteService.getNoteByGuid(guid);
+            n.command = 'delete';
+            note_changes.push(n);
         });
 
         if (note_changes.length > 0) {
@@ -447,6 +466,8 @@ app.factory('noteService', function($http, $q, $rootScope, loginService) {
             };
             req['note-changes'] = note_changes;
 
+            console.log(req);
+
             $http({
                 method: 'PUT',
                 url: '/api/1.0/' + loginService.username + '/notes',
@@ -454,6 +475,7 @@ app.factory('noteService', function($http, $q, $rootScope, loginService) {
                 data: req
             }).success(function (data, status, headers, config) {
                 console.log('successfully synced');
+                noteService.fetchNotes();
             });
         } else {
             console.log ('no changes, not syncing');
@@ -477,6 +499,13 @@ app.factory('noteService', function($http, $q, $rootScope, loginService) {
 
         notes.push(note);
         return note;
+    };
+
+    noteService.markAsTainted = function (note) {
+        if (!_.contains(manifest.taintedNotes, note.guid)) {
+            console.log('marking note ' + note.guid + ' as tainted');
+            manifest.taintedNotes.push(note.guid);
+        }
     };
 
     noteService.fetchNotes();

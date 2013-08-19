@@ -1,4 +1,4 @@
-app.factory('noteService', function($http, $q, $rootScope, loginService) {
+app.factory('noteService', function($http, $rootScope, loginService) {
 
     var noteService = {};
     var notes = [];
@@ -99,33 +99,34 @@ app.factory('noteService', function($http, $q, $rootScope, loginService) {
     noteService.getNoteByGuid = function (guid) {
         if (noteService.notes.length === 0)
             return null;
-        return _.findWhere(noteService.notes, {guid: guid});
+        return _.findWhere(notes, {guid: guid});
     };
 
     noteService.fetchNotes = function() {
-        var defered = $q.defer();
+        manifest.taintedNotes = [];
+        manifest.deletedNotes = [];
+
         $http({
             method: 'GET',
             url: '/api/1.0/' + loginService.username + '/notes?include_notes=true',
             headers: { 'AccessToken': loginService.accessToken }
         }).success(function (data, status, headers, config) {
             notes = data.notes;
-            defered.resolve();
         }).error(function () {
             // console.log('fail');
-            defered.reject();
         });
-        return defered.promise;
     };
 
     noteService.uploadChanges = function () {
         var note_changes = [];
-        _.each(manifest.taintedNotes, function(note) {
-            note_changes.push(note);
+        _.each(manifest.taintedNotes, function(guid) {
+            var n = noteService.getNoteByGuid(guid);
+            note_changes.push(n);
         });
-        _.each(manifest.deletedNotes, function(note) {
-            note.command = 'delete';
-            note_changes.push(note);
+        _.each(manifest.deletedNotes, function(guid) {
+            var n = noteService.getNoteByGuid(guid);
+            n.command = 'delete';
+            note_changes.push(n);
         });
 
         if (note_changes.length > 0) {
@@ -135,6 +136,8 @@ app.factory('noteService', function($http, $q, $rootScope, loginService) {
             };
             req['note-changes'] = note_changes;
 
+            console.log(req);
+
             $http({
                 method: 'PUT',
                 url: '/api/1.0/' + loginService.username + '/notes',
@@ -142,6 +145,7 @@ app.factory('noteService', function($http, $q, $rootScope, loginService) {
                 data: req
             }).success(function (data, status, headers, config) {
                 console.log('successfully synced');
+                noteService.fetchNotes();
             });
         } else {
             console.log ('no changes, not syncing');
@@ -165,6 +169,13 @@ app.factory('noteService', function($http, $q, $rootScope, loginService) {
 
         notes.push(note);
         return note;
+    };
+
+    noteService.markAsTainted = function (note) {
+        if (!_.contains(manifest.taintedNotes, note.guid)) {
+            console.log('marking note ' + note.guid + ' as tainted');
+            manifest.taintedNotes.push(note.guid);
+        }
     };
 
     noteService.fetchNotes();
