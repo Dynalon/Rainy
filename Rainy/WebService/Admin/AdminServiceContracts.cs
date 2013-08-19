@@ -30,6 +30,18 @@ namespace Rainy.WebService.Management
 	{
 	}
 
+	// check if a username is available
+	public class CheckUsernameResponse
+	{
+		public bool Available { get; set; }
+		public string Username { get; set; }
+	}
+	[Route("/api/user/signup/check_username/{Username}", "GET")]
+	public class CheckUsernameRequest : IReturn<CheckUsernameResponse>
+	{
+		public string Username { get; set; }
+	}
+
 	// allows anyone to register a new account
 	[Route("/api/user/signup/new/", "POST")]
 	public class SignupUserRequest : DTOUser, IReturnVoid

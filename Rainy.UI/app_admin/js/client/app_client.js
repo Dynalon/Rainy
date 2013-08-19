@@ -89,6 +89,33 @@ angular.module('clientApp.directives', [])
             };
         }
     ])
+    .directive('uniqueUsername', ['$http', function ($http) {
+        return {
+            require:'ngModel',
+            restrict: 'A',
+            link:function (scope, el, attrs, ctrl) {
+
+                var check_username_avail = _.debounce(function (username) {
+                    $http.get('/api/user/signup/check_username/' + username)
+                    .success(function (data) {
+                        console.log(data);
+                        if (data.Available === true)
+                            ctrl.$setValidity('username_avail', true);
+                        else
+                            ctrl.$setValidity('username_avail', false);
+                    }); 
+                }, 800);
+
+                // push to the end of all other validity parsers
+                ctrl.$parsers.push(function (viewValue) {
+                    if (viewValue) {
+                        check_username_avail(viewValue);
+                        return viewValue;
+                    }
+                });
+            }
+        };
+    }])
 ;
 
 if (typeof String.prototype.startsWith !== 'function') {

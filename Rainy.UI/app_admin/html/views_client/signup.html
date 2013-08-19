@@ -1,5 +1,6 @@
 <script type="text/ng-template" id="signup.html">
 
+
 <div class="row">
     <div class="span3"></div>
     <div class="span6">
@@ -7,26 +8,45 @@
         <h2>Signup</h2><hr />
         <form name="formSignup" ng-submit="signup()">
             <div class="row">
+
+                <!-- EMAIL ADDRESS -->
                 <div class="span3">
-                    <div class="control-group">
+                    <div class="control-group"
+                        ng-class="{
+                            error: formSignup.email.$invalid && formSignup.email.$dirty,
+                            success: formSignup.email.$valid && formSignup.email.$dirty
+                        }">
                         <label class="control-label" for="email">Email address</label>
                         <div class="controls">
                             <input type="email" ng-model="email" name="email" id="email" placeholder="Email" required>
                         </div>
                     </div>
                 </div>
+
+                <!-- USERNAME -->
                 <div class="span3">
-                    <div class="control-group">
+                    <div class="control-group"
+                        ng-class="{
+                            error: formSignup.username.$invalid && formSignup.username.$dirty,
+                            success: formSignup.username.$valid && formSignup.username.$dirty
+                        }">
                         <label class="control-label" for="username">Username</label>
                         <div class="controls">
-                          <input type="text" ng-model="username" name="username" id="username" placeholder="Username" required ng-minLength="4" ng-maxLength="20">
+                          <input type="text" ng-model="username" name="username" id="username" placeholder="Username" required unique-username ng-minLength="4" ng-maxLength="20">
                         </div>
                     </div>
                 </div>
             </div> <!-- /row -->
             <div class="row">
+
+                <!-- PASSWORD1 -->
                 <div class="span3">
-                    <div class="control-group">
+                    <div class="control-group"
+                        ng-class="{
+                            error: formSignup.password1.$invalid && formSignup.password1.$dirty,
+                            success: formSignup.password1.$valid && formSignup.password1.$dirty
+                        }">
+
                         <label class="control-label" for="password1">Password</label>
                         <div class="controls">
                             <input type="password"
@@ -38,8 +58,14 @@
                         </div>
                     </div>
                 </div>
+
+                <!-- PASSWORD2 -->
                 <div class="span3">
-                    <div class="control-group">
+                    <div class="control-group"
+                        ng-class="{
+                            error: (formSignup.password2.$invalid || formSignup.$error.passwdmatch) && formSignup.password2.$dirty,
+                            success: formSignup.password2.$valid && formSignup.password2.$dirty && !formSignup.$error.passwdmatch
+                        }">
                         <label class="control-label" for="password2">Password verification</label>
                         <div class="controls">
                           <input type="password" ng-model="password2" name="password2" id="password2" placeholder="Password verification" required ng-minLength="8">
@@ -49,25 +75,23 @@
             </div> <!-- /row -->
 
             <div class="row">
-                <div class="span6"
+                <div class="span6">
+
+                    <!-- ERROR MESSAGES --> 
                     <div class="control-group">
                         <div class="controls">
                             <label class="checkbox" >
                                 <input type="checkbox" ng-model="toc"> Accept Terms &amp; Conditions
                             </label>
-                            <div class="alert alert-error" ng-show="formSignup.$invalid">
+
+                            <div class="alert alert-error" ng-show="formSignup.$error.username_avail && formSignup.username.$dirty">
                                 <ul>
-                                    <li ng-show="formSignup.$error.passwdmatch">Passwords don't match</li>
-                                    <li ng-show="formSignup.password1.$error.minlength || formSignup.password1.$error.required">Password length >= 8</li>
-                                    <li ng-show="formSignup.email.$error.required || formSignup.email.$error.email">Valid email address is required</li>
-                                    <li ng-show="formSignup.username.$error.minlength || formSignup.username.$error.maxlength">Username length between 4 and 20 chars</li>
-                                    <li ng-show="formSignup.$error.toc">Accept Terms and Conditions</li>
+                                    <li ng-show="formSignup.$error.username_avail">Username is already taken</li>
                                 </ul>
                             </div>
-
-                            <button type="submit" ng-disabled="!formSignup.$valid" class="btn">Sign in</button>
                         </div>
                     </div>
+                    <button type="submit" ng-disabled="!formSignup.$valid" class="btn">Sign up</button>
                 </div>
             </div>
         </form>
@@ -78,7 +102,7 @@
 <div class="row">
     <div class="span3"><!-- SPACING --> </div>
     <div class="span6">
-        <div class="alert">Don&quot;t have an account yet? Click <a href="register">here to sign up!</a>
+        <div class="alert alert-info">Already have an account? <a href="#/login">Click here to log in!</a>
     </div>
     <div class="span3"><!-- SPACING --> </div>
 </div>

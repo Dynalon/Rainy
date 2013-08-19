@@ -96,6 +96,23 @@ namespace Rainy.WebService.Signup
 			};
 		}
 
+		public object Get (CheckUsernameRequest req)
+		{
+			req.Username = req.Username.ToLower ();
+
+			var resp = new CheckUsernameResponse {
+				Username = req.Username,
+				Available = false
+			};
+
+			using (var db = connFactory.OpenDbConnection ()) {
+				var user = db.FirstOrDefault<DBUser> (u => u.Username == req.Username);
+				if (user == null)
+					resp.Available = true;
+			}
+			return resp;
+		}
+
 		public object Post (ActivateUserRequest req)
 		{
 			using (var db = connFactory.OpenDbConnection ()) {
