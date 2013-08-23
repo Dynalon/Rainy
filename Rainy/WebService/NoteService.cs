@@ -9,6 +9,7 @@ using Tomboy.Sync.Web.DTO;
 using DTO = Tomboy.Sync.Web.DTO;
 using Rainy.ErrorHandling;
 using ServiceStack.OrmLite;
+using Rainy.NoteConversion;
 
 
 namespace Rainy.WebService
@@ -60,6 +61,12 @@ namespace Rainy.WebService
 					if (!string.IsNullOrEmpty (include_notes) && !bool.TryParse (include_notes, out include_note_body))
 						throw new InvalidRequestDtoException () {ErrorMessage = "unable to parse parameter include_notes to boolean"};
 
+					// check if we transform the note content to HTML
+					bool notes_as_html = false; 
+					string to_html = Request.GetParam ("notes_as_html");
+					if (!string.IsNullOrEmpty (to_html) && !bool.TryParse (to_html, out notes_as_html))
+						throw new InvalidRequestDtoException () {ErrorMessage = "unable to parse parameter notes_as_html to boolean"};
+
 					// if since is given, we might only need to return a subset of notes
 					string since = Request.GetParam ("since");
 					long since_revision = -1;
@@ -78,6 +85,10 @@ namespace Rainy.WebService
 
 					if (include_note_body) {
 						notes.Notes = changed_notes.ToList ();
+
+						if (notes_as_html) {
+							notes.Notes = notes.Notes.Select (n => { n.Text = n.Text.ToHtml (); return n; }).ToList ();
+						}
 					} else {
 						// empty the note Text
 						notes.Notes = changed_notes.Select (n => {
@@ -100,6 +111,12 @@ namespace Rainy.WebService
 		public object Put (PutNotesRequest request)
 		{
 			try {
+				// check if we need to include the note body
+				bool notes_as_html = false; 
+				string as_html = Request.GetParam ("notes_as_html");
+				if (!string.IsNullOrEmpty (as_html) && !bool.TryParse (as_html, out notes_as_html))
+					throw new InvalidRequestDtoException () {ErrorMessage = "unable to parse parameter notes_as_html to boolean"};
+
 				using (var note_repo = GetNotes ()) {
 
 					// constraint taken from snowy source code at http://git.gnome.org/browse/snowy/tree/api/handlers.py:143
@@ -116,6 +133,10 @@ namespace Rainy.WebService
 
 					foreach (var dto_note in request.Notes) {
 						// map from the DTO 
+						if (notes_as_html) {
+							dto_note.Text = dto_note.Text.ToTomboyXml ();
+						}
+
 						var note = dto_note.ToTomboyNote ();
 
 						if (dto_note.Command == "delete") {
@@ -126,7 +147,6 @@ namespace Rainy.WebService
 							note_repo.Engine.SaveNote (note, false);
 						}
 					}
-
 
 					// only update the sync revision if changes were sent
 					if (request.Notes.Count > 0)

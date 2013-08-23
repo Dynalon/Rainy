@@ -10,6 +10,8 @@
     "underscore": "~1.5.1"
   },
   "dependencies": {
-    "noty": "~2.1.0"
+    "noty": "~2.1.0",
+    "wysihtml5": "~0.3.0",
+    "bootstrap-wysihtml5": "*"
   }
 }

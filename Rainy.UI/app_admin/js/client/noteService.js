@@ -108,7 +108,8 @@ app.factory('noteService', function($http, $rootScope, loginService) {
 
         $http({
             method: 'GET',
-            url: '/api/1.0/' + loginService.username + '/notes?include_notes=true',
+//            url: '/api/1.0/' + loginService.username + '/notes?include_notes=true&notes_as_html=true',
+            url: '/api/1.0/' + loginService.username + '/notes?include_notes=true&notes_as_html=true',
             headers: { 'AccessToken': loginService.accessToken }
         }).success(function (data, status, headers, config) {
             notes = data.notes;
@@ -140,7 +141,7 @@ app.factory('noteService', function($http, $rootScope, loginService) {
 
             $http({
                 method: 'PUT',
-                url: '/api/1.0/' + loginService.username + '/notes',
+                url: '/api/1.0/' + loginService.username + '/notes?notes_as_html=true',
                 headers: { 'AccessToken': loginService.accessToken },
                 data: req
             }).success(function (data, status, headers, config) {
