@@ -8,32 +8,30 @@
         </title>
         <link href="//netdna.bootstrapcdn.com/bootswatch/2.3.2/united/bootstrap.min.css"
         rel="stylesheet"/>
-    <!-- 
+    <!--
         <link href="admin.css" rel="stylesheet"/>
     -->
     </head>
 
     <body>
-    <div ng-controller="MainCtrl">
-        <div class="navbar navbar-inverse" bs-navbar ng-show="!hideAdminNav">
-            <div class="navbar-inner">
-                <a class="brand" href="#/">Rainy <span class="label label-important">ADMIN</span></a>
-                <ul class="nav">
-                    <li class="active" data-match-route="/admin/overview">
-                        <a href="#/admin/overview"><i class="icon-signal"></i> Overview</a>
-                    </li>
-                    <li data-match-route="/admin/user">
-                        <a href="#/admin/user"><i class="icon-user"></i> User</a>
-                    </li>
-                </ul>
+        <div ng-controller="MainCtrl">
+            <div class="navbar navbar-inverse" bs-navbar ng-show="!hideAdminNav">
+                <div class="navbar-inner">
+                    <a class="brand" href="#/">Rainy <span class="label label-important">ADMIN</span></a>
+                    <ul class="nav">
+                        <li class="active" data-match-route="/admin/overview">
+                            <a href="#/admin/overview"><i class="icon-signal"></i> Overview</a>
+                        </li>
+                        <li data-match-route="/admin/user">
+                            <a href="#/admin/user"><i class="icon-user"></i> User</a>
+                        </li>
+                    </ul>
+                </div>
             </div>
         </div>
-    </div>
         <div class="container">
-            <div class="row">
-                <!-- TOPLINE NAV SELECTION -->
-                <div class="span12" ng-View>
-                </div>
+            <!-- TOPLINE NAV SELECTION -->
+            <div class="span12" ng-View>
             </div>
 
             <script src="common.js" type="text/javascript">

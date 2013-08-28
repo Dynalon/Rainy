@@ -458,25 +458,45 @@ function NoteCtrl($scope, $location, $routeParams, $q, noteService) {
     $scope.noteContent = null;
 
     $scope.noteService = noteService;
+
+    // deep watching, will get triggered if a note content's changes, too
     $scope.$watch('noteService.notes', function (newval, oldval) {
+
+        if (newval && newval.length === 0) return;
+
+        loadNote();
+
+        if (oldval && oldval.length === 0 && newval && newval.length > 0) {
+            // first time the notes become ready
+        }
+
         $scope.notebooks = noteService.notebooks;
         $scope.notes = newval;
 
-        $scope.$watch('noteContentValue', function (newval, oldval) {
-            if (newval === oldval) return;
-            $scope.updateContent ();
-        });
-
-        var guid = $routeParams.guid;
-        if (guid) {
-            if ($scope.selectedNote === null || guid !== $scope.selectedNote.guid) {
-                var n = noteService.getNoteByGuid($routeParams.guid);
-                $scope.selectNote(n);
-                }
-        }
-
 
     }, true);
+
+    $scope.$watch('noteContentValue', function (newval, oldval) {
+        if (newval && newval === oldval) return;
+        $scope.updateContent ();
+    });
+
+    function loadNote () {
+        var guid = $routeParams.guid;
+
+        if (!guid) return;
+        var n = noteService.getNoteByGuid(guid);
+        if (!n) return;
+        if ($scope.selectedNote && n.guid === $scope.selectedNote.guid) return;
+
+        $scope.selectedNote = n;
+        //if ($scope.selectedNote === null || guid !== $scope.selectedNote.guid) {
+        wysi_editor.setValue(n['note-content']);
+
+        var dereg_watcher = $scope.$watch('selectedNote["note-content"]', function (newval, oldval) {
+            checkIfTainted (newval, oldval, dereg_watcher);
+        });
+    }
 
     function noteContentValue () {
         return $('#txtarea').val();
@@ -530,40 +550,22 @@ function NoteCtrl($scope, $location, $routeParams, $q, noteService) {
         dereg();
     }
 
-    $scope.saveNote = function () {
-        noteService.saveNote($scope.selectedNote);
-    };
-
     $scope.selectNote = function (note) {
-        if (!!note) {
-            $scope.selectedNote = note;
-            wysi_editor.setValue(note['note-content']);
-
-            var dereg_watcher = $scope.$watch('selectedNote["note-content"]', function (newval, oldval) {
-
-                checkIfTainted (newval, oldval, dereg_watcher);
-            });
-
-            var guid = note.guid;
-            $location.path('/notes/' + guid);
-        } else
-            $scope.selectedNote = null;
+        var guid = note.guid;
+        $location.path('/notes/' + guid);
     };
 
     $scope.updateContent = function () {
+        console.log('updateContent');
         if ($scope && $scope.selectedNote && $scope.selectedNote['note-content']) {
             $scope.selectedNote['note-content'] = $('#txtarea').val();
-            console.log('setting note-content value');
+            if(!$scope.$$phase) {
+                $scope.$digest();
+            }
         }
-        if(!$scope.$$phase) {
-            $scope.$digest();
-        }
-
     };
 
-
     $scope.sync = function () {
-        //noteService.debug();
         noteService.uploadChanges();
     };
 
