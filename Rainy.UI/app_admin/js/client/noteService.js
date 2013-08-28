@@ -95,6 +95,8 @@ app.factory('noteService', function($http, $rootScope, loginService) {
         });
     }
 
+    // PUBLIC functions
+    //
     noteService.getNoteByGuid = function (guid) {
         if (noteService.notes.length === 0)
             return null;
@@ -107,7 +109,6 @@ app.factory('noteService', function($http, $rootScope, loginService) {
 
         $http({
             method: 'GET',
-//            url: '/api/1.0/' + loginService.username + '/notes?include_notes=true&notes_as_html=true',
             url: '/api/1.0/' + loginService.username + '/notes?include_notes=true&notes_as_html=true',
             headers: { 'AccessToken': loginService.accessToken }
         }).success(function (data, status, headers, config) {

@@ -45,6 +45,15 @@ namespace Rainy.Tests.NoteConversion
 			var result = note_body.ToHtml ();
 			Assert.AreEqual ("<ul><li>Foo</li><li>Bar</li></ul>", result);
 		}
+		
+		[Test]
+		public void SizeTags ()
+		{
+			string html_body = "<size:small>Foobar</size:small>";
+			var result = html_body.ToHtml ();
+			string expected = "<h3>Foobar</h3>";
+			Assert.AreEqual (expected, result);
+		}
 	}
 
 	[TestFixture]
@@ -72,6 +81,15 @@ namespace Rainy.Tests.NoteConversion
 			string html_body = "<b>Bold1</b><b>Bold2<br></b>";
 			var result = html_body.ToTomboyXml ();
 			string expected = "<bold>Bold1</bold><bold>Bold2\n</bold>";
+			Assert.AreEqual (expected, result);
+		}
+
+		[Test]
+		public void SizeTags ()
+		{
+			string html_body = "<h3>Foobar</h3>";
+			var result = html_body.ToTomboyXml ();
+			string expected = "<size:small>Foobar</size:small>";
 			Assert.AreEqual (expected, result);
 		}
 	}

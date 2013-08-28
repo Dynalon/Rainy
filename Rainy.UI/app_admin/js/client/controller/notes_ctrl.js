@@ -87,7 +87,9 @@ function NoteCtrl($scope, $location, $routeParams, $q, noteService) {
             $('[data-wysihtml5-command=underline]').remove();
             $('[data-wysihtml5-command-value=h1]').text('Huge');
             $('[data-wysihtml5-command-value=h2]').text('Large');
-            $('[data-wysihtml5-command-value=h3]').replaceWith('<a data-wysihtml5-command=​"formatBlock" data-wysihtml5-command-value=​"h4" href=​"javascript:​;​" unselectable=​"on">Small</a>​');
+            $('[data-wysihtml5-command-value=h3]').text('Small');
+
+            //$('[data-wysihtml5-command-value=h3]').replaceWith('<a data-wysihtml5-command=​"formatBlock" data-wysihtml5-command-value=​"h3" href=​"javascript:​;​" unselectable=​"on">Small</a>​');
         }
     }
 

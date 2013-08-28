@@ -15,6 +15,10 @@ namespace Rainy.NoteConversion
 			note["list"].ReplaceOuterWithTag ("<ul/>");
 			note["list-item"].ReplaceOuterWithTag ("<li/>");
 
+			note["size\\:huge"].ReplaceOuterWithTag ("<h1/>");
+			note["size\\:large"].ReplaceOuterWithTag ("<h2/>");
+			note["size\\:small"].ReplaceOuterWithTag ("<h3/>");
+
 			return note.Render ();
 		}
 		private static CQ ReplaceOuterWithTag (this CQ element, string tag)
@@ -41,6 +45,9 @@ namespace Rainy.NoteConversion
 			html["i"].ReplaceOuterWithTag ("<i/>");
 			html["ul"].ReplaceOuterWithTag ("<list/>");
 			html["li"].ReplaceOuterWithTag ("<list-item/>");
+			html["h1"].ReplaceOuterWithTag ("<size:huge/>");
+			html["h2"].ReplaceOuterWithTag ("<size:large/>");
+			html["h3"].ReplaceOuterWithTag ("<size:small/>");
 
 			return html.Render ();
 		}

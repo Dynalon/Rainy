@@ -538,7 +538,9 @@ function NoteCtrl($scope, $location, $routeParams, $q, noteService) {
             $('[data-wysihtml5-command=underline]').remove();
             $('[data-wysihtml5-command-value=h1]').text('Huge');
             $('[data-wysihtml5-command-value=h2]').text('Large');
-            $('[data-wysihtml5-command-value=h3]').replaceWith('<a data-wysihtml5-command=​"formatBlock" data-wysihtml5-command-value=​"h4" href=​"javascript:​;​" unselectable=​"on">Small</a>​');
+            $('[data-wysihtml5-command-value=h3]').text('Small');
+
+            //$('[data-wysihtml5-command-value=h3]').replaceWith('<a data-wysihtml5-command=​"formatBlock" data-wysihtml5-command-value=​"h3" href=​"javascript:​;​" unselectable=​"on">Small</a>​');
         }
     }
 
@@ -783,6 +785,8 @@ app.factory('noteService', function($http, $rootScope, loginService) {
         });
     }
 
+    // PUBLIC functions
+    //
     noteService.getNoteByGuid = function (guid) {
         if (noteService.notes.length === 0)
             return null;
@@ -795,7 +799,6 @@ app.factory('noteService', function($http, $rootScope, loginService) {
 
         $http({
             method: 'GET',
-//            url: '/api/1.0/' + loginService.username + '/notes?include_notes=true&notes_as_html=true',
             url: '/api/1.0/' + loginService.username + '/notes?include_notes=true&notes_as_html=true',
             headers: { 'AccessToken': loginService.accessToken }
         }).success(function (data, status, headers, config) {
