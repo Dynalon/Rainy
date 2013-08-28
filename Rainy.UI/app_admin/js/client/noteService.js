@@ -24,7 +24,6 @@ app.factory('noteService', function($http, $rootScope, loginService) {
     $rootScope.$on('loginStatus', function(ev, isLoggedIn) {
         // TODO is this needed at all?
         if (!isLoggedIn) {
-            //noteService.notes = [];
             latest_sync_revision = 0;
         }
     });
@@ -113,6 +112,7 @@ app.factory('noteService', function($http, $rootScope, loginService) {
             headers: { 'AccessToken': loginService.accessToken }
         }).success(function (data, status, headers, config) {
             notes = data.notes;
+            latest_sync_revision = data['latest-sync-revision'];
         }).error(function () {
             // console.log('fail');
         });
