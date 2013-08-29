@@ -101,8 +101,6 @@ namespace Rainy
 				this.WireupGenericTestClasses (c);
 			};
 		}
-
-
 		private void WireupSqliteTestserver (Funq.Container container)
 		{
 			Container = container;
@@ -122,7 +120,6 @@ namespace Rainy
 				return new OrmLiteConnectionFactory (connection_string, SqliteDialect.Provider);
 			});
 		}
-
 		private void WireupPostgresServer (Funq.Container container)
 		{
 			Container = container;
@@ -143,7 +140,6 @@ namespace Rainy
 				return new OrmLiteConnectionFactory (connection_string, PostgreSqlDialect.Provider);
 			});
 		}
-
 		private void WireupGenericTestClasses (Funq.Container container)
 		{
 			container.Register<IAuthenticator> (c => {

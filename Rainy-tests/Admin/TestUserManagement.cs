@@ -7,7 +7,7 @@ using Rainy.WebService.Management;
 using ServiceStack.ServiceClient.Web;
 using Rainy.Tests.Db;
 
-namespace Rainy.Tests.RestApi
+namespace Rainy.Tests.RestApi.Management
 {
 	[TestFixture()]
 	public class TestUserManagement : DbTestsBase
@@ -103,7 +103,28 @@ namespace Rainy.Tests.RestApi
 				Assert.AreEqual (400, e.StatusCode);
 				throw e;
 			}
+		}
 
+		[Test]
+		public void ChangeUserPassword ()
+		{
+			var user = new DTOUser ();
+			user.Username = "michael";
+			user.EmailAddress = "michael@knight.com";
+			user.Password = "thisissecret";
+			user.AdditionalData = "Some more info about Michael";
+
+			var user_url = new UserRequest ().ToUrl("POST");
+			adminClient.Post<UserRequest> (user_url, user);
+
+			user.Password = "thisismynewpassword";
+			var update_url = new Rainy.WebService.UserRequest ().ToUrl ("PUT");
+			adminClient.Put<UserRequest> (update_url, user);
+
+			// authorization with the old password fails for the user
+			Assert.Fail ("TODO: Implement me");
+
+			// TODO: authorization with the new password works
 		}
 
 		[Test]

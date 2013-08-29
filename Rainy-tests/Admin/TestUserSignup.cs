@@ -9,7 +9,7 @@ using ServiceStack.OrmLite;
 using ServiceStack.ServiceClient.Web;
 using Rainy.Tests.Db;
 
-namespace Rainy.Tests.Management
+namespace Rainy.Tests.RestApi.Management
 {
 	[TestFixture()]
 	public class TestUserSignup : DbTestsBase
