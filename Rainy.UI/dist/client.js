@@ -449,7 +449,7 @@ function MainCtrl ($scope, loginService) {
         $scope.isLoggedIn = isLoggedIn;
     });
 }
-function NoteCtrl($scope, $location, $routeParams, $q, noteService) {
+function NoteCtrl($scope, $location, $routeParams, $q, $rootScope, noteService) {
 
     $scope.notebooks = {};
     $scope.notes = [];
@@ -473,12 +473,11 @@ function NoteCtrl($scope, $location, $routeParams, $q, noteService) {
         $scope.notebooks = noteService.notebooks;
         $scope.notes = newval;
 
-
     }, true);
 
     $scope.$watch('noteContentValue', function (newval, oldval) {
         if (newval && newval === oldval) return;
-        $scope.updateContent ();
+        $scope.updateContent();
     });
 
     function loadNote () {
@@ -517,8 +516,8 @@ function NoteCtrl($scope, $location, $routeParams, $q, noteService) {
                 color: false,
                 stylesheets: [],
                 events: {
-                    change: function() {
-                        $scope.updateContent();
+                    change: function () {
+                        /* the change event prevents events, like links clicks :( */
                     },
                     load: function () {
                         var editor = $('#txtarea').data('wysihtml5').editor;
