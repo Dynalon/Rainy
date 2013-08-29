@@ -577,8 +577,10 @@ function NoteCtrl($scope, $location, $routeParams, $q, $rootScope, noteService) 
         var titleUpdateFn = function () {
             $scope.$apply(function() {
                 var txt = $('#noteTitle').text();
-                if (txt !== '')
+                if (txt !== '') {
                     $scope.selectedNote.title = txt;
+                    noteService.markAsTainted($scope.selectedNote);
+                }
             });
         };
 
