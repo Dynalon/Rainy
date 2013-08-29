@@ -2,12 +2,10 @@ using System;
 using System.Collections.Generic;
 using System.Data;
 using System.Linq;
+using ServiceStack.Common;
 using ServiceStack.OrmLite;
 using Tomboy;
 using Tomboy.Sync.Web.DTO;
-using Rainy.Crypto;
-using System.Security.Cryptography;
-using ServiceStack.Common;
 
 namespace Rainy.Db
 {
@@ -15,22 +13,9 @@ namespace Rainy.Db
 	{
 		public readonly DBUser dbUser;
 		public readonly bool UseHistory;
-		private IDbConnection db;
-		private IDbTransaction trans;
+		protected IDbConnection db;
+		protected IDbTransaction trans;
 
-		private string encryptionMasterKey;
-		private bool encryptNotes {
-			get { return !string.IsNullOrEmpty (encryptionMasterKey); }
-		}
-
-		public DbStorage (IDbConnectionFactory factory, DBUser user, string encryption_master_key, bool use_history = true)
-			: this (factory, user, use_history)
-		{
-			if (encryption_master_key == null)
-				throw new ArgumentNullException ("encryption_master_key");
-
-			encryptionMasterKey = encryption_master_key;
-		}
 		public DbStorage (IDbConnectionFactory factory, DBUser user, bool use_history = true) : base (factory)
 		{
 			if (user == null)
@@ -45,34 +30,33 @@ namespace Rainy.Db
 
 		}
 		#region IStorage implementation
-		public Dictionary<string, Note> GetNotes ()
+		public virtual Dictionary<string, Note> GetNotes ()
 		{
-			var notes = db.Select<DBNote> (dbn => dbn.Username == dbUser.Username);
-
-			if (encryptNotes) {
-				notes.ForEach(n => DecryptNoteBody (n));
-			}
-
-			// TODO remove the double copying
+			// TODO remove double copying
+			var notes = GetDBNotes ();
 			var dict = notes.ToDictionary (n => n.Guid, n => n.ToDTONote ().ToTomboyNote ());
 			return dict;
 		}
+		protected List<DBNote> GetDBNotes ()
+		{
+			var db_notes = db.Select<DBNote> (dbn => dbn.Username == dbUser.Username);
+			return db_notes;
+		}
 		public void SetPath (string path)
 		{
+			throw new NotImplementedException ();
 		}
 		public void SetBackupPath (string path)
 		{
+			throw new NotImplementedException ();
 		}
-		public void SaveNote (Note note)
+		public virtual void SaveNote (Note note)
 		{
 			var db_note = note.ToDTONote ().ToDBNote (dbUser);
-
-			if (encryptNotes) {
-				// we need to check if the note exists, and if so, use the same encryption key
-				db_note.EncryptedKey = GetEncryptedNoteKey (db_note);
-				EncryptNoteBody (db_note);
-			}
-
+			SaveDBNote (db_note);
+		}
+		protected void SaveDBNote (DBNote db_note)
+		{
 			// archive any previously existing note into its own table
 			// TODO: evaluate how we could re-use the same DBNote table, which will save us
 			// a select + reinsert operation
@@ -82,8 +66,8 @@ namespace Rainy.Db
 					var archived_note = new DBArchivedNote ().PopulateWith (old_note);
 					// set the last known revision
 
-					if (dbUser.Manifest.NoteRevisions.Keys.Contains (note.Guid)) {
-						archived_note.LastSyncRevision = dbUser.Manifest.NoteRevisions[note.Guid];
+					if (dbUser.Manifest.NoteRevisions.Keys.Contains (db_note.Guid)) {
+						archived_note.LastSyncRevision = dbUser.Manifest.NoteRevisions[db_note.Guid];
 					}
 					db.Insert<DBArchivedNote> (archived_note);
 				}
@@ -127,35 +111,6 @@ namespace Rainy.Db
 		}
 		#endregion
 
-		private string GetEncryptedNoteKey (DBNote note)
-		{
-			// re-use the same key when saving a note
-			string encrypted_per_note_key;
-
-			var saved_note = db.FirstOrDefault<DBNote> (n => n.CompoundPrimaryKey == note.CompoundPrimaryKey);
-			if (saved_note != null) {
-				encrypted_per_note_key = saved_note.EncryptedKey;
-			} else {
-				// new note, generate a new key
-				var rng = new RNGCryptoServiceProvider ();
-				encrypted_per_note_key = rng.Create256BitLowerCaseHexKey ().EncryptWithKey (encryptionMasterKey, dbUser.MasterKeySalt);
-			}
-			return encrypted_per_note_key;
-		}
-		private void EncryptNoteBody (DBNote note)
-		{
-			// decrypt the per note key
-			var plaintext_key = note.EncryptedKey.DecryptWithKey (encryptionMasterKey, dbUser.MasterKeySalt);
-			note.IsEncypted = true;
-			note.Text = dbUser.EncryptString (plaintext_key.ToByteArray (), note.Text).ToHexString ();
-		}
-		private void DecryptNoteBody (DBNote note)
-		{
-			if (!note.IsEncypted)
-				return;
-
-			note.Decrypt (dbUser, encryptionMasterKey);
-		}
 
 		#region IDisposable implementation
 		public void Dispose ()

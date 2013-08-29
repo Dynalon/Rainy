@@ -143,7 +143,7 @@ namespace Rainy
 			}
 
 			var master_key = user.EncryptionMasterKey;
-			storage = new DbStorage (factory, dbUser, master_key, use_history: true);
+			storage = new DbEncryptedStorage (factory, dbUser, master_key, use_history: true);
 			engine = new Engine (storage);
 
 			if (dbUser.Manifest == null || string.IsNullOrEmpty (dbUser.Manifest.ServerId)) {

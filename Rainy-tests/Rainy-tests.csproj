@@ -84,6 +84,7 @@
     <Compile Include="PublicNoteShareTestsSqlite.cs" />
     <Compile Include="Admin\TestUserSignup.cs" />
     <Compile Include="NoteConversionTests.cs" />
+    <Compile Include="ORM\DbEncryptedStorageTests.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <ItemGroup>

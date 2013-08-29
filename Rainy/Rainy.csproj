@@ -153,6 +153,7 @@
     <Compile Include="WebService\Admin\StatusService.cs" />
     <Compile Include="CustomHandler\IHttpHandlerDecider.cs" />
     <Compile Include="NoteHtmlConversion.cs" />
+    <Compile Include="ORM\DbEncryptedStorage.cs" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="WebService\" />
