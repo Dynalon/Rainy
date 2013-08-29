@@ -508,13 +508,31 @@ function NoteCtrl($scope, $location, $routeParams, $q, $rootScope, noteService) 
         if (once) return;
         once = true;
 
+        var wysihtml5ParserRules = {
+            tags: {
+                'del': 1
+            }
+        };
+
         if ($('#txtarea').is(':visible')) {
-            $('#txtarea').wysihtml5({
+            console.log(noteService.getNoteByGuid('59315f46-baad-49cd-a07b-c29166794b0c'));
+            $('#txtarea').wysihtml5('deepExtend', {
                 html: true,
                 link: false,
                 image: false,
                 color: false,
                 stylesheets: [],
+                deepExtend: {
+                    parserRules: {
+                        classes: {
+                            'middle': 1
+                        }
+                    },
+                    tags: {
+                        'del': 1,
+                        'strike': 1,
+                    }
+                },
                 events: {
                     change: function () {
                         /* the change event prevents events, like links clicks :( */
@@ -539,8 +557,32 @@ function NoteCtrl($scope, $location, $routeParams, $q, $rootScope, noteService) 
             $('[data-wysihtml5-command-value=h2]').text('Large');
             $('[data-wysihtml5-command-value=h3]').text('Small');
 
+            var strike_btn = $('<a class="btn" data-wysihtml5-command="formatInline" data-wysihtml5-command-value="del"><del>Strike</del></a>');
+
+            strike_btn.insertAfter($('[data-wysihtml5-command=italic]'));
             //$('[data-wysihtml5-command-value=h3]').replaceWith('<a data-wysihtml5-command=​"formatBlock" data-wysihtml5-command-value=​"h3" href=​"javascript:​;​" unselectable=​"on">Small</a>​');
+            //$('[data-wysihtml5-command-value=h3]').replaceWith('<a data-wysihtml5-command=​"formatBlock" data-wysihtml5-command-value=​"h3" href=​"javascript:​;​" unselectable=​"on">Small</a>​');
+
         }
+    }
+
+    function setupTitleInput () {
+        // we don't want line breaks in the title so ignore press of enter key
+        $('#noteTitle').keypress(function (e){
+            if (e.which === 13) {
+                return false;
+            }
+        });
+        // HACK update title on keyup, but we dont have 
+        var titleUpdateFn = function () {
+            $scope.$apply(function() {
+                var txt = $('#noteTitle').text();
+                if (txt !== '')
+                    $scope.selectedNote.title = txt;
+            });
+        };
+
+        $('#noteTitle').keyup(titleUpdateFn);
     }
 
     function checkIfTainted (newval, oldval, dereg) {
@@ -581,6 +623,7 @@ function NoteCtrl($scope, $location, $routeParams, $q, $rootScope, noteService) 
     };
 
     setupWysi();
+    setupTitleInput();
 }
 
 function SignupCtrl($scope, $location, $http) {

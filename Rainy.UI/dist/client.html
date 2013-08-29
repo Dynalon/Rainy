@@ -147,7 +147,7 @@
 
             <div class="span9" ng-show="selectedNote">
                 <div class="control-group">
-                    <h2>{{ selectedNote.title }}</h2>
+                    <h2 id="noteTitle" ng-model="selectedNote.title" contenteditable="true">{{ selectedNote.title }}</h2>
                     <div class="controls">
                         <textarea id="txtarea"
                             style=""
