@@ -1,9 +1,8 @@
 using NUnit.Framework;
-using Tomboy.Sync.Web;
 using Rainy.Db;
-using ServiceStack.OrmLite;
+using Tomboy.Sync.Web;
 
-namespace Rainy.Tests
+namespace Rainy.Tests.RestApi
 {
 
 	[TestFixture]

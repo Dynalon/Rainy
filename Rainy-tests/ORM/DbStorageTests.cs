@@ -1,13 +1,13 @@
 using System;
-using System.Data;
-using NUnit.Framework;
-using Tomboy;
 using System.Collections.Generic;
+using System.Data;
 using System.Linq;
-using Rainy.Crypto;
+using NUnit.Framework;
 using ServiceStack.OrmLite;
+using Tomboy;
+using Rainy.Db;
 
-namespace Rainy.Db
+namespace Rainy.Tests.Db
 {
 	public abstract class DbStorageTests : DbTestsBase
 	{

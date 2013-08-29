@@ -7,10 +7,8 @@ using ServiceStack.ServiceClient.Web;
 using Tomboy.Sync;
 using Tomboy.Sync.Web;
 using Tomboy.Sync.Web.DTO;
-using Rainy.Tests;
-using System.Net;
 
-namespace Rainy.Tests
+namespace Rainy.Tests.RestApi
 {
 	public abstract class NoteHistoryTestsBase : Tomboy.Sync.AbstractSyncManagerTestsBase
 	{

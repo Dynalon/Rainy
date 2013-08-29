@@ -1,15 +1,13 @@
 using System;
+using System.Collections.Generic;
+using System.Linq;
 using NUnit.Framework;
 using Rainy.UserManagement;
-using Rainy.WebService.Admin;
-using ServiceStack.ServiceClient.Web;
-using System.Linq;
-using System.Collections.Generic;
-using System.Threading;
 using Rainy.WebService.Management;
-using Rainy.Db;
+using ServiceStack.ServiceClient.Web;
+using Rainy.Tests.Db;
 
-namespace Rainy.Tests.Management
+namespace Rainy.Tests.RestApi
 {
 	[TestFixture()]
 	public class TestUserManagement : DbTestsBase

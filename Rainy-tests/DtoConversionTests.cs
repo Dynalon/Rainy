@@ -1,12 +1,11 @@
-using NUnit.Framework;
-using Tomboy.Sync.Web;
-using Tomboy;
 using System;
-using Tomboy.Sync.Web.DTO;
 using System.Linq;
+using NUnit.Framework;
+using Tomboy;
+using Tomboy.Sync.Web.DTO;
 using Tomboy.Tags;
 
-namespace Rainy.Tests.WebSync
+namespace Rainy.Tests
 {
 	[TestFixture]
 	public class DtoConversionTests 

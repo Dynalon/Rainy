@@ -2,7 +2,7 @@ using System;
 using NUnit.Framework;
 using Rainy.NoteConversion;
 
-namespace Rainy.Tests.NoteConversion
+namespace Rainy.Tests.XmlNoteConversion
 {
 	[TestFixture]
 	public class NoteToHtmlConversionTests

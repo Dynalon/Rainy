@@ -1,13 +1,13 @@
 using System;
-using NUnit.Framework;
-using ServiceStack.ServiceClient.Web;
-using Rainy.UserManagement;
-using Rainy.Db;
-using ServiceStack.OrmLite;
-using Rainy.WebService.Management;
 using System.Linq;
 using System.Net;
-using ServiceStack.WebHost.Endpoints;
+using NUnit.Framework;
+using Rainy.Db;
+using Rainy.UserManagement;
+using Rainy.WebService.Management;
+using ServiceStack.OrmLite;
+using ServiceStack.ServiceClient.Web;
+using Rainy.Tests.Db;
 
 namespace Rainy.Tests.Management
 {

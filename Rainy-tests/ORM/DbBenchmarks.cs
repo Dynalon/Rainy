@@ -1,12 +1,14 @@
 using System;
-using NUnit.Framework;
-using System.Data;
-using ServiceStack.OrmLite;
-using System.Diagnostics;
 using System.Collections.Generic;
+using System.Data;
+using System.Diagnostics;
 using System.Threading.Tasks;
+using NUnit.Framework;
+using ServiceStack.OrmLite;
+using Rainy.Tests.Db;
+using Rainy.Db;
 
-namespace Rainy.Db
+namespace Rainy.Tests.Benchmarks
 {
 	public abstract class DbBenchmarks : DbTestsBase
 	{

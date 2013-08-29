@@ -1,14 +1,13 @@
 using System;
-using Tomboy.Sync.Web.DTO;
-using NUnit.Framework;
-using System.Data;
-using ServiceStack.OrmLite;
 using System.Collections.Generic;
-using System.IO;
-using Rainy.Db.Config;
+using System.Data;
+using NUnit.Framework;
+using Rainy.Db;
+using ServiceStack.OrmLite;
+using Tomboy.Sync.Web.DTO;
 using Rainy.Tests;
 
-namespace Rainy.Db
+namespace Rainy.Tests.Db
 {
 	public class DbTestsBase : TestBase
 	{

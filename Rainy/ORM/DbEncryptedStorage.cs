@@ -47,8 +47,8 @@ namespace Rainy.Db
 		/// </summary>
 		/// <param name="new_encryption_key">The new key that is used for encryption.</param>
 		public void ReEncryptAllNotes (string new_encryption_key) {
-			// enforce evaluation, lazy eval wouldn't work as we change the key
-			var old_notes = GetDBNotes ().ToArray ();
+			var old_notes = GetDBNotes ();
+			old_notes.ForEach (n => DecryptNoteBody (n));
 
 			this.encryptionMasterKey = new_encryption_key;
 			foreach (var note in old_notes) {
@@ -84,6 +84,7 @@ namespace Rainy.Db
 				return;
 			
 			note.Decrypt (dbUser, encryptionMasterKey);
+			note.IsEncypted = false;
 		}
 	}
 }

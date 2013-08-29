@@ -1,16 +1,13 @@
 using System;
 using System.Linq;
+using System.Net;
 using NUnit.Framework;
 using Rainy.Db;
 using Rainy.WebService;
 using ServiceStack.ServiceClient.Web;
-using Tomboy.Sync;
 using Tomboy.Sync.Web;
-using Tomboy.Sync.Web.DTO;
-using Rainy.Tests;
-using System.Net;
 
-namespace Rainy.Tests
+namespace Rainy.Tests.RestApi
 {
 	public class PublicNoteShareTestsSqlite : Tomboy.Sync.AbstractSyncManagerTestsBase
 	{

@@ -11,8 +11,9 @@ using ServiceStack.Common;
 using ServiceStack.OrmLite;
 using Tomboy.Sync.Web.DTO;
 using Rainy.WebService;
+using Rainy.Db;
 
-namespace Rainy.Db
+namespace Rainy.Tests.Db
 {
 	public abstract class DbBasicTests : DbTestsBase
 	{
