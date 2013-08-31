@@ -65,7 +65,7 @@ namespace Rainy
 			SetConfig (new EndpointHostConfig {
 
 				EnableFeatures = Feature.All.Remove (Feature.Metadata),
-				DefaultRedirectPath = "/ui/manage.html",
+				DefaultRedirectPath = "/ui/admin/",
 
 				// not all tomboy clients send the correct content-type
 				// so we force application/json

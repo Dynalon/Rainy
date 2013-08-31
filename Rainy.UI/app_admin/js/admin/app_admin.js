@@ -10,11 +10,11 @@ var app = angular.module('myApp', [
 .config(['$routeProvider',
     function($routeProvider) {
         // admin interface
-        $routeProvider.when('/admin/user', {
+        $routeProvider.when('/user', {
             templateUrl: 'user.html',
             controller: 'AllUserCtrl'
         });
-        $routeProvider.when('/admin/overview', {
+        $routeProvider.when('/overview', {
             templateUrl: 'overview.html',
             controller: 'StatusCtrl'
         });
@@ -27,7 +27,7 @@ var app = angular.module('myApp', [
 
         // default is the admin overview
         $routeProvider.otherwise({
-            redirectTo: '/admin/user'
+            redirectTo: '/user'
         });
     }
 ])

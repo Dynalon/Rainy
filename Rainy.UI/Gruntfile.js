@@ -29,7 +29,7 @@ module.exports = function (grunt) {
                 src: [
                     'app_admin/js/admin/**/*.js',
                 ],
-                dest: 'dist/admin.js'
+                dest: 'dist/admin/admin.js'
             },
             scripts_client: {
                 src: [
@@ -47,11 +47,11 @@ module.exports = function (grunt) {
             },
             admin_ui: {
                 src: ['app_admin/admin.html', 'app_admin/html/views_admin/*.html'],
-                dest: 'dist/manage.html'
+                dest: 'dist/admin/index.html'
             },
             client_ui: {
                 src: ['app_admin/client.html', 'app_admin/html/views_client/*.html'],
-                dest: 'dist/client.html'
+                dest: 'dist/index.html'
             }
         },
         watch: {

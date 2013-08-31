@@ -109,14 +109,14 @@ namespace Rainy.CustomHandler
                         {
                             var defaultFileName = Path.Combine(fi.FullName, defaultDoc);
                             if (!File.Exists(defaultFileName)) continue;
-							var path = new Uri(request.AbsoluteUri).PathAndQuery;
-							var redirect_url = path + "/" + defaultDoc;
-							r.Redirect(redirect_url);
-                            return;
+							fi = new FileInfo (defaultFileName);
+							fileName = defaultFileName;
                         }
                     }
-					var msg = "Static File '" + request.PathInfo + "' not found.";
-                    throw new HttpException(404, msg);
+					if (!fi.Exists) {
+						var msg = "Static File '" + request.PathInfo + "' not found.";
+						throw new HttpException(404, msg);
+					}
                 }
 
                 TimeSpan maxAge;

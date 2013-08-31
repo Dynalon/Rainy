@@ -10,11 +10,11 @@ var app = angular.module('myApp', [
 .config(['$routeProvider',
     function($routeProvider) {
         // admin interface
-        $routeProvider.when('/admin/user', {
+        $routeProvider.when('/user', {
             templateUrl: 'user.html',
             controller: 'AllUserCtrl'
         });
-        $routeProvider.when('/admin/overview', {
+        $routeProvider.when('/overview', {
             templateUrl: 'overview.html',
             controller: 'StatusCtrl'
         });
@@ -27,7 +27,7 @@ var app = angular.module('myApp', [
 
         // default is the admin overview
         $routeProvider.otherwise({
-            redirectTo: '/admin/user'
+            redirectTo: '/user'
         });
     }
 ])
@@ -156,7 +156,7 @@ function AuthCtrl($scope, $route, $location) {
     if (url_pw !== undefined && url_pw.length > 0) {
         // new admin pw, update teh cookie
         admin_pw = url_pw;
-    } else if ($location.path().startsWith('/admin')) {
+    } else if (!$location.path().startsWith('/login')) {
         $('#loginModal').modal();
         $('#loginModal').find(':password').focus();
     }
@@ -213,7 +213,7 @@ function LoginCtrl($scope, $rootScope, $http) {
 function MainCtrl($scope, $routeParams, $route, $location) {
 
     $scope.checkLocation = function() {
-        if ($location.path().startsWith('/admin')) {
+        if (!$location.path().startsWith('/login')) {
             $scope.hideAdminNav = false;
             $scope.dontAskForPassword = false;
         } else {

@@ -162,6 +162,7 @@
     <Folder Include="WebService\Admin\UI\" />
     <Folder Include="ORM\" />
     <Folder Include="CustomHandler\" />
+    <Folder Include="WebService\Admin\UI\admin\" />
   </ItemGroup>
   <ItemGroup>
     <None Include="settings.conf" />
@@ -192,23 +193,23 @@
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
-    <EmbeddedResource Include="..\Rainy.UI\dist\manage.html">
-      <Link>WebService\Admin\UI\manage.html</Link>
-    </EmbeddedResource>
-    <EmbeddedResource Include="..\Rainy.UI\dist\admin.js">
-      <Link>WebService\Admin\UI\admin.js</Link>
-    </EmbeddedResource>
     <EmbeddedResource Include="..\Rainy.UI\dist\client.css">
       <Link>WebService\Admin\UI\client.css</Link>
-    </EmbeddedResource>
-    <EmbeddedResource Include="..\Rainy.UI\dist\client.html">
-      <Link>WebService\Admin\UI\client.html</Link>
     </EmbeddedResource>
     <EmbeddedResource Include="..\Rainy.UI\dist\client.js">
       <Link>WebService\Admin\UI\client.js</Link>
     </EmbeddedResource>
     <EmbeddedResource Include="..\Rainy.UI\dist\common.js">
       <Link>WebService\Admin\UI\common.js</Link>
+    </EmbeddedResource>
+    <EmbeddedResource Include="..\Rainy.UI\dist\admin\admin.js">
+      <Link>WebService\Admin\UI\admin\admin.js</Link>
+    </EmbeddedResource>
+    <EmbeddedResource Include="..\Rainy.UI\dist\admin\index.html">
+      <Link>WebService\Admin\UI\admin\index.html</Link>
+    </EmbeddedResource>
+    <EmbeddedResource Include="..\Rainy.UI\dist\index.html">
+      <Link>WebService\Admin\UI\index.html</Link>
     </EmbeddedResource>
   </ItemGroup>
 </Project>
