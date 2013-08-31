@@ -23,9 +23,9 @@
 	            <a class="brand" href="#/notes/">Rainy <span class="label label-important">2 GO</span></a>
 	            <ul class="nav">
                    <ul class="nav">
-	                <li data-match-route="/account">
+	                <!-- <li data-match-route="/account">
 	                    <a href="#/account"><i class="icon-user icon-white"></i> Account</a>
-	                </li>
+	                </li> -->
                     <li class="divider"></li>
 	                <li data-match-route="/logout" ng-show="isLoggedIn">
 	                    <a href="#/logout"><i class="icon-circle-arrow-right icon-white"></i> Logout</a>
@@ -94,63 +94,68 @@
     </div>
 </div><!-- /row -->
 
+<!-- SIGNUP LINK
 <div class="row">
-    <div class="span3"><!-- SPACING --> </div>
+    <div class="span3"></div>
     <div class="span6">
         <div class="alert">Don&quot;t have an account yet? Click <a href="register">here to sign up!</a>
     </div>
-    <div class="span3"><!-- SPACING --> </div>
+
+    <div class="span3"></div>
 </div>
+-->
 </script>
 
 <script type="text/ng-template" id="notes.html">
 
-<h3>Your notes</h3>
-
-    <div class="container-fluid">
-        <div class="row-fluid">
-            <div class="span3">
-                <!-- SEARCH INPUT -->
-                <div class="input-prepend pull-left">
-                    <span class="add-on"><i class="icon-search"></i></span>
-                    <input ng-model="search_term" type="text" placeholder="Search notes..." />
-                </div>
+<div class="container-fluid">
+    <div class="row-fluid">
+        <h3>{{ username }}'s notes</h3>
+    </div>
+    <div class="row-fluid">
+        <div class="span3">
+            <!-- SEARCH INPUT -->
+            <div class="input-prepend pull-left">
+                <span class="add-on"><i class="icon-search"></i></span>
+                <input class="input-large" ng-model="search_term" type="text" placeholder="Search notes..." />
             </div>
-            <div class="span3">
-            <!-- CONTROLLS -->
-                <button class="btn btn-primary" ng-click="newNote()">
-                    <i class="icon-plus"></i>
-                    New note
-                </button>
-                <button class="btn btn-danger" ng-click="deleteNote()" ng-disabled="selectedNote == null">
-                    <i class="icon-trash"></i>
-                    Delete note
-                </button>
-                <button class="btn pull-right" ng-click="sync()">
-                    <i class="icon-refresh"></i>
-                </button>
-            </div>
-        </div><!-- /row -->
-        <div class="row-fluid">
-            <div class="span3">
-                <div class="sidebar-nav">
-                    <ul class="nav nav-list">
-                        <div ng-repeat="(name,notes) in notebooks">
-                        <li class="nav-header" ng-show="(notes | filter: search_term).length > 0">{{ name }}</li>
-                            <li ng-repeat="note in notes | filter: search_term">
-                            <a href="#/notes/{{ note.guid }}">{{ note.title }} </a>
-                            </li>
-                        </div>
-                    </ul>
-                </div><!--/.well -->
-            </div><!--/span-->
+        </div>
+        <div class="span3">
+        <!-- CONTROLLS -->
+            <button class="btn btn-primary" ng-click="newNote()">
+                <i class="icon-plus"></i>
+                New note
+            </button>
+            <button class="btn btn-danger" ng-click="deleteNote()" ng-disabled="selectedNote == null">
+                <i class="icon-trash"></i>
+                Delete note
+            </button>
+            <a ng-disabled="!enableSyncButton" rel="tooltip" id="sync_btn" class="btn btn-primary" ng-click="sync()">
+                <i class="icon-refresh"></i>
+                Sync
+            </a>
+        </div>
+    </div><!-- /row -->
+    <div class="row-fluid">
+        <div class="span3">
+            <div class="well sidebar-nav">
+                <ul class="nav nav-list">
+                    <div class="" ng-repeat="(name,notes) in notebooks">
+                    <li class="nav-header" ng-show="(notes | filter: search_term).length > 0">{{ name }}</li>
+                        <li ng-repeat="note in notes | filter: search_term">
+                        <a href="#/notes/{{ note.guid }}">{{ note.title }} </a>
+                        </li>
+                    </div>
+                </ul>
+            </div><!--/.well -->
+        </div><!--/span-->
 
-            <div class="span9" ng-show="selectedNote">
-                    <pre>{{ selectedNote['note-content'] }}</pre>
-                    <wysiwyg></wysiwyg>
-            </div><!--/span-->
-        </div><!--/row-->
-    </div><!--/.fluid-container-->
+        <div class="span3" ng-show="selectedNote">
+                <pre style="display: none;">{{ selectedNote['note-content'] }}</pre>
+                <wysiwyg></wysiwyg>
+        </div><!--/span-->
+    </div><!--/row-->
+</div><!--/.fluid-container-->
 </script>
 
 <script type="text/ng-template" id="signup.html">
@@ -265,9 +270,9 @@
 
 <script type="text/ng-template" id="wysiwyg.html">
 <div>
-    <h2 ng-model="selectedNote.noteTitle" contenteditable="true">{{ selectedNote.title }}</h2></textarea>
-    <textarea 
-        style=""
+    <h2 style="width: 650px;" ng-model="selectedNote.noteTitle" contenteditable="true">{{ selectedNote.title }}</h2></textarea>
+    <textarea
+        style="width: 650px; height: 450px;"
         rows="20"
         class="span10"
         ng-trim="false">

@@ -1,4 +1,4 @@
-app.factory('noteService', function($http, $rootScope, loginService) {
+app.factory('noteService', function($http, $rootScope, $q, loginService) {
 
     var noteService = {};
     var notes = [];
@@ -18,6 +18,12 @@ app.factory('noteService', function($http, $rootScope, loginService) {
     Object.defineProperty(noteService, 'notes', {
         get: function () {
             return filterDeletedNotes(notes);
+        }
+    });
+
+    Object.defineProperty(noteService, 'needsSyncing', {
+        get: function () {
+            return manifest.taintedNotes.length > 0 || manifest.deletedNotes.length > 0;
         }
     });
 
@@ -56,8 +62,7 @@ app.factory('noteService', function($http, $rootScope, loginService) {
         var notebooks = {};
         var notebook_names = [];
 
-        notebooks.All = notesByNotebook(notes);
-
+        notebooks.Unsorted = notesByNotebook(notes);
 
         _.each(notes, function (note) {
             var nb = getNotebookFromNote (note);
@@ -120,6 +125,7 @@ app.factory('noteService', function($http, $rootScope, loginService) {
     };
 
     noteService.uploadChanges = function () {
+        var dfd_complete = $q.defer();
         var note_changes = [];
         _.each(manifest.taintedNotes, function(guid) {
             var n = noteService.getNoteByGuid(guid);
@@ -148,10 +154,15 @@ app.factory('noteService', function($http, $rootScope, loginService) {
             }).success(function (data, status, headers, config) {
                 console.log('successfully synced');
                 noteService.fetchNotes();
+                dfd_complete.resolve();
+            }).error(function () {
+                dfd_complete.reject();
             });
         } else {
             console.log ('no changes, not syncing');
+            dfd_complete.resolve();
         }
+        return dfd_complete.promise;
     };
 
     noteService.deleteNote = function (note) {

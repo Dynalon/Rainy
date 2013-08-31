@@ -449,11 +449,14 @@ function MainCtrl ($scope, loginService) {
         $scope.isLoggedIn = isLoggedIn;
     });
 }
-function NoteCtrl($scope, $location, $routeParams, $q, $rootScope, noteService) {
+function NoteCtrl($scope, $location, $routeParams, $timeout, $q, $rootScope, noteService, loginService) {
 
     $scope.notebooks = {};
     $scope.notes = [];
     $scope.noteService = noteService;
+    $scope.username = loginService.username;
+    $scope.enableSyncButton = false;
+
 
     // deep watching, will get triggered if a note content's changes, too
     $scope.$watch('noteService.notes', function (newval, oldval) {
@@ -469,6 +472,66 @@ function NoteCtrl($scope, $location, $routeParams, $q, $rootScope, noteService) 
         loadNote();
 
     }, true);
+
+
+    var initialAutosyncSeconds = 10;
+    function startAutosyncTimer () {
+
+        $timeout.cancel($rootScope.timer_dfd);
+        $rootScope.autosyncSeconds = initialAutosyncSeconds;
+        console.log('starting timer');
+        $scope.enableSyncButton = true;
+        $rootScope.timer_dfd = $timeout(function autosync(){
+            console.log('tick: ' + $rootScope.autosyncSeconds);
+            if ($rootScope.autosyncSeconds <= 0) {
+                $scope.sync();
+                return;
+            }
+            else {
+                $rootScope.autosyncSeconds--;
+                $rootScope.timer_dfd = $timeout(autosync, 1000);
+            }
+        }, 1000);
+
+    }
+
+    function stopAutosyncTimer () {
+        $rootScope.autosyncSeconds = initialAutosyncSeconds;
+        $timeout.cancel($rootScope.timer_dfd);
+        console.log('stopping timer');
+        $scope.enableSyncButton = false;
+    }
+
+    function setSyncButtonTooltip () {
+        // we need to recreate the tooltip every mouseover due to bootstrap internals
+        $('#sync_btn').mouseenter(function() {
+            var caption = 'Next autosync in ' + $rootScope.autosyncSeconds + ' seconds or press to perform manual sync';
+            $('#sync_btn').data('tooltip', false);
+            if ($scope.enableSyncButton) {
+                $('#sync_btn').tooltip({ title: caption });
+                $('#sync_btn').tooltip('show');
+            }
+        });
+    }
+    setSyncButtonTooltip ();
+
+    function setWindowCloseMessage () {
+        window.onbeforeunload = function () {
+            if ($scope.enableSyncButton) {
+                return 'There are unsaved notes, please push the synchronize button!';
+            } else {
+            }
+        };
+    }
+    setWindowCloseMessage();
+
+
+    $scope.$watch('noteService.needsSyncing', function (newval, oldval) {
+        $scope.enableSyncButton = newval;
+        if (newval === true && oldval === false) {
+            startAutosyncTimer();
+        }
+    });
 
     function loadNote () {
         var guid = $routeParams.guid;
@@ -491,9 +554,13 @@ function NoteCtrl($scope, $location, $routeParams, $q, $rootScope, noteService) 
     };
 
     $scope.sync = function () {
+        stopAutosyncTimer();
         $scope.flushWysi();
-        console.log('DO A SYNC!');
-        noteService.uploadChanges();
+        // HACK we give 100ms before we sync to wait for the editor to flush
+        $timeout(function () {
+            console.log('SYNCING...');
+            noteService.uploadChanges();
+        }, 100);
     };
 
     $scope.deleteNote = function () {
@@ -612,7 +679,7 @@ app.factory('loginService', function($q, $http, $rootScope) {
     return loginService;
 });
 
-app.factory('noteService', function($http, $rootScope, loginService) {
+app.factory('noteService', function($http, $rootScope, $q, loginService) {
 
     var noteService = {};
     var notes = [];
@@ -632,6 +699,12 @@ app.factory('noteService', function($http, $rootScope, loginService) {
     Object.defineProperty(noteService, 'notes', {
         get: function () {
             return filterDeletedNotes(notes);
+        }
+    });
+
+    Object.defineProperty(noteService, 'needsSyncing', {
+        get: function () {
+            return manifest.taintedNotes.length > 0 || manifest.deletedNotes.length > 0;
         }
     });
 
@@ -670,8 +743,7 @@ app.factory('noteService', function($http, $rootScope, loginService) {
         var notebooks = {};
         var notebook_names = [];
 
-        notebooks.All = notesByNotebook(notes);
-
+        notebooks.Unsorted = notesByNotebook(notes);
 
         _.each(notes, function (note) {
             var nb = getNotebookFromNote (note);
@@ -734,6 +806,7 @@ app.factory('noteService', function($http, $rootScope, loginService) {
     };
 
     noteService.uploadChanges = function () {
+        var dfd_complete = $q.defer();
         var note_changes = [];
         _.each(manifest.taintedNotes, function(guid) {
             var n = noteService.getNoteByGuid(guid);
@@ -762,10 +835,15 @@ app.factory('noteService', function($http, $rootScope, loginService) {
             }).success(function (data, status, headers, config) {
                 console.log('successfully synced');
                 noteService.fetchNotes();
+                dfd_complete.resolve();
+            }).error(function () {
+                dfd_complete.reject();
             });
         } else {
             console.log ('no changes, not syncing');
+            dfd_complete.resolve();
         }
+        return dfd_complete.promise;
     };
 
     noteService.deleteNote = function (note) {
@@ -829,7 +907,7 @@ app.directive('wysiwyg', ['$q', function($q){
 
     var setupWysiwyg = function (tElement, scope) {
         tElement.wysihtml5('deepExtend', {
-            html: true,
+            html: false,
             link: false,
             image: false,
             color: false,
@@ -950,7 +1028,7 @@ app.directive('wysiwyg', ['$q', function($q){
                         scope.$apply(function () {
                             if (scope.selectedNote)
                                 scope.selectedNote['note-content'] = newtext;
-                            console.log('text changed: ' + newtext);
+                            //console.log('text changed: ' + newtext);
                         });
                     }, 800, { leading: false });
 
@@ -964,11 +1042,10 @@ app.directive('wysiwyg', ['$q', function($q){
                         var newtext = textarea.val();
                         if (scope.selectedNote)
                             scope.selectedNote['note-content'] = newtext;
-                        console.log('flushed text: ' + newtext);
+                        //console.log('flushed text: ' + newtext);
                     };
 
                     setupChangeListeners (tElement, scope);
-
                 },
                 pre: function postLink(scope, tElement, iAttrs, controller){
                 }

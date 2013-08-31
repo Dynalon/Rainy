@@ -1,8 +1,11 @@
-function NoteCtrl($scope, $location, $routeParams, $q, $rootScope, noteService) {
+function NoteCtrl($scope, $location, $routeParams, $timeout, $q, $rootScope, noteService, loginService) {
 
     $scope.notebooks = {};
     $scope.notes = [];
     $scope.noteService = noteService;
+    $scope.username = loginService.username;
+    $scope.enableSyncButton = false;
+
 
     // deep watching, will get triggered if a note content's changes, too
     $scope.$watch('noteService.notes', function (newval, oldval) {
@@ -18,6 +21,66 @@ function NoteCtrl($scope, $location, $routeParams, $q, $rootScope, noteService) 
         loadNote();
 
     }, true);
+
+
+    var initialAutosyncSeconds = 10;
+    function startAutosyncTimer () {
+
+        $timeout.cancel($rootScope.timer_dfd);
+        $rootScope.autosyncSeconds = initialAutosyncSeconds;
+        console.log('starting timer');
+        $scope.enableSyncButton = true;
+        $rootScope.timer_dfd = $timeout(function autosync(){
+            console.log('tick: ' + $rootScope.autosyncSeconds);
+            if ($rootScope.autosyncSeconds <= 0) {
+                $scope.sync();
+                return;
+            }
+            else {
+                $rootScope.autosyncSeconds--;
+                $rootScope.timer_dfd = $timeout(autosync, 1000);
+            }
+        }, 1000);
+
+    }
+
+    function stopAutosyncTimer () {
+        $rootScope.autosyncSeconds = initialAutosyncSeconds;
+        $timeout.cancel($rootScope.timer_dfd);
+        console.log('stopping timer');
+        $scope.enableSyncButton = false;
+    }
+
+    function setSyncButtonTooltip () {
+        // we need to recreate the tooltip every mouseover due to bootstrap internals
+        $('#sync_btn').mouseenter(function() {
+            var caption = 'Next autosync in ' + $rootScope.autosyncSeconds + ' seconds or press to perform manual sync';
+            $('#sync_btn').data('tooltip', false);
+            if ($scope.enableSyncButton) {
+                $('#sync_btn').tooltip({ title: caption });
+                $('#sync_btn').tooltip('show');
+            }
+        });
+    }
+    setSyncButtonTooltip ();
+
+    function setWindowCloseMessage () {
+        window.onbeforeunload = function () {
+            if ($scope.enableSyncButton) {
+                return 'There are unsaved notes, please push the synchronize button!';
+            } else {
+            }
+        };
+    }
+    setWindowCloseMessage();
+
+
+    $scope.$watch('noteService.needsSyncing', function (newval, oldval) {
+        $scope.enableSyncButton = newval;
+        if (newval === true && oldval === false) {
+            startAutosyncTimer();
+        }
+    });
 
     function loadNote () {
         var guid = $routeParams.guid;
@@ -40,9 +103,13 @@ function NoteCtrl($scope, $location, $routeParams, $q, $rootScope, noteService) 
     };
 
     $scope.sync = function () {
+        stopAutosyncTimer();
         $scope.flushWysi();
-        console.log('DO A SYNC!');
-        noteService.uploadChanges();
+        // HACK we give 100ms before we sync to wait for the editor to flush
+        $timeout(function () {
+            console.log('SYNCING...');
+            noteService.uploadChanges();
+        }, 100);
     };
 
     $scope.deleteNote = function () {

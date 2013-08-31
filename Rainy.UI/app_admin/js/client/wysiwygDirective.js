@@ -2,7 +2,7 @@ app.directive('wysiwyg', ['$q', function($q){
 
     var setupWysiwyg = function (tElement, scope) {
         tElement.wysihtml5('deepExtend', {
-            html: true,
+            html: false,
             link: false,
             image: false,
             color: false,
@@ -123,7 +123,7 @@ app.directive('wysiwyg', ['$q', function($q){
                         scope.$apply(function () {
                             if (scope.selectedNote)
                                 scope.selectedNote['note-content'] = newtext;
-                            console.log('text changed: ' + newtext);
+                            //console.log('text changed: ' + newtext);
                         });
                     }, 800, { leading: false });
 
@@ -137,11 +137,10 @@ app.directive('wysiwyg', ['$q', function($q){
                         var newtext = textarea.val();
                         if (scope.selectedNote)
                             scope.selectedNote['note-content'] = newtext;
-                        console.log('flushed text: ' + newtext);
+                        //console.log('flushed text: ' + newtext);
                     };
 
                     setupChangeListeners (tElement, scope);
-
                 },
                 pre: function postLink(scope, tElement, iAttrs, controller){
                 }
