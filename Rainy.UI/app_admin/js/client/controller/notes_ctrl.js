@@ -40,6 +40,7 @@ function NoteCtrl($scope, $location, $routeParams, $q, $rootScope, noteService) 
     };
 
     $scope.sync = function () {
+        $scope.flushWysi();
         console.log('DO A SYNC!');
         noteService.uploadChanges();
     };

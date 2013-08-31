@@ -85,7 +85,7 @@ app.directive('wysiwyg', ['$q', function($q){
                 newval.title === oldval.title) {
                 // nothing changed
                 return;
-            } 
+            }
             if (oldval) {
                 scope.onNoteChange(newval);
             }
@@ -96,7 +96,7 @@ app.directive('wysiwyg', ['$q', function($q){
         name: 'wysiwyg',
         // priority: 1,
         // terminal: true,
-      
+
         scope: false,
         //{} = isolate, true = child, false/undefined = no change
 
@@ -129,6 +129,15 @@ app.directive('wysiwyg', ['$q', function($q){
 
                     scope.setWysiText = function (text) {
                         scope.wysiEditor.setValue(text);
+                    };
+
+                    // HACK we sometimes miss any character for any reason?
+                    // allow explicit flush (i.e. before sync)
+                    scope.flushWysi = function () {
+                        var newtext = textarea.val();
+                        if (scope.selectedNote)
+                            scope.selectedNote['note-content'] = newtext;
+                        console.log('flushed text: ' + newtext);
                     };
 
                     setupChangeListeners (tElement, scope);
