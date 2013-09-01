@@ -92,13 +92,16 @@ namespace Rainy.CustomHandler
 		public IHttpHandler CheckAndProcess (IHttpRequest request)
 		{
 			var abs_path = request.GetAbsolutePath();
-			
-			// TODO case insensitive on option
-			if (abs_path.StartsWith(RoutePath))
-				// we want to handle this url path
-				return this;
-			else
+		
+			if (abs_path.StartsWith ("/oauth/") || abs_path.StartsWith ("/api/")) {
 				return null;
+			} else if (abs_path.StartsWith ("/admin/") || abs_path.StartsWith ("swagger-ui")) {
+				return this;
+			} else if (abs_path.Count (c => c == '/') == 1) {
+				return this;
+			} else {
+				return null;
+			}
 		}
 		
 		public void ProcessRequest(IHttpRequest request, IHttpResponse response, string operationName)
@@ -107,7 +110,14 @@ namespace Rainy.CustomHandler
 				
 				// i.e. /static/folder/file.html => folder/file.html
 				var requested_relative_path = request.GetAbsolutePath().Substring(RoutePath.Length);
-				
+			
+				if (requested_relative_path.Count (c => c == '.') == 0) {
+					// append index.html
+					if (requested_relative_path.EndsWith ("/")) {
+						requested_relative_path += "index.html";
+					} else 
+						requested_relative_path += "/index.html";
+				}
 				var file_content = ReadInEmbeddedResource (requested_relative_path);
 
 				if (file_content == null)
@@ -151,6 +161,8 @@ namespace Rainy.CustomHandler
 			filename = filename.Replace("/",".");
 
 			var res_filename = ResourcePath + "." + filename;
+
+			res_filename = res_filename.Replace ("..", ".");
 
 			var file = res.Where (r => res_filename == r).FirstOrDefault ();
 

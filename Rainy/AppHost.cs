@@ -44,10 +44,10 @@ namespace Rainy
 
 			IHttpHandlerDecider uihandler;
 			if (JsonConfig.Config.Global.Development) {
-				var adminui_path = Path.Combine(Path.GetDirectoryName(this.GetType ().Assembly.Location), "../../../Rainy.UI/dist/");
-				uihandler = (IHttpHandlerDecider) new FilesystemHandler ("/ui/", adminui_path);
+				var webui_path = Path.Combine(Path.GetDirectoryName(this.GetType ().Assembly.Location), "../../../Rainy.UI/dist/");
+				uihandler = (IHttpHandlerDecider) new FilesystemHandler ("/", webui_path);
 			} else {
-				uihandler = (IHttpHandlerDecider) new EmbeddedResourceHandler ("/ui/", this.GetType ().Assembly, "Rainy.WebService.Admin.UI");
+				uihandler = (IHttpHandlerDecider) new EmbeddedResourceHandler ("/", this.GetType ().Assembly, "Rainy.WebService.Admin.UI");
 			}
 
 			this.RequestFilters.Add ((req, resp, dto) => {
@@ -72,7 +72,7 @@ namespace Rainy
 				DefaultContentType = ContentType.Json,
 
 				RawHttpHandlers = { 
-					swagger_handler.CheckAndProcess,
+					//swagger_handler.CheckAndProcess,
 					uihandler.CheckAndProcess
 				},
 

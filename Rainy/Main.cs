@@ -294,6 +294,7 @@ namespace Rainy
 			open_browser = open_browser && !string.IsNullOrEmpty (Config.Global.AdminPassword);
 			open_browser = open_browser && Config.Global.Backend != "filesystem";
 			string admin_ui_url = listen_url.Replace ("*", "localhost");
+			admin_ui_url += "admin/";
 
 			ComposeObjectGraphDelegate object_graph_composer = ComposeObjectGraph;
 

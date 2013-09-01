@@ -120,7 +120,7 @@
                 <input class="input-large" ng-model="search_term" type="text" placeholder="Search notes..." />
             </div>
         </div>
-        <div class="span3">
+        <div class="span5">
         <!-- CONTROLLS -->
             <button class="btn btn-primary" ng-click="newNote()">
                 <i class="icon-plus"></i>
@@ -150,7 +150,7 @@
             </div><!--/.well -->
         </div><!--/span-->
 
-        <div class="span3" ng-show="selectedNote">
+        <div class="span5" ng-show="selectedNote">
                 <pre style="display: none;">{{ selectedNote['note-content'] }}</pre>
                 <wysiwyg></wysiwyg>
         </div><!--/span-->

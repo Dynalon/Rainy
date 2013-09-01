@@ -40,6 +40,7 @@ using HttpRequestWrapper = ServiceStack.WebHost.Endpoints.Extensions.HttpRequest
 using HttpResponseWrapper = ServiceStack.WebHost.Endpoints.Extensions.HttpResponseWrapper;
 using ServiceStack.WebHost.Endpoints.Support;
 using ServiceStack.WebHost.Endpoints;
+using System.Linq;
 
 namespace Rainy.CustomHandler
 {
@@ -81,14 +82,26 @@ namespace Rainy.CustomHandler
 			if (!active)
 				return null;
 
-			var abs_path = request.GetAbsolutePath();
+			string abs_path = request.GetAbsolutePath();
 
+			if (abs_path.StartsWith ("/oauth/") || abs_path.StartsWith ("/api/")) {
+				return null;
+			} else if (abs_path.StartsWith ("/admin/") || abs_path.StartsWith ("swagger-ui")) {
+				return this;
+			} else if (abs_path.Count (c => c == '/') == 1) {
+				return this;
+			} else {
+				return null;
+			}
+
+			/*
 			// TODO case insensitive on option
-			if (abs_path.StartsWith(RoutePath))
+			if (abs_path.StartsWith(RoutePath) && is_html_request)
 				// we want to handle this url path
 				return this;
 			else
 				return null;
+			*/
 		}
 
         public void ProcessRequest(IHttpRequest request, IHttpResponse response, string operationName)

@@ -13,6 +13,8 @@ Since this is for testing purposes only, there are no private account registrati
 Setup
 -----
 
+Note: Public server is currently under maintenance and not available. It will hopefully be back by October 2013.
+
 Pick a username/password combination below, and then use this URL in Tomboy/Tomdroid as a sync url:
 
 	https://notesync.org/<username>/<password>/

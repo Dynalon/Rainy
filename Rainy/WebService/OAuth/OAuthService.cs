@@ -244,7 +244,7 @@ namespace Rainy.WebService.OAuth
 			} else {
 				// take all url parameters and redirect to the login page
 				string prams =  new Uri (Request.RawUrl).PathAndQuery.Split (new char[] { '?' })[1];
-				Response.Redirect ("/ui/manage.html#/login?" + prams);
+				Response.Redirect ("/admin/#/login?" + prams);
 				Response.EndServiceStackRequest ();
 				return null;
 			}
