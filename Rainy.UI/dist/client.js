@@ -387,14 +387,14 @@ if (typeof String.prototype.startsWith !== 'function') {
     };
 }
 
-function LoginCtrl($scope, $location, loginService, notyService, $rootScope) {
+function LoginCtrl($scope, $location, $rootScope,
+                   loginService, notyService, configService) {
 
     $scope.username = '';
     $scope.password = '';
     $scope.rememberMe = false;
 
-    $scope.allowSignup = true;
-    $scope.allowRememberMe = true;
+    $scope.serverConfig = configService.serverConfig;
 
     if (loginService.userIsLoggedIn()) {
         $location.path('/notes/');
@@ -424,7 +424,7 @@ function LoginCtrl($scope, $location, loginService, notyService, $rootScope) {
         $('#inputPassword').focus();
 
     $scope.doLogin = function () {
-        var remember = $scope.allowRememberMe && $scope.rememberMe;
+        var remember = $scope.rememberMe;
 
         loginService.login($scope.username, $scope.password, remember)
         .then(function () {
@@ -1053,3 +1053,21 @@ app.directive('wysiwyg', ['$q', function($q){
         },
     };
 }]);
+
+angular.module('clientApp').factory('configService', function($http) {
+    var configService = {};
+    var conf = {};
+
+    Object.defineProperty(configService, 'serverConfig', {
+        get: function () {
+            // always return a copy as we don't allow edits
+            return conf;
+        }
+    });
+
+    $http.get('/api/config').success(function (data) {
+        conf = $.extend(conf, data);
+    });
+
+    return configService;
+});

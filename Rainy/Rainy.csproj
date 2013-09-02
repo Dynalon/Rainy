@@ -154,6 +154,7 @@
     <Compile Include="CustomHandler\IHttpHandlerDecider.cs" />
     <Compile Include="NoteHtmlConversion.cs" />
     <Compile Include="ORM\DbEncryptedStorage.cs" />
+    <Compile Include="WebService\ConfigService.cs" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="WebService\" />
