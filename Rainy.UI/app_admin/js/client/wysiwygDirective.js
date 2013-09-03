@@ -1,23 +1,38 @@
 app.directive('wysiwyg', ['$q', function($q){
 
     var setupWysiwyg = function (tElement, scope) {
-        tElement.wysihtml5('deepExtend', {
+        var parserRules = {
+            classes: {
+                'middle': 1
+            },
+            tags: {
+                'strike': {
+                    'remove': 0,
+                },
+                'del': {
+                    'remove': 0,
+                },
+                'blockquote': {
+                    rename_tag: 'span'
+                },
+                'i': {},
+                'b': {},
+                'br': {},
+                'li': {},
+                'ul': {},
+                'h1': {},
+                'h2': {},
+                'h3': {},
+            }
+        };
+
+        tElement.wysihtml5({
             html: false,
             link: false,
             image: false,
             color: false,
+            parserRules: parserRules,
             stylesheets: [],
-            deepExtend: {
-                parserRules: {
-                    classes: {
-                        'middle': 1
-                    }
-                },
-                tags: {
-                    'del': 1,
-                    'strike': 1,
-                }
-            },
             events: {
                 change: function () {
                     /* the change event prevents events, like links clicks :( */
@@ -47,7 +62,7 @@ app.directive('wysiwyg', ['$q', function($q){
         $('[data-wysihtml5-command-value=h2]').text('Large');
         $('[data-wysihtml5-command-value=h3]').text('Small');
 
-        var strike_btn = $('<a class="btn" data-wysihtml5-command="formatInline" data-wysihtml5-command-value="del"><del>Strike</del></a>');
+        var strike_btn = $('<a class="btn" data-wysihtml5-command="formatInline" data-wysihtml5-command-value="strike"><del>Strike</del></a>');
 
         strike_btn.insertAfter($('[data-wysihtml5-command=italic]'));
         //$('[data-wysihtml5-command-value=h3]').replaceWith('<a data-wysihtml5-command=​"formatBlock" data-wysihtml5-command-value=​"h3" href=​"javascript:​;​" unselectable=​"on">Small</a>​');

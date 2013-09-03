@@ -19,7 +19,7 @@ namespace Rainy.NoteConversion
 			note["size\\:large"].ReplaceOuterWithTag ("<h2/>");
 			note["size\\:small"].ReplaceOuterWithTag ("<h3/>");
 
-			note["strikethrough"].ReplaceOuterWithTag ("<del/>");
+			note["strikethrough"].ReplaceOuterWithTag ("<strike/>");
 			return note.Render ();
 		}
 		private static CQ ReplaceOuterWithTag (this CQ element, string tag)
@@ -49,7 +49,7 @@ namespace Rainy.NoteConversion
 			html["h1"].ReplaceOuterWithTag ("<size:huge/>");
 			html["h2"].ReplaceOuterWithTag ("<size:large/>");
 			html["h3"].ReplaceOuterWithTag ("<size:small/>");
-			html["del"].ReplaceOuterWithTag ("<strikethrough/>");
+			html["strike"].ReplaceOuterWithTag ("<strikethrough/>");
 
 			return html.Render ();
 		}

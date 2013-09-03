@@ -23,7 +23,7 @@ function NoteCtrl($scope, $location, $routeParams, $timeout, $q, $rootScope, not
     }, true);
 
 
-    var initialAutosyncSeconds = 10;
+    var initialAutosyncSeconds = 300;
     function startAutosyncTimer () {
 
         $timeout.cancel($rootScope.timer_dfd);
