@@ -167,11 +167,25 @@ namespace Rainy
 				return (IAdminAuthenticator)admin_auth;
 			});
 
+			container.Register<IDbStorageFactory> (c => {
+				var conn_factory = c.Resolve<IDbConnectionFactory> ();
+
+				IDbStorageFactory storage_factory;
+				bool use_encryption = true;
+				if (use_encryption)
+					storage_factory = new DbEncryptedStorageFactory (conn_factory, use_history: true);
+				else
+					storage_factory = new DbStorageFactory (conn_factory, use_history: true);
+
+				return (IDbStorageFactory) storage_factory;
+			});
+
 			container.Register<IDataBackend> (c => {
-				var factory = c.Resolve<IDbConnectionFactory> ();
+				var conn_factory = c.Resolve<IDbConnectionFactory> ();
+				var storage_factory = c.Resolve<IDbStorageFactory> ();
 				var auth = c.Resolve<IAuthenticator> ();
 				var handler = c.Resolve<OAuthHandler> ();
-				return new DatabaseBackend (factory, auth, handler);
+				return new DatabaseBackend (conn_factory, storage_factory, auth, handler);
 			});
 
 			container.Register<OAuthHandler> (c => {

@@ -36,7 +36,7 @@ namespace Rainy.Db
 
 		public override void SaveNote (Note note)
 		{
-			var db_note = note.ToDTONote ().ToDBNote (dbUser);
+			var db_note = note.ToDTONote ().ToDBNote (User);
 
 			db_note.EncryptedKey = GetEncryptedNoteKey (db_note);
 			EncryptNoteBody (db_note);
@@ -67,23 +67,23 @@ namespace Rainy.Db
 			} else {
 				// new note, generate a new key
 				var rng = new RNGCryptoServiceProvider ();
-				encrypted_per_note_key = rng.Create256BitLowerCaseHexKey ().EncryptWithKey (encryptionMasterKey, dbUser.MasterKeySalt);
+				encrypted_per_note_key = rng.Create256BitLowerCaseHexKey ().EncryptWithKey (encryptionMasterKey, User.MasterKeySalt);
 			}
 			return encrypted_per_note_key;
 		}
 		private void EncryptNoteBody (DBNote note)
 		{
 			// decrypt the per note key
-			var plaintext_key = note.EncryptedKey.DecryptWithKey (encryptionMasterKey, dbUser.MasterKeySalt);
+			var plaintext_key = note.EncryptedKey.DecryptWithKey (encryptionMasterKey, User.MasterKeySalt);
 			note.IsEncypted = true;
-			note.Text = dbUser.EncryptString (plaintext_key.ToByteArray (), note.Text).ToHexString ();
+			note.Text = User.EncryptString (plaintext_key.ToByteArray (), note.Text).ToHexString ();
 		}
 		private void DecryptNoteBody (DBNote note)
 		{
 			if (!note.IsEncypted)
 				return;
 			
-			note.Decrypt (dbUser, encryptionMasterKey);
+			note.Decrypt (User, encryptionMasterKey);
 			note.IsEncypted = false;
 		}
 	}

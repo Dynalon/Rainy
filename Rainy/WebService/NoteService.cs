@@ -17,6 +17,7 @@ namespace Rainy.WebService
 	public interface IUser
 	{
 		string Username { get; set; }
+		// this is plaintext representation of the master key!
 		string EncryptionMasterKey { get; set; }
 	}
 
