@@ -20,6 +20,8 @@ namespace Rainy.NoteConversion
 			note["size\\:small"].ReplaceOuterWithTag ("<h3/>");
 
 			note["strikethrough"].ReplaceOuterWithTag ("<strike/>");
+			note["monospace"].ReplaceOuterWithTag ("<pre/>");
+			note["highlight"].ReplaceOuterWithTag ("<span class=\"highlight\" />");
 			return note.Render ();
 		}
 		private static CQ ReplaceOuterWithTag (this CQ element, string tag)
@@ -50,6 +52,9 @@ namespace Rainy.NoteConversion
 			html["h2"].ReplaceOuterWithTag ("<size:large/>");
 			html["h3"].ReplaceOuterWithTag ("<size:small/>");
 			html["strike"].ReplaceOuterWithTag ("<strikethrough/>");
+			html["pre"].ReplaceOuterWithTag ("<monospace/>");
+
+			html["span[class='highlight']"].ReplaceOuterWithTag ("<highlight/>");
 
 			return html.Render ();
 		}

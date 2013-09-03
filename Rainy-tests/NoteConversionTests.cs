@@ -54,6 +54,14 @@ namespace Rainy.Tests.XmlNoteConversion
 			string expected = "<h3>Foobar</h3>";
 			Assert.AreEqual (expected, result);
 		}
+		[Test]
+		public void HighlightTag ()
+		{
+			string html_body = "<highlight>Foobar</highlight>";
+			var result = html_body.ToHtml ();
+			string expected = "<span class=\"highlight\">Foobar</span>";
+			Assert.AreEqual (expected, result);
+		}
 	}
 
 	[TestFixture]
@@ -88,6 +96,15 @@ namespace Rainy.Tests.XmlNoteConversion
 		public void SizeTags ()
 		{
 			string html_body = "<h3>Foobar</h3>";
+			var result = html_body.ToTomboyXml ();
+			string expected = "<size:small>Foobar</size:small>";
+			Assert.AreEqual (expected, result);
+		}
+
+		[Test]
+		public void HighlightTags ()
+		{
+			string html_body = "<span class=\"highlight\">Foobar</span>";
 			var result = html_body.ToTomboyXml ();
 			string expected = "<size:small>Foobar</size:small>";
 			Assert.AreEqual (expected, result);
