@@ -77,7 +77,7 @@
                 <div class="span6"
                     <div class="control-group">
                         <div class="controls">
-                            <label class="checkbox" ng-show="allowRememberMe">
+                            <label class="checkbox">
                                 <input type="checkbox" ng-model="rememberMe"> Remember me
                             </label>
                             <div class="alert alert-info" ng-show="rememberMe">
@@ -94,8 +94,7 @@
     </div>
 </div><!-- /row -->
 
-<!-- SIGNUP LINK
-<div class="row">
+<div class="row" ng-show="serverConfig.AllowSignup">
     <div class="span3"></div>
     <div class="span6">
         <div class="alert">Don&quot;t have an account yet? Click <a href="register">here to sign up!</a>
@@ -103,7 +102,7 @@
 
     <div class="span3"></div>
 </div>
--->
+
 </script>
 
 <script type="text/ng-template" id="notes.html">
@@ -151,7 +150,7 @@
         </div><!--/span-->
 
         <div class="span5" ng-show="selectedNote">
-                <pre style="display: none;">{{ selectedNote['note-content'] }}</pre>
+                <textarea style="display: block; width:500px; height: 100px;">{{ selectedNote['note-content'] }}</textarea>
                 <wysiwyg></wysiwyg>
         </div><!--/span-->
     </div><!--/row-->

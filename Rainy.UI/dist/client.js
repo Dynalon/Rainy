@@ -387,14 +387,14 @@ if (typeof String.prototype.startsWith !== 'function') {
     };
 }
 
-function LoginCtrl($scope, $location, loginService, notyService, $rootScope) {
+function LoginCtrl($scope, $location, $rootScope,
+                   loginService, notyService, configService) {
 
     $scope.username = '';
     $scope.password = '';
     $scope.rememberMe = false;
 
-    $scope.allowSignup = true;
-    $scope.allowRememberMe = true;
+    $scope.serverConfig = configService.serverConfig;
 
     if (loginService.userIsLoggedIn()) {
         $location.path('/notes/');
@@ -424,7 +424,7 @@ function LoginCtrl($scope, $location, loginService, notyService, $rootScope) {
         $('#inputPassword').focus();
 
     $scope.doLogin = function () {
-        var remember = $scope.allowRememberMe && $scope.rememberMe;
+        var remember = $scope.rememberMe;
 
         loginService.login($scope.username, $scope.password, remember)
         .then(function () {
@@ -474,7 +474,7 @@ function NoteCtrl($scope, $location, $routeParams, $timeout, $q, $rootScope, not
     }, true);
 
 
-    var initialAutosyncSeconds = 10;
+    var initialAutosyncSeconds = 300;
     function startAutosyncTimer () {
 
         $timeout.cancel($rootScope.timer_dfd);
@@ -906,23 +906,38 @@ app.factory('notyService', function($rootScope) {
 app.directive('wysiwyg', ['$q', function($q){
 
     var setupWysiwyg = function (tElement, scope) {
-        tElement.wysihtml5('deepExtend', {
+        var parserRules = {
+            classes: {
+                'middle': 1
+            },
+            tags: {
+                'strike': {
+                    'remove': 0,
+                },
+                'del': {
+                    'remove': 0,
+                },
+                'blockquote': {
+                    rename_tag: 'span'
+                },
+                'i': {},
+                'b': {},
+                'br': {},
+                'li': {},
+                'ul': {},
+                'h1': {},
+                'h2': {},
+                'h3': {},
+            }
+        };
+
+        tElement.wysihtml5({
             html: false,
             link: false,
             image: false,
             color: false,
+            parserRules: parserRules,
             stylesheets: [],
-            deepExtend: {
-                parserRules: {
-                    classes: {
-                        'middle': 1
-                    }
-                },
-                tags: {
-                    'del': 1,
-                    'strike': 1,
-                }
-            },
             events: {
                 change: function () {
                     /* the change event prevents events, like links clicks :( */
@@ -952,7 +967,7 @@ app.directive('wysiwyg', ['$q', function($q){
         $('[data-wysihtml5-command-value=h2]').text('Large');
         $('[data-wysihtml5-command-value=h3]').text('Small');
 
-        var strike_btn = $('<a class="btn" data-wysihtml5-command="formatInline" data-wysihtml5-command-value="del"><del>Strike</del></a>');
+        var strike_btn = $('<a class="btn" data-wysihtml5-command="formatInline" data-wysihtml5-command-value="strike"><del>Strike</del></a>');
 
         strike_btn.insertAfter($('[data-wysihtml5-command=italic]'));
         //$('[data-wysihtml5-command-value=h3]').replaceWith('<a data-wysihtml5-command=​"formatBlock" data-wysihtml5-command-value=​"h3" href=​"javascript:​;​" unselectable=​"on">Small</a>​');
@@ -1053,3 +1068,21 @@ app.directive('wysiwyg', ['$q', function($q){
         },
     };
 }]);
+
+angular.module('clientApp').factory('configService', function($http) {
+    var configService = {};
+    var conf = {};
+
+    Object.defineProperty(configService, 'serverConfig', {
+        get: function () {
+            // always return a copy as we don't allow edits
+            return conf;
+        }
+    });
+
+    $http.get('/api/config').success(function (data) {
+        conf = $.extend(conf, data);
+    });
+
+    return configService;
+});

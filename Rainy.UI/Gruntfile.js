@@ -36,6 +36,7 @@ module.exports = function (grunt) {
                     'bower_components/wysihtml5/dist/wysihtml5-0.3.0.min.js',
                     'bower_components/bootstrap-wysihtml5/dist/bootstrap-wysihtml5-0.0.2.min.js',
                     'app_admin/js/client/**/*.js',
+                    'app_admin/js/shared/**/*.js'
                 ],
                 dest: 'dist/client.js'
             },

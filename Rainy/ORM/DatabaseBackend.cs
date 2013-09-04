@@ -65,12 +65,16 @@ namespace Rainy
 	public class DatabaseBackend : DbAccessObject, IDataBackend
 	{
 		OAuthHandler oauthHandler;
+		IDbStorageFactory storageFactory;
 
-		public DatabaseBackend (IDbConnectionFactory factory, IAuthenticator auth, OAuthHandler handler) : base (factory)
+		public DatabaseBackend (IDbConnectionFactory conn_factory, IDbStorageFactory storage_factory, IAuthenticator auth,
+		                        OAuthHandler handler) : base (conn_factory)
 		{
 			oauthHandler = handler;
+			storageFactory = storage_factory;
 
-			CreateSchema (factory);
+			// TODO move this into (Encrypted)DbStorageFactory implementation
+			CreateSchema (conn_factory);
 		}
 
 		public static void CreateSchema (IDbConnectionFactory connFactory, bool reset = false)
@@ -118,7 +122,7 @@ namespace Rainy
 		#region IDataBackend implementation
 		public INoteRepository GetNoteRepository (IUser user)
 		{
-			var rep = new DatabaseNoteRepository (this.connFactory, user);
+			var rep = new DatabaseNoteRepository (connFactory, storageFactory, user);
 			return rep;
 		}
 		public OAuthHandler OAuth {
@@ -137,18 +141,11 @@ namespace Rainy
 		private Engine engine;
 		private DBUser dbUser;
 
-		public DatabaseNoteRepository (IDbConnectionFactory factory, IUser user) : base (factory)
+		public DatabaseNoteRepository (IDbConnectionFactory factory, IDbStorageFactory storageFactory, IUser user) : base (factory)
 		{
-			using (var db = connFactory.OpenDbConnection ()) {
-				dbUser = db.First<DBUser> (u => u.Username == user.Username);
-				// TODO why doesn't ormlite raise this error?
-				if (dbUser == null)
-					throw new ArgumentException(user.Username);
-			}
-
-			var master_key = user.EncryptionMasterKey;
-			storage = new DbEncryptedStorage (factory, dbUser, master_key, use_history: true);
+			this.storage = storageFactory.GetDbStorage (user);
 			engine = new Engine (storage);
+			this.dbUser = storage.User;
 
 			if (dbUser.Manifest == null || string.IsNullOrEmpty (dbUser.Manifest.ServerId)) {
 				// the user may not yet have synced
@@ -161,6 +158,7 @@ namespace Rainy
 		{
 			storage.Dispose ();
 
+			// TODO why is this needed? find a better way...
 			// write back the user
 			using (var db = connFactory.OpenDbConnection ()) {
 				using (var trans = db.OpenTransaction ()) {

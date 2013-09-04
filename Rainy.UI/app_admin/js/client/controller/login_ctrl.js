@@ -1,11 +1,11 @@
-function LoginCtrl($scope, $location, loginService, notyService, $rootScope) {
+function LoginCtrl($scope, $location, $rootScope,
+                   loginService, notyService, configService) {
 
     $scope.username = '';
     $scope.password = '';
     $scope.rememberMe = false;
 
-    $scope.allowSignup = true;
-    $scope.allowRememberMe = true;
+    $scope.serverConfig = configService.serverConfig;
 
     if (loginService.userIsLoggedIn()) {
         $location.path('/notes/');
@@ -35,7 +35,7 @@ function LoginCtrl($scope, $location, loginService, notyService, $rootScope) {
         $('#inputPassword').focus();
 
     $scope.doLogin = function () {
-        var remember = $scope.allowRememberMe && $scope.rememberMe;
+        var remember = $scope.rememberMe;
 
         loginService.login($scope.username, $scope.password, remember)
         .then(function () {
