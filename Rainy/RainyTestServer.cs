@@ -127,8 +127,8 @@ namespace Rainy
 			container.Register<PostgreConfig> (c => {
 				var cnf = new PostgreConfig {
 					Host = "localhost",
-					Username = "td",
-					Password = "foobar",
+					Username = "rainy",
+					Password = "rainy",
 					Port = 5432,
 					Database = "rainy"
 				};

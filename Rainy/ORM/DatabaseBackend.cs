@@ -83,12 +83,16 @@ namespace Rainy
 					// postgresql ormlite workaround
 					var ormfac = connFactory as OrmLiteConnectionFactory;
 					if (ormfac.DialectProvider == PostgreSqlDialect.Provider) {
+						try {
 						var cmd = db.CreateCommand ();
-						cmd.CommandText = "DROP SCHEMA PUBLIC CASCADE;";
+						cmd.CommandText = "DROP SCHEMA IF EXISTS PUBLIC CASCADE;";
 						cmd.ExecuteNonQuery ();
 						cmd = db.CreateCommand ();
-						cmd.CommandText = "CREATE SCHEMA public AUTHORIZATION td";
+						cmd.CommandText = "CREATE SCHEMA public AUTHORIZATION rainy";
 						cmd.ExecuteNonQuery ();
+						} catch (Exception e) {
+							Console.WriteLine (e.Message);
+						}
 						db.CreateTableIfNotExists <DBUser> ();
 						db.CreateTableIfNotExists <DBNote> ();
 						db.CreateTableIfNotExists <DBArchivedNote> ();
