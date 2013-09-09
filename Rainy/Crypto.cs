@@ -35,6 +35,9 @@ namespace Rainy.Crypto
 		}
 		public static void CreateCryptoFields (this DBUser db_user, string password)
 		{
+			if (string.IsNullOrEmpty (password))
+				throw new ArgumentNullException ("password");
+
 			var rng = new RNGCryptoServiceProvider ();
 
 			var salt = rng.Create256BitLowerCaseHexKey ();

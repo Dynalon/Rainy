@@ -99,11 +99,13 @@ angular.module('clientApp.directives', [])
                     $http.get('/api/user/signup/check_username/' + username)
                     .success(function (data) {
                         console.log(data);
-                        if (data.Available === true)
+                        if (data.Available === true) {
                             ctrl.$setValidity('username_avail', true);
+                            //scope.username = data.Username;
+                        }
                         else
                             ctrl.$setValidity('username_avail', false);
-                    }); 
+                    });
                 }, 800);
 
                 // push to the end of all other validity parsers

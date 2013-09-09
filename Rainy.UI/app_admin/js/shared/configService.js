@@ -4,7 +4,6 @@ angular.module('clientApp').factory('configService', function($http) {
 
     Object.defineProperty(configService, 'serverConfig', {
         get: function () {
-            // always return a copy as we don't allow edits
             return conf;
         }
     });

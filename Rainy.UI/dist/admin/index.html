@@ -98,7 +98,7 @@
         <th>Password</th>
         <th>Additional data</th>
         <th>Active?</th>
-        <th>Verified?</th>
+        <!--<th>Verified?</th> -->
         <th></th>
     </thead>
     <tbody ng-repeat="user in alluser | filter: search_term | orderBy: 'Username' ">
@@ -119,10 +119,10 @@
                 <i class="icon-ok" ng-show="user.IsActivated"></i>
                 <i class="icon-remove" ng-show="!user.IsActivated"></i>
             </td>
-            <td>
+            <!-- <td>
                 <i class="icon-ok" ng-show="user.IsVerified"></i>
                 <i class="icon-remove" ng-show="!user.IsVerified"></i>
-            </td>
+            </td> -->
             <td>
                 <a class="btn pull-right" ng-click="delete_user(user,$event)"><i class="icon-trash"></i></a>
             </td>
@@ -145,9 +145,9 @@
             <td>
                 <input type="checkbox" ng-model="currently_edited_user.IsActivated" />
             </td>
-            <td>
+            <!-- <td>
                 <input type="checkbox" ng-model="currently_edited_user.IsVerified" />
-            </td>
+            </td> -->
             <td>
                 <span class="pull-right">
                     <a class="btn btn-primary" ng-click="save_user(false)"><i class="icon-ok"></i>Save</a>

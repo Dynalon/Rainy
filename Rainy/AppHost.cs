@@ -40,7 +40,7 @@ namespace Rainy
 			this.ServiceExceptionHandler = Rainy.ErrorHandling.ExceptionHandler.CustomServiceExceptionHandler;
 
 			var swagger_path = Path.Combine(Path.GetDirectoryName(this.GetType ().Assembly.Location), "../../swagger-ui/");
-			var swagger_handler = new FilesystemHandler ("/swagger-ui/", swagger_path);
+			//var swagger_handler = new FilesystemHandler ("/swagger-ui/", swagger_path);
 
 			IHttpHandlerDecider uihandler;
 			if (JsonConfig.Config.Global.Development) {
@@ -65,7 +65,7 @@ namespace Rainy
 			SetConfig (new EndpointHostConfig {
 
 				EnableFeatures = Feature.All.Remove (Feature.Metadata),
-				DefaultRedirectPath = "/ui/admin/",
+				//DefaultRedirectPath = "/admin/",
 
 				// not all tomboy clients send the correct content-type
 				// so we force application/json

@@ -362,11 +362,13 @@ angular.module('clientApp.directives', [])
                     $http.get('/api/user/signup/check_username/' + username)
                     .success(function (data) {
                         console.log(data);
-                        if (data.Available === true)
+                        if (data.Available === true) {
                             ctrl.$setValidity('username_avail', true);
+                            //scope.username = data.Username;
+                        }
                         else
                             ctrl.$setValidity('username_avail', false);
-                    }); 
+                    });
                 }, 800);
 
                 // push to the end of all other validity parsers
@@ -576,7 +578,7 @@ function NoteCtrl($scope, $location, $routeParams, $timeout, $q, $rootScope, not
     };
 }
 
-function SignupCtrl($scope, $location, $http) {
+function SignupCtrl($scope, $location, $http, notyService) {
     $scope.username = '';
     $scope.password1 = '';
     $scope.password2 = '';
@@ -595,7 +597,7 @@ function SignupCtrl($scope, $location, $http) {
         else
             $scope.formSignup.$setValidity('toc', false);
     });
-    
+
     function combinedPassword () {
         return $scope.password1 + ' ' + $scope.password2;
     }
@@ -606,6 +608,19 @@ function SignupCtrl($scope, $location, $http) {
         else
             $scope.formSignup.$setValidity('passwdmatch', false);
     }
+
+    $scope.signUp = function () {
+        var new_user = {
+            Username: $scope.username,
+            Password: $scope.password1,
+            EmailAddress: $scope.email
+        };
+        $http.post('/api/user/signup/new/', new_user).success(function (data) {
+            $location.path('#/login/');
+        }).error(function (data, status, headers, config) {
+            notyService.error('ERROR: ' + status);
+        });
+    };
 }
 
 app.factory('loginService', function($q, $http, $rootScope) {
@@ -1076,7 +1091,6 @@ angular.module('clientApp').factory('configService', function($http) {
 
     Object.defineProperty(configService, 'serverConfig', {
         get: function () {
-            // always return a copy as we don't allow edits
             return conf;
         }
     });

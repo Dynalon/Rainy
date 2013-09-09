@@ -49,8 +49,8 @@ namespace Rainy
 			if (user.IsActivated == false)
 				return false;
 
-			if (user.IsVerified == false)
-				return false;
+			//if (user.IsVerified == false)
+			//	return false;
 
 			var supplied_hash = user.ComputePasswordHash (password);
 			if (supplied_hash == user.PasswordHash)

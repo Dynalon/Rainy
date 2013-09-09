@@ -49,38 +49,37 @@ namespace Rainy.WebService.Management.Admin
 		// update existing user
 		public object Put (UserRequest updated_user)
 		{
-			var user = new DBUser ();
-			// TODO make explicit mapping
-			user.PopulateWith (updated_user);
-
 			using (var conn = connFactory.OpenDbConnection ()) {
-				var stored_user = conn.FirstOrDefault<DBUser>("Username = {0}", user.Username);
+				var stored_user = conn.FirstOrDefault<DBUser>("Username = {0}", updated_user.Username);
 
 				if (stored_user == null) {
 					// user did not exist, can't update
 					return new HttpResult {
 						Status = 404,
-						StatusDescription = "User " + user.Username + " was not found," +
+						StatusDescription = "User " + updated_user.Username + " was not found," +
 							" and can't be updated. Try using HTTP POST to create a new user"
 					};
 				}
 
-				if (user.Password == "") {
-					// password was not sent so use the old password
-					// TODO hashing
-					user.Password = stored_user.Password;
+				// TODO automapping
+				stored_user.IsActivated = updated_user.IsActivated;
+				stored_user.IsVerified = updated_user.IsVerified;
+				stored_user.AdditionalData = updated_user.AdditionalData;
+				stored_user.EmailAddress = updated_user.EmailAddress;
+
+				if (updated_user.Password == "") {
 				} else
 					throw new NotImplementedException ("Password changing is not yet implemented");
 
-				conn.Update<DBUser> (user, u => u.Username == user.Username);
+				conn.Update<DBUser> (stored_user, u => u.Username == updated_user.Username);
 			}
-			Logger.DebugFormat ("updating user information for user {0}", user.Username);
+			Logger.DebugFormat ("updating user information for user {0}", updated_user.Username);
 
 			// do not return the password over the wire
-			user.Password = "";
-			return new HttpResult (user) {
+			updated_user.Password = "";
+			return new HttpResult (updated_user) {
 				StatusCode = System.Net.HttpStatusCode.OK,
-				StatusDescription = "Successfully updated user " + user.Username
+				StatusDescription = "Successfully updated user " + updated_user.Username
 			};
 		}
 

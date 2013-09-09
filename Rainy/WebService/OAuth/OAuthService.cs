@@ -129,7 +129,8 @@ namespace Rainy.WebService.OAuth
 					};
 				} else
 					throw new UnauthorizedException ();
-			} catch {
+			} catch (Exception e) {
+				Logger.Debug(e.Message);
 				throw new UnauthorizedException ();
 			}
 		}

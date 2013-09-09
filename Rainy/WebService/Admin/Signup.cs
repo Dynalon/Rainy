@@ -1,22 +1,15 @@
 using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Linq;
 using System.Net;
-using System.Security.Cryptography;
-using System.Text;
 using ServiceStack.Common;
 using ServiceStack.Common.Web;
 using ServiceStack.OrmLite;
-using ServiceStack.ServiceClient.Web;
-using ServiceStack.ServiceHost;
-using ServiceStack.ServiceInterface;
-using ServiceStack.ServiceInterface.Cors;
 using Rainy.Db;
 using Rainy.UserManagement;
-using Rainy.WebService.Admin;
 using Rainy.WebService.Management;
 using Rainy.ErrorHandling;
+using Rainy.Crypto;
 
 
 namespace Rainy.WebService.Signup
@@ -41,8 +34,8 @@ namespace Rainy.WebService.Signup
 			req.Username = req.Username.ToLower ();
 
 			// assert password is safe enough
-			if (!req.Password.IsSafeAsPassword ())
-				throw new ValidationException () {ErrorMessage = "Password is unsafe"};
+			//if (!req.Password.IsSafeAsPassword ())
+			//	throw new ValidationException () {ErrorMessage = "Password is unsafe"};
 
 			// assert username is not already taken
 			using (var db = connFactory.OpenDbConnection ()) {
@@ -62,9 +55,15 @@ namespace Rainy.WebService.Signup
 			db_user.PopulateWith (req);
 
 			db_user.IsActivated = false;
-			db_user.IsVerified = false;
+			if (JsonConfig.Config.Global.RequireModeration == false)
+				db_user.IsActivated = true;
+
+			db_user.IsVerified = true;
 
 			db_user.VerifySecret = Guid.NewGuid ().ToString ().Replace("-", "");
+
+			db_user.CreateCryptoFields (req.Password);
+			db_user.Password = "";
 
 			// write user to db
 			using (var db = connFactory.OpenDbConnection ()) {
