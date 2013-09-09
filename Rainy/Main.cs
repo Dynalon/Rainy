@@ -221,10 +221,7 @@ namespace Rainy
 					var conn_factory = c.Resolve<IDbConnectionFactory> ();
 
 					IDbStorageFactory storage_factory;
-					if (Config.Global.UseNoteEncryption == true)
-						storage_factory = new DbEncryptedStorageFactory (conn_factory, use_history: true);
-					else
-						storage_factory = new DbStorageFactory (conn_factory, use_history: true);
+					storage_factory = new DbEncryptedStorageFactory (conn_factory, use_history: true);
 
 					return (IDbStorageFactory) storage_factory;
 				});

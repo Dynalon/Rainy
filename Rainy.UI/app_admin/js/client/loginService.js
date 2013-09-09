@@ -8,7 +8,7 @@ app.factory('loginService', function($q, $http, $rootScope) {
     if (useStorage) {
         loginService.accessToken = window.localStorage.getItem('accessToken');
         loginService.username = window.localStorage.getItem('username');
-    } 
+    }
 
     loginService.login = function (user, pass, remember) {
         var deferred = $q.defer();
@@ -59,7 +59,7 @@ app.factory('loginService', function($q, $http, $rootScope) {
             loginService.accessToken === undefined);
 
         if (useStorage && logged) {
-            var ret = window.localStorage.getItem('accessToken') && true;  
+            var ret = window.localStorage.getItem('accessToken') && true;
             return ret;
         }
         else return logged;
