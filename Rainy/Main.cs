@@ -146,6 +146,26 @@ namespace Rainy
 					});
 					break;
 				}
+				if (Config.Global.Development == true) {
+					// create a dummy user
+					var fac = container.Resolve<IDbConnectionFactory> ();
+					using (var db = fac.OpenDbConnection ()) {
+
+						if (db.FirstOrDefault<DBUser> (u => u.Username == "dummy") == null) {
+
+							var user = new DBUser ();
+							user.Username = "dummy";
+							user.CreateCryptoFields ("foobar123");
+							user.FirstName = "John Dummy";
+							user.LastName = "Doe";
+							user.AdditionalData  = "Dummy user that is created when in development mode";
+							user.IsActivated = true;
+							user.IsVerified = true;
+							user.EmailAddress = "dummy@doe.com";
+							db.Insert<DBUser> (user);
+						}
+					}
+				}
 //
 				container.Register<IAuthenticator> (c => {
 					var factory = c.Resolve<IDbConnectionFactory> ();
@@ -299,8 +319,12 @@ namespace Rainy
 			}
 
 			if (Config.Global.Backend != "filesystem" && string.IsNullOrEmpty (Config.Global.AdminPassword)) {
-				logger.Fatal ("An administrator password must be set");
-				Environment.Exit (-1);
+				if (Config.Global.Development == true)
+					Config.Global.AdminPassword = "foobar";
+				else {
+					logger.Fatal ("An administrator password must be set");
+					Environment.Exit (-1);
+				}
 			}
 
 			open_browser = open_browser && !string.IsNullOrEmpty (Environment.GetEnvironmentVariable ("DISPLAY"));

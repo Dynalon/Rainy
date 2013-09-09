@@ -11,6 +11,7 @@ using ServiceStack.OrmLite;
 using DevDefined.OAuth.Storage.Basic;
 using Rainy.Crypto;
 using Rainy.Db;
+using JsonConfig;
 
 namespace Rainy.WebService
 {
@@ -127,17 +128,20 @@ namespace Rainy.WebService
 				user.Username = (string) base_req.Items["Username"];
 				var full_auth_token = (string) base_req.Items["AccessToken"];
 
-				DBUser db_user;
-				using (var db = connFactory.OpenDbConnection ()) {
-					db_user = db.First<DBUser> (u => u.Username == user.Username);
+				if (JsonConfig.Config.Global.UseNoteEncryption) {
+
+					DBUser db_user;
+					using (var db = connFactory.OpenDbConnection ()) {
+						db_user = db.First<DBUser> (u => u.Username == user.Username);
+					}
+
+					var access_token_repo = new DbAccessTokenRepository<AccessToken> (connFactory);
+					var access_token = access_token_repo.GetToken (full_auth_token);
+					var token_key = access_token.GetTokenKey ();
+					var master_key = full_auth_token.DecryptWithKey (token_key, db_user.MasterKeySalt);
+
+					user.EncryptionMasterKey = master_key;
 				}
-
-				var access_token_repo = new DbAccessTokenRepository<AccessToken> (connFactory);
-				var access_token = access_token_repo.GetToken (full_auth_token);
-				var token_key = access_token.GetTokenKey ();
-				var master_key = full_auth_token.DecryptWithKey (token_key, db_user.MasterKeySalt);
-
-				user.EncryptionMasterKey = master_key;
 				_requestingUser = user;
 
 				return user;
