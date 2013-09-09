@@ -31,7 +31,8 @@ function NoteCtrl($scope, $location, $routeParams, $timeout, $q, $rootScope, not
         console.log('starting timer');
         $scope.enableSyncButton = true;
         $rootScope.timer_dfd = $timeout(function autosync(){
-            console.log('tick: ' + $rootScope.autosyncSeconds);
+            if ($rootScope.autosyncSeconds % 10 === 0)
+                console.log('next sync in: ' + $rootScope.autosyncSeconds + ' seconds');
             if ($rootScope.autosyncSeconds <= 0) {
                 $scope.sync();
                 return;
