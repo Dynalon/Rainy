@@ -16,6 +16,7 @@ app.directive('wysiwyg', ['$q', function($q){
                     rename_tag: 'span'
                 },
                 'i': {},
+                'a': {},
                 'b': {},
                 'br': {},
                 'li': {},

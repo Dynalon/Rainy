@@ -203,7 +203,7 @@ namespace Rainy.WebService.OAuth
 			} else {
 				username_out = username;
 			}
-			return Authenticator.VerifyCredentials (username, password);
+			return Authenticator.VerifyCredentials (username_out, password);
 		}
 	}
 

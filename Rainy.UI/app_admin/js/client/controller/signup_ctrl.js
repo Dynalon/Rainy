@@ -36,6 +36,7 @@ function SignupCtrl($scope, $location, $http, notyService) {
             EmailAddress: $scope.email
         };
         $http.post('/api/user/signup/new/', new_user).success(function (data) {
+            window.localStorage.setItem('username', $scope.username);
             $location.path('#/login/');
         }).error(function (data, status, headers, config) {
             notyService.error('ERROR: ' + status);
