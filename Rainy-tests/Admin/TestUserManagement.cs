@@ -118,11 +118,11 @@ namespace Rainy.Tests.RestApi.Management
 			adminClient.Post<UserRequest> (user_url, user);
 
 			user.Password = "thisismynewpassword";
-			var update_url = new Rainy.WebService.UserRequest ().ToUrl ("PUT");
+			var update_url = new UserRequest ().ToUrl ("PUT");
 			adminClient.Put<UserRequest> (update_url, user);
 
 			// authorization with the old password fails for the user
-			Assert.Fail ("TODO: Implement me");
+			Assert.Fail ("TODO: Password changing not possible with encryption");
 
 			// TODO: authorization with the new password works
 		}

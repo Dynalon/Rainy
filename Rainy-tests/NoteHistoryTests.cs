@@ -34,10 +34,10 @@ namespace Rainy.Tests.RestApi
 		[Test]
 		public void NoteHistoryIsEmpty ()
 		{
-			this.FirstSyncForBothSides ();
+			FirstSyncForBothSides ();
 			var client = testServer.GetJsonClient ();
 
-			var first_note = this.clientEngineOne.GetNotes ().Values.First ();
+			var first_note = clientEngineOne.GetNotes ().Values.First ();
 			var url = GetNoteHistoryUrl (first_note.Guid);
 			var resp = client.Get<NoteHistoryResponse> (url);
 
@@ -60,15 +60,15 @@ namespace Rainy.Tests.RestApi
 		[Test]
 		public void NoteHistoryIsPresentWithOneNoteAfterChange ()
 		{
-			this.FirstSyncForBothSides ();
+			FirstSyncForBothSides ();
 
-			var first_note = this.clientEngineOne.GetNotes ().Values.First ();
+			var first_note = clientEngineOne.GetNotes ().Values.First ();
 			var new_title = "Some other title";
 			var old_title = first_note.Title;
 			first_note.Title = new_title;
 			clientEngineOne.SaveNote (first_note);
 
-			var sync_manager = new SyncManager (this.syncClientOne, this.syncServer);
+			var sync_manager = new SyncManager (syncClientOne, syncServer);
 			sync_manager.DoSync ();
 
 			var client = testServer.GetJsonClient ();
@@ -84,9 +84,9 @@ namespace Rainy.Tests.RestApi
 		[Test]
 		public void RetrieveAnArchivedVersionOfANote ()
 		{
-			this.FirstSyncForBothSides ();
+			FirstSyncForBothSides ();
 
-			Tomboy.Note first_note = this.clientEngineOne.GetNotes ().Values.First ();
+			Tomboy.Note first_note = clientEngineOne.GetNotes ().Values.First ();
 			DTONote first_note_dto = first_note.ToDTONote ();
 
 			var new_title = "Some other title";
@@ -99,7 +99,7 @@ namespace Rainy.Tests.RestApi
 
 			clientEngineOne.SaveNote (first_note);
 
-			var sync_manager = new SyncManager (this.syncClientOne, this.syncServer);
+			var sync_manager = new SyncManager (syncClientOne, syncServer);
 			sync_manager.DoSync ();
 
 			var client = testServer.GetJsonClient ();
@@ -120,13 +120,13 @@ namespace Rainy.Tests.RestApi
 		[Test]
 		public void NoteArchiveDoesHonorTheIncludeTextParameter ()
 		{
-			this.FirstSyncForBothSides ();
+			FirstSyncForBothSides ();
 
-			Tomboy.Note first_note = this.clientEngineOne.GetNotes ().Values.First ();
+			Tomboy.Note first_note = clientEngineOne.GetNotes ().Values.First ();
 			first_note.Title = "different";
 			clientEngineOne.SaveNote (first_note);
 
-			var sync_manager = new SyncManager (this.syncClientOne, this.syncServer);
+			var sync_manager = new SyncManager (syncClientOne, syncServer);
 			sync_manager.DoSync ();
 
 			var client = testServer.GetJsonClient ();
@@ -146,14 +146,14 @@ namespace Rainy.Tests.RestApi
 		[Test]
 		public void NoteArchiveContainsAllGuids ()
 		{
-			this.FirstSyncForBothSides ();
+			FirstSyncForBothSides ();
 
 			// now, lets delete a note from the client
 			var first_note = clientEngineOne.GetNotes ().First ().Value;
 			first_note.Title = "different";
 			clientEngineOne.SaveNote (first_note);
 
-			var sync_manager = new SyncManager (this.syncClientOne, this.syncServer);
+			var sync_manager = new SyncManager (syncClientOne, syncServer);
 			sync_manager.DoSync ();
 
 			var client = testServer.GetJsonClient ();
@@ -167,14 +167,14 @@ namespace Rainy.Tests.RestApi
 		[Test]
 		public void NoteArchiveContainsNoteDataButNoText ()
 		{
-			this.FirstSyncForBothSides ();
+			FirstSyncForBothSides ();
 
 			// now, lets delete a note from the client
 			var first_note = clientEngineOne.GetNotes ().First ().Value;
 			first_note.Title = "different";
 			clientEngineOne.SaveNote (first_note);
 
-			var sync_manager = new SyncManager (this.syncClientOne, this.syncServer);
+			var sync_manager = new SyncManager (syncClientOne, syncServer);
 			sync_manager.DoSync ();
 
 			var client = testServer.GetJsonClient ();
@@ -187,14 +187,14 @@ namespace Rainy.Tests.RestApi
 		[Test]
 		public void DeletedNoteShowsUpInNoteArchive()
 		{
-			this.FirstSyncForBothSides ();
+			FirstSyncForBothSides ();
 
 			// now, lets delete a note from the client
 			var deleted_note = clientEngineOne.GetNotes ().First ().Value;
 			clientEngineOne.DeleteNote (deleted_note);
 			clientManifestOne.NoteDeletions.Add (deleted_note.Guid, deleted_note.Title);
 
-			var sync_manager = new SyncManager (this.syncClientOne, this.syncServer);
+			var sync_manager = new SyncManager (syncClientOne, syncServer);
 			sync_manager.DoSync ();
 
 			var client = testServer.GetJsonClient ();

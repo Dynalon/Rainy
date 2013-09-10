@@ -33,10 +33,10 @@ namespace Rainy.Tests.RestApi
 		[Test]
 		public void GetShareableUrlWorks ()
 		{
-			this.FirstSyncForBothSides ();
+			FirstSyncForBothSides ();
 			var client = testServer.GetJsonClient ();
 
-			var first_note = this.clientEngineOne.GetNotes ().Values.First ();
+			var first_note = clientEngineOne.GetNotes ().Values.First ();
 			var url = testServer.ListenUrl + new GetPublicUrlForNote () { Username = RainyTestServer.TEST_USER }.ToUrl ("GET");
 
 			var resp = client.Get<string> (url);

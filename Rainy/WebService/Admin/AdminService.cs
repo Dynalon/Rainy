@@ -67,9 +67,9 @@ namespace Rainy.WebService.Management.Admin
 				stored_user.AdditionalData = updated_user.AdditionalData;
 				stored_user.EmailAddress = updated_user.EmailAddress;
 
-				if (updated_user.Password == "") {
-				} else
-					throw new NotImplementedException ("Password changing is not yet implemented");
+				if (updated_user.Password != "") {
+					throw new NotImplementedException ("Password changing is not possible due to encryption!");
+				}
 
 				conn.Update<DBUser> (stored_user, u => u.Username == updated_user.Username);
 			}
