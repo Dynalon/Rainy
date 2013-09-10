@@ -1,5 +1,5 @@
 
-function LoginCtrl($scope, $rootScope, $http) {
+function LoginCtrl($scope, $rootScope, $http, notyService) {
 
     $scope.getUrlVars = function() {
         var vars = [], hash;
@@ -22,6 +22,9 @@ function LoginCtrl($scope, $rootScope, $http) {
         $http.post('/oauth/authenticate', $scope.authData)
             .success(function (data, status, headers, config) {
                 window.document.location = data.RedirectUrl;
+            })
+            .error(function (data, status, headers, config) {
+                notyService.error('Login failed. Check username and password');
             });
     };
 }

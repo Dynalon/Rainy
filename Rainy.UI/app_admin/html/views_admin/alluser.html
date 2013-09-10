@@ -50,7 +50,7 @@
     <thead>
         <th>Username</th>
         <th>EmailAddress</th>
-        <th>Password</th>
+        <!-- <th>Password</th> -->
         <th>Additional data</th>
         <th>Active?</th>
         <!--<th>Verified?</th> -->
@@ -64,9 +64,9 @@
             <td>
                 {{ user.EmailAddress }}
             </td>
-            <td>
+            <!-- <td>
                 ***
-            </td>
+            </td> -->
             <td>
                 {{ user.AdditionalData }}
             </td>
@@ -91,9 +91,9 @@
             <td>
                 <input ng-model="currently_edited_user.EmailAddress" />
             </td>
-            <td>
+            <!-- <td>
                 <input placeholder="empty = use old pw" ng-model="currently_edited_user.Password" />
-            </td>
+            </td> -->
             <td>
                 <textarea rows="3" ng-model="currently_edited_user.AdditionalData"></textarea>
             </td>

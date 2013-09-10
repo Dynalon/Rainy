@@ -41,6 +41,33 @@ var app = angular.module('myApp', [
         $locationProvider.html5Mode(false);
     }
 ])
+.factory('notyService', function($rootScope) {
+    var notyService = {};
+
+    function showNoty (msg, type, timeout) {
+        timeout = timeout || 5000;
+        var n = noty({
+            text: msg,
+            layout: 'topCenter',
+            timeout: 5000,
+            type: 'error'
+        });
+    }
+
+    $rootScope.$on('$routeChangeStart', function() {
+        $.noty.clearQueue();
+        $.noty.closeAll();
+    });
+    notyService.error = function (msg, timeout) {
+        return showNoty(msg, 'error', timeout);
+    };
+    notyService.warn = function (msg, timeout) {
+        return showNoty(msg, 'warn', timeout);
+    };
+
+    return notyService;
+})
+
 .run(['$rootScope', '$modal', '$route', '$q', function($rootScope, $modal, $route, $q)  {
     var backend = {
         ajax: function(rel_url, options) {
@@ -146,7 +173,6 @@ function AllUserCtrl($scope, $route) {
         });
     };
 }
-AllUserCtrl.$inject = [ '$scope','$route' ];
 
 /*global admin_pw:true*/
 var admin_pw='';
@@ -182,7 +208,7 @@ function AuthCtrl($scope, $route, $location) {
 AuthCtrl.$inject = [ '$scope','$route', '$location' ];
 
 
-function LoginCtrl($scope, $rootScope, $http) {
+function LoginCtrl($scope, $rootScope, $http, notyService) {
 
     $scope.getUrlVars = function() {
         var vars = [], hash;
@@ -205,6 +231,9 @@ function LoginCtrl($scope, $rootScope, $http) {
         $http.post('/oauth/authenticate', $scope.authData)
             .success(function (data, status, headers, config) {
                 window.document.location = data.RedirectUrl;
+            })
+            .error(function (data, status, headers, config) {
+                notyService.error('Login failed. Check username and password');
             });
     };
 }

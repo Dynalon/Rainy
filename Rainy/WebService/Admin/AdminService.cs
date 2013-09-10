@@ -154,6 +154,8 @@ namespace Rainy.WebService.Management.Admin
 					try {
 						conn.Delete<DBUser> (u => u.Username == user.Username);
 						conn.Delete<DBNote> (n => n.Username == user.Username);
+						conn.Delete<DBAccessToken> (t => t.UserName == user.Username);
+						conn.Delete<DBArchivedNote> (an => an.Username == user.Username);
 						trans.Commit ();
 					} catch (Exception e) {
 						Logger.DebugFormat ("error deleting user {0}, msg was: {1}",

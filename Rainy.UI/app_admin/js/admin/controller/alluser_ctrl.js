@@ -77,4 +77,3 @@ function AllUserCtrl($scope, $route) {
         });
     };
 }
-AllUserCtrl.$inject = [ '$scope','$route' ];

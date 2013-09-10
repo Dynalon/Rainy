@@ -27,7 +27,7 @@ module.exports = function (grunt) {
             },
             scripts_admin: {
                 src: [
-                    'app_admin/js/admin/**/*.js',
+                    'app_admin/js/admin/**/*.js'
                 ],
                 dest: 'dist/admin/admin.js'
             },

@@ -142,6 +142,12 @@ namespace Rainy.Tests.RestApi.Management
 		}
 
 		[Test]
+		public void DeleteUserDeletesAllData ()
+		{
+			Assert.Fail ("TODO: implement me");
+		}
+
+		[Test]
 		public void UpdateUser ()
 		{
 			var user = new DTOUser () {
