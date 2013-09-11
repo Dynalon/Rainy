@@ -22,7 +22,6 @@
 	        <div class="navbar-inner">
 	            <a class="brand" href="#/notes/">Rainy <span class="label label-important">2 GO</span></a>
 	            <ul class="nav">
-                   <ul class="nav">
 	                <!-- <li data-match-route="/account">
 	                    <a href="#/account"><i class="icon-user icon-white"></i> Account</a>
 	                </li> -->
@@ -31,6 +30,14 @@
 	                    <a href="#/logout"><i class="icon-circle-arrow-right icon-white"></i> Logout</a>
 	                </li>
 	            </ul>
+                <ul class="pull-right nav">
+                    <li class="pull-right">
+                        <a href="/admin/">
+                            Admin panel
+                            <i class="icon-lock icon-white"></i>
+                        </a>
+                    </li>
+                </ul>
 	        </div>
 	    </div>
 	</div>
@@ -60,7 +67,7 @@
                     <div class="control-group">
                         <label class="control-label" for="inputEmail">Username</label>
                         <div class="controls">
-                            <input type="text" ng-model="username" id="inputUsername" placeholder="Username or Email" required>
+                            <input type="text" ng-model="username" id="inputUsername" placeholder="Username" required>
                         </div>
                     </div>
                 </div>
