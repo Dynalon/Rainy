@@ -53,6 +53,7 @@
         class="input-small"
         type="text"
         id="inputUsername"
+        ng-minLength="3"
         autofocus
         required />
 
@@ -72,8 +73,8 @@
     <label>Send email to user </label>
     <input type="checkbox" ng-model="sendMail" ng-disabled="sendMailDisabled" />
     -->
-    <button type="submit" class="btn pull-right" ng-disabled="!formNewUser.$valid">
-        Add
+    <button type="submit" class="btn" ng-disabled="!formNewUser.$valid">
+        <i class="icon-plus"></i>Add new user
     </button>
 </form>
 <hr>
