@@ -15,6 +15,7 @@ namespace Rainy.ErrorHandling
 	public class UnauthorizedException : RainyBaseException
 	{
 		public string Username;
+		public string UserStatus = "Unknown";
 	}
 
 	public class InvalidRequestDtoException : RainyBaseException
@@ -76,9 +77,15 @@ namespace Rainy.ErrorHandling
 				var ex = (UnauthorizedException) e;
 				//logger.Debug (ex.ErrorMessage);
 				//LogExceptionDetails (logger, e);
-				response.StatusCode = 401;
-				response.StatusDescription = "Unauthorized.";
-				response.ContentType = request.ContentType;
+				if (ex.UserStatus.StartsWith ("Moderation")) {
+					response.StatusCode = 412;
+					response.StatusDescription = ex.UserStatus;
+					response.ContentType = request.ContentType;
+				} else {
+					response.StatusCode = 401;
+					response.StatusDescription = "Unauthorized.";
+					response.ContentType = request.ContentType;
+				}
 				// TODO provide JSON error objects
 			} else if (e is ValidationException) {
 				var ex = (ValidationException) e;

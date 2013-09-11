@@ -40,8 +40,12 @@ function LoginCtrl($scope, $location, $rootScope,
         loginService.login($scope.username, $scope.password, remember)
         .then(function () {
             $location.path('/notes/');
-        }, function (error) {
-            notyService.error('Login failed. Check username and password.');
+        }, function (error_status) {
+            console.log(error_status);
+            if (error_status === 412)
+                notyService.error('Login failed. User ' + $scope.username + ' requires activation by an admin (moderation is enabled)');
+            else
+                notyService.error('Login failed. Check username and password.');
         });
     };
 }

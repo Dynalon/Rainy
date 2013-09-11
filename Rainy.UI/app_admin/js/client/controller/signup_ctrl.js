@@ -1,4 +1,4 @@
-function SignupCtrl($scope, $location, $http, notyService) {
+function SignupCtrl($scope, $location, $http, $timeout, notyService) {
     $scope.username = '';
     $scope.password1 = '';
     $scope.password2 = '';
@@ -36,8 +36,11 @@ function SignupCtrl($scope, $location, $http, notyService) {
             EmailAddress: $scope.email
         };
         $http.post('/api/user/signup/new/', new_user).success(function (data) {
-            window.localStorage.setItem('username', $scope.username);
-            $location.path('#/login/');
+            window.sessionStorage.setItem('username', $scope.username);
+            notyService.success('Signup successfull! You will be redirected to the login page...');
+            $timeout(function () {
+                $location.path('#/login/');
+            }, 2000);
         }).error(function (data, status, headers, config) {
             notyService.error('ERROR: ' + status);
         });

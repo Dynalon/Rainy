@@ -7,7 +7,7 @@ app.factory('notyService', function($rootScope) {
             text: msg,
             layout: 'topCenter',
             timeout: 5000,
-            type: 'error'
+            type: type
         });
     }
 
@@ -20,6 +20,9 @@ app.factory('notyService', function($rootScope) {
     };
     notyService.warn = function (msg, timeout) {
         return showNoty(msg, 'warn', timeout);
+    };
+    notyService.success = function (msg, timeout) {
+        return showNoty(msg, 'success', timeout);
     };
 
     return notyService;

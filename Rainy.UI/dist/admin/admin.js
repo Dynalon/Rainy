@@ -233,7 +233,10 @@ function LoginCtrl($scope, $rootScope, $http, notyService) {
                 window.document.location = data.RedirectUrl;
             })
             .error(function (data, status, headers, config) {
-                notyService.error('Login failed. Check username and password');
+                if (status === 412)
+                    notyService.error('Login failed. User ' + $scope.authData.Username + ' requires activation by an admin (Moderation is enabled)');
+                else
+                    notyService.error('Login failed. Check username and password');
             });
     };
 }

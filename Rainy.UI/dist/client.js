@@ -431,8 +431,12 @@ function LoginCtrl($scope, $location, $rootScope,
         loginService.login($scope.username, $scope.password, remember)
         .then(function () {
             $location.path('/notes/');
-        }, function (error) {
-            notyService.error('Login failed. Check username and password.');
+        }, function (error_status) {
+            console.log(error_status);
+            if (error_status === 412)
+                notyService.error('Login failed. User ' + $scope.username + ' requires activation by an admin (moderation is enabled)');
+            else
+                notyService.error('Login failed. Check username and password.');
         });
     };
 }
@@ -578,7 +582,7 @@ function NoteCtrl($scope, $location, $routeParams, $timeout, $q, $rootScope, not
     };
 }
 
-function SignupCtrl($scope, $location, $http, notyService) {
+function SignupCtrl($scope, $location, $http, $timeout, notyService) {
     $scope.username = '';
     $scope.password1 = '';
     $scope.password2 = '';
@@ -616,8 +620,11 @@ function SignupCtrl($scope, $location, $http, notyService) {
             EmailAddress: $scope.email
         };
         $http.post('/api/user/signup/new/', new_user).success(function (data) {
-            window.localStorage.setItem('username', $scope.username);
-            $location.path('#/login/');
+            window.sessionStorage.setItem('username', $scope.username);
+            notyService.success('Signup successfull! You will be redirected to the login page...');
+            $timeout(function () {
+                $location.path('#/login/');
+            }, 2000);
         }).error(function (data, status, headers, config) {
             notyService.error('ERROR: ' + status);
         });
@@ -675,6 +682,7 @@ app.factory('loginService', function($q, $http, $rootScope) {
 
         if (useStorage) {
             window.localStorage.removeItem('accessToken');
+            window.sessionStorage.removeItem('accessToken');
         }
         $rootScope.$broadcast('loginStatus', false);
     };
@@ -1087,7 +1095,7 @@ app.factory('notyService', function($rootScope) {
             text: msg,
             layout: 'topCenter',
             timeout: 5000,
-            type: 'error'
+            type: type
         });
     }
 
@@ -1100,6 +1108,9 @@ app.factory('notyService', function($rootScope) {
     };
     notyService.warn = function (msg, timeout) {
         return showNoty(msg, 'warn', timeout);
+    };
+    notyService.success = function (msg, timeout) {
+        return showNoty(msg, 'success', timeout);
     };
 
     return notyService;

@@ -128,10 +128,10 @@ namespace Rainy.WebService.OAuth
 						ValidUntil = expiry
 					};
 				} else
-					throw new UnauthorizedException ();
+					throw new Rainy.ErrorHandling.UnauthorizedException ();
 			} catch (Exception e) {
 				Logger.Debug(e.Message);
-				throw new UnauthorizedException ();
+				throw e;
 			}
 		}
 

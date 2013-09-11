@@ -46,8 +46,11 @@ namespace Rainy
 			if (user == null)
 				return false;
 
-			if (user.IsActivated == false)
-				return false;
+			if (user.IsActivated == false) {
+				throw new Rainy.ErrorHandling.UnauthorizedException () {
+					UserStatus = "Moderation required",
+				};
+			}
 
 			//if (user.IsVerified == false)
 			//	return false;

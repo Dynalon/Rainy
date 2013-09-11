@@ -49,6 +49,7 @@ app.factory('loginService', function($q, $http, $rootScope) {
 
         if (useStorage) {
             window.localStorage.removeItem('accessToken');
+            window.sessionStorage.removeItem('accessToken');
         }
         $rootScope.$broadcast('loginStatus', false);
     };
