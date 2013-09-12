@@ -881,16 +881,21 @@ app.factory('noteService', function($http, $rootScope, $q, loginService) {
         var proto = {};
         proto.title = 'New note';
         proto['note-content'] = 'Enter your note.';
+        proto['create-date'] = new Date().toISOString();
         proto.guid = guid();
         proto.tags = [];
 
         var note = $.extend(proto, initial_note);
-
         notes.push(note);
         return note;
     };
 
     noteService.markAsTainted = function (note) {
+        var now = new Date().toISOString();
+        note['last-change-date'] = now;
+        note['last-metadata-change-date'] = now;
+
+        console.log(note);
         if (!_.contains(manifest.taintedNotes, note.guid)) {
             console.log('marking note ' + note.guid + ' as tainted');
             manifest.taintedNotes.push(note.guid);
