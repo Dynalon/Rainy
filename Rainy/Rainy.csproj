@@ -212,5 +212,8 @@
     <EmbeddedResource Include="..\Rainy.UI\dist\index.html">
       <Link>WebService\Admin\UI\index.html</Link>
     </EmbeddedResource>
+    <EmbeddedResource Include="..\Rainy.UI\dist\wysihtml5_style.css">
+      <Link>WebService\Admin\UI\wysihtml5_style.css</Link>
+    </EmbeddedResource>
   </ItemGroup>
 </Project>

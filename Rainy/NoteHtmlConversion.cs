@@ -17,7 +17,7 @@ namespace Rainy.NoteConversion
 
 			note["size\\:huge"].ReplaceOuterWithTag ("<h1/>");
 			note["size\\:large"].ReplaceOuterWithTag ("<h2/>");
-			note["size\\:small"].ReplaceOuterWithTag ("<h3/>");
+			note["size\\:small"].ReplaceOuterWithTag ("<small/>");
 
 			note["strikethrough"].ReplaceOuterWithTag ("<strike/>");
 			note["monospace"].ReplaceOuterWithTag ("<pre/>");
@@ -52,7 +52,7 @@ namespace Rainy.NoteConversion
 			html["li"].ReplaceOuterWithTag ("<list-item/>");
 			html["h1"].ReplaceOuterWithTag ("<size:huge/>");
 			html["h2"].ReplaceOuterWithTag ("<size:large/>");
-			html["h3"].ReplaceOuterWithTag ("<size:small/>");
+			html["small"].ReplaceOuterWithTag ("<size:small/>");
 			html["strike"].ReplaceOuterWithTag ("<strikethrough/>");
 			html["pre"].ReplaceOuterWithTag ("<monospace/>");
 			html["a"].ReplaceOuterWithTag ("<link:internal/>");

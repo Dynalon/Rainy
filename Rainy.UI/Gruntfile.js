@@ -53,6 +53,10 @@ module.exports = function (grunt) {
             client_ui: {
                 src: ['app_admin/client.html', 'app_admin/html/views_client/*.html'],
                 dest: 'dist/index.html'
+            },
+            wysihtml5_style: {
+                src: [ 'app_admin/wysihtml5_style.css' ],
+                dest: 'dist/wysihtml5_style.css'
             }
         },
         watch: {

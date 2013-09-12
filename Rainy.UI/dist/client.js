@@ -919,6 +919,7 @@ app.directive('wysiwyg', ['$q', function($q){
                 'blockquote': {
                     rename_tag: 'span'
                 },
+                'small': {},
                 'i': {},
                 'a': {},
                 'b': {},
@@ -927,7 +928,9 @@ app.directive('wysiwyg', ['$q', function($q){
                 'ul': {},
                 'h1': {},
                 'h2': {},
-                'h3': {},
+                'h3': {
+                    rename_tag: 'small'
+                },
             }
         };
 
@@ -937,7 +940,7 @@ app.directive('wysiwyg', ['$q', function($q){
             image: false,
             color: false,
             parserRules: parserRules,
-            stylesheets: [],
+            stylesheets: ['wysihtml5_style.css'],
             events: {
                 change: function () {
                     /* the change event prevents events, like links clicks :( */
@@ -963,9 +966,15 @@ app.directive('wysiwyg', ['$q', function($q){
         $('[data-wysihtml5-command=Indent]').remove();
 
         $('[data-wysihtml5-command=underline]').remove();
-        $('[data-wysihtml5-command-value=h1]').text('Huge');
-        $('[data-wysihtml5-command-value=h2]').text('Large');
-        $('[data-wysihtml5-command-value=h3]').text('Small');
+
+        var huge_btn= $('<a data-wysihtml5-command="formatBlock" data-wysihtml5-command-value="h1"><h3>Huge</h3></a>');
+        $('[data-wysihtml5-command-value=h1]').replaceWith(huge_btn);
+
+        var large_btn= $('<a data-wysihtml5-command="formatBlock" data-wysihtml5-command-value="h2"><h4>Large</h4></a>');
+        $('[data-wysihtml5-command-value=h2]').replaceWith(large_btn);
+
+        var small_btn = $('<a data-wysihtml5-command="formatInline" data-wysihtml5-command-value="small"><small>Small</small></a>');
+        $('[data-wysihtml5-command-value=h3]').replaceWith(small_btn);
 
         var strike_btn = $('<a class="btn" data-wysihtml5-command="formatInline" data-wysihtml5-command-value="strike"><del>Strike</del></a>');
 
