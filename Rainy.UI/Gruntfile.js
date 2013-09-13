@@ -54,8 +54,12 @@ module.exports = function (grunt) {
                 src: ['app_admin/client.html', 'app_admin/html/views_client/*.html'],
                 dest: 'dist/index.html'
             },
-            wysihtml5_style: {
-                src: [ 'app_admin/wysihtml5_style.css' ],
+        },
+        copy: {
+            wysi: {
+                expand: false,
+                flatten: true,
+                src: [ 'app_admin/css/wysihtml5_style.css' ],
                 dest: 'dist/wysihtml5_style.css'
             }
         },
@@ -71,10 +75,11 @@ module.exports = function (grunt) {
 
     grunt.loadNpmTasks('grunt-contrib-jshint');
     grunt.loadNpmTasks('grunt-contrib-watch');
+    grunt.loadNpmTasks('grunt-contrib-copy');
     grunt.loadNpmTasks('grunt-contrib-concat');
     grunt.loadNpmTasks('grunt-reload');
 
     // Default task.
-    grunt.registerTask('default', ['concat', 'reload', 'jshint', 'watch']);
+    grunt.registerTask('default', ['concat', 'copy', 'reload', 'jshint', 'watch']);
 
 };
