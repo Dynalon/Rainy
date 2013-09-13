@@ -12,7 +12,7 @@
                 <input class="input-large" ng-model="search_term" type="text" placeholder="Search notes..." />
             </div>
         </div>
-        <div class="span5">
+        <div class="span6">
         <!-- CONTROLLS -->
             <button class="btn btn-primary" ng-click="newNote()">
                 <i class="icon-plus"></i>
@@ -42,8 +42,8 @@
             </div><!--/.well -->
         </div><!--/span-->
 
-        <div class="span5" ng-show="selectedNote">
-                <textarea style="display: none; width:500px; height: 100px;">{{ selectedNote['note-content'] }}</textarea>
+        <div class="span6" ng-show="selectedNote">
+                <textarea style="display: block; width:500px; height: 100px;">{{ selectedNote['note-content'] }}</textarea>
                 <wysiwyg></wysiwyg>
         </div><!--/span-->
     </div><!--/row-->

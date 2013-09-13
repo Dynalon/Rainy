@@ -76,8 +76,14 @@ app.directive('wysiwyg', ['$q', function($q){
         $('[data-wysihtml5-command-value=h3]').replaceWith(small_btn);
 
         var strike_btn = $('<a class="btn" data-wysihtml5-command="formatInline" data-wysihtml5-command-value="strike"><del>Strike</del></a>');
-
         strike_btn.insertAfter($('[data-wysihtml5-command=italic]'));
+
+        var highlight_btn = $('<a class="btn highlight" data-wysihtml5-command="highlight">Highlight</a>');
+        highlight_btn.insertAfter(strike_btn);
+
+        var fixed_btn = $('<a style="font-family: monospace;" class="btn" data-wysihtml5-command="fixedwidth">Fixed</a>');
+        fixed_btn.insertAfter(strike_btn);
+
         //$('[data-wysihtml5-command-value=h3]').replaceWith('<a data-wysihtml5-command=​"formatBlock" data-wysihtml5-command-value=​"h3" href=​"javascript:​;​" unselectable=​"on">Small</a>​');
         //$('[data-wysihtml5-command-value=h3]').replaceWith('<a data-wysihtml5-command=​"formatBlock" data-wysihtml5-command-value=​"h3" href=​"javascript:​;​" unselectable=​"on">Small</a>​');
         $('.wysihtml5-toolbar').find('a').click(function () {
@@ -138,6 +144,24 @@ app.directive('wysiwyg', ['$q', function($q){
         compile: function compile(tElement, tAttrs, transclude) {
             return {
                 post: function preLink(scope, tElement, iAttrs, controller){
+
+                    wysihtml5.commands.highlight = {
+                        exec: function(composer, command) {
+                            return wysihtml5.commands.formatInline.exec(composer, command, 'span', 'highlight', 'highlight');
+                        },
+                        state: function(composer, command) {
+                            return wysihtml5.commands.formatInline.state(composer, command, 'span', 'highlight', 'highlight');
+                        }
+                    };
+                    wysihtml5.commands.fixedwidth = {
+                        exec: function(composer, command) {
+                            return wysihtml5.commands.formatInline.exec(composer, command, 'pre');
+                        },
+                        state: function(composer, command) {
+                            return wysihtml5.commands.formatInline.state(composer, command, 'pre');
+                        }
+                    };
+
 
                     scope.selectedNote = null;
 

@@ -64,7 +64,12 @@ module.exports = function (grunt) {
             }
         },
         watch: {
-            files: ['app_admin/**/*.js', 'app_admin/**/*.html', 'Gruntfile.js'],
+            files: [
+                'app_admin/**/*.js',
+                'app_admin/**/*.html',
+                'app_admin/**/*.css',
+                'Gruntfile.js'
+            ],
             tasks: ['default']
         },
         reload: {

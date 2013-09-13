@@ -17,6 +17,7 @@
         "module": true,
         "noty": true,
         "app": true,
-        "_": true
+        "_": true,
+        "wysihtml5": true
     }
 }
