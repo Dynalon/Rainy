@@ -455,13 +455,15 @@ function MainCtrl ($scope, loginService) {
         $scope.isLoggedIn = isLoggedIn;
     });
 }
-function NoteCtrl($scope,$location, $routeParams, $timeout, $q, $rootScope, noteService, loginService, notyService) {
+function NoteCtrl($scope,$location, $routeParams, $timeout, $q, $rootScope,
+                  noteService, loginService, notyService, configService) {
 
     $scope.notebooks = {};
     $scope.notes = [];
     $scope.noteService = noteService;
     $scope.username = loginService.username;
     $scope.enableSyncButton = false;
+    $scope.config = configService.serverConfig;
 
 
     // deep watching, will get triggered if a note content's changes, too

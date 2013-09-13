@@ -157,7 +157,7 @@
         </div><!--/span-->
 
         <div class="span6" ng-show="selectedNote">
-                <textarea style="display: block; width:500px; height: 100px;">{{ selectedNote['note-content'] }}</textarea>
+                <textarea ng-show="config.DevelopmentMode" style="width:500px; height: 100px;">{{ selectedNote['note-content'] }}</textarea>
                 <wysiwyg></wysiwyg>
         </div><!--/span-->
     </div><!--/row-->

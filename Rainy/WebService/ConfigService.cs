@@ -21,6 +21,7 @@ namespace Rainy.WebService
 		public bool AllowSignup { get; set; }
 		public bool RequireEmailVerification { get; set; }
 		public bool RequireModeration { get; set; }
+		public bool DevelopmentMode { get; set; }
 		public string ServerVersion { get { return "0.1.2"; } }
 		public string ServerName { get { return "Rainy"; } }
 	}
@@ -37,6 +38,7 @@ namespace Rainy.WebService
 			conf.AllowSignup = Config.Global.AllowSignup;
 			conf.RequireEmailVerification = Config.Global.RequireEmailVerification;
 			conf.RequireModeration = Config.Global.RequireModeration;
+			conf.DevelopmentMode = Config.Global.Development;
 
 			return conf;
 		}
