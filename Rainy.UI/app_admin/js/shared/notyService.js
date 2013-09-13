@@ -6,7 +6,7 @@ app.factory('notyService', function($rootScope) {
         var n = noty({
             text: msg,
             layout: 'topCenter',
-            timeout: 5000,
+            timeout: timeout,
             type: type
         });
     }

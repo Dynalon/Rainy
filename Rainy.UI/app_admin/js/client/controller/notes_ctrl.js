@@ -1,4 +1,4 @@
-function NoteCtrl($scope, $location, $routeParams, $timeout, $q, $rootScope, noteService, loginService) {
+function NoteCtrl($scope,$location, $routeParams, $timeout, $q, $rootScope, noteService, loginService, notyService) {
 
     $scope.notebooks = {};
     $scope.notes = [];
@@ -28,7 +28,6 @@ function NoteCtrl($scope, $location, $routeParams, $timeout, $q, $rootScope, not
 
         $timeout.cancel($rootScope.timer_dfd);
         $rootScope.autosyncSeconds = initialAutosyncSeconds;
-        console.log('starting timer');
         $scope.enableSyncButton = true;
         $rootScope.timer_dfd = $timeout(function autosync(){
             if ($rootScope.autosyncSeconds % 10 === 0)
@@ -48,7 +47,6 @@ function NoteCtrl($scope, $location, $routeParams, $timeout, $q, $rootScope, not
     function stopAutosyncTimer () {
         $rootScope.autosyncSeconds = initialAutosyncSeconds;
         $timeout.cancel($rootScope.timer_dfd);
-        console.log('stopping timer');
         $scope.enableSyncButton = false;
     }
 
@@ -104,12 +102,20 @@ function NoteCtrl($scope, $location, $routeParams, $timeout, $q, $rootScope, not
     };
 
     $scope.sync = function () {
+        if ($scope.enableSyncButton === false)
+            return;
+
+        $('#sync_btn').tooltip('hide');
         stopAutosyncTimer();
         $scope.flushWysi();
         // HACK we give 100ms before we sync to wait for the editor to flush
         $timeout(function () {
-            console.log('SYNCING...');
-            noteService.uploadChanges();
+            noteService.uploadChanges().then(function (note_changes) {
+                notyService.success('Successfully synced ' + note_changes.length + ' notes.', 2000);
+            },function () {
+                notyService.error('Error occured during syncing!');
+            });
+
         }, 100);
     };
 

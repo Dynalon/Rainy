@@ -455,7 +455,7 @@ function MainCtrl ($scope, loginService) {
         $scope.isLoggedIn = isLoggedIn;
     });
 }
-function NoteCtrl($scope, $location, $routeParams, $timeout, $q, $rootScope, noteService, loginService) {
+function NoteCtrl($scope,$location, $routeParams, $timeout, $q, $rootScope, noteService, loginService, notyService) {
 
     $scope.notebooks = {};
     $scope.notes = [];
@@ -485,7 +485,6 @@ function NoteCtrl($scope, $location, $routeParams, $timeout, $q, $rootScope, not
 
         $timeout.cancel($rootScope.timer_dfd);
         $rootScope.autosyncSeconds = initialAutosyncSeconds;
-        console.log('starting timer');
         $scope.enableSyncButton = true;
         $rootScope.timer_dfd = $timeout(function autosync(){
             if ($rootScope.autosyncSeconds % 10 === 0)
@@ -505,7 +504,6 @@ function NoteCtrl($scope, $location, $routeParams, $timeout, $q, $rootScope, not
     function stopAutosyncTimer () {
         $rootScope.autosyncSeconds = initialAutosyncSeconds;
         $timeout.cancel($rootScope.timer_dfd);
-        console.log('stopping timer');
         $scope.enableSyncButton = false;
     }
 
@@ -561,12 +559,20 @@ function NoteCtrl($scope, $location, $routeParams, $timeout, $q, $rootScope, not
     };
 
     $scope.sync = function () {
+        if ($scope.enableSyncButton === false)
+            return;
+
+        $('#sync_btn').tooltip('hide');
         stopAutosyncTimer();
         $scope.flushWysi();
         // HACK we give 100ms before we sync to wait for the editor to flush
         $timeout(function () {
-            console.log('SYNCING...');
-            noteService.uploadChanges();
+            noteService.uploadChanges().then(function (note_changes) {
+                notyService.success('Successfully synced ' + note_changes.length + ' notes.', 2000);
+            },function () {
+                notyService.error('Error occured during syncing!');
+            });
+
         }, 100);
     };
 
@@ -860,7 +866,7 @@ app.factory('noteService', function($http, $rootScope, $q, loginService) {
             }).success(function (data, status, headers, config) {
                 console.log('successfully synced');
                 noteService.fetchNotes();
-                dfd_complete.resolve();
+                dfd_complete.resolve(note_changes);
             }).error(function () {
                 dfd_complete.reject();
             });
@@ -895,7 +901,6 @@ app.factory('noteService', function($http, $rootScope, $q, loginService) {
         note['last-change-date'] = now;
         note['last-metadata-change-date'] = now;
 
-        console.log(note);
         if (!_.contains(manifest.taintedNotes, note.guid)) {
             console.log('marking note ' + note.guid + ' as tainted');
             manifest.taintedNotes.push(note.guid);
@@ -1135,7 +1140,7 @@ app.factory('notyService', function($rootScope) {
         var n = noty({
             text: msg,
             layout: 'topCenter',
-            timeout: 5000,
+            timeout: timeout,
             type: type
         });
     }

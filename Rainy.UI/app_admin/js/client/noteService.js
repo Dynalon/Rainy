@@ -154,7 +154,7 @@ app.factory('noteService', function($http, $rootScope, $q, loginService) {
             }).success(function (data, status, headers, config) {
                 console.log('successfully synced');
                 noteService.fetchNotes();
-                dfd_complete.resolve();
+                dfd_complete.resolve(note_changes);
             }).error(function () {
                 dfd_complete.reject();
             });
@@ -189,7 +189,6 @@ app.factory('noteService', function($http, $rootScope, $q, loginService) {
         note['last-change-date'] = now;
         note['last-metadata-change-date'] = now;
 
-        console.log(note);
         if (!_.contains(manifest.taintedNotes, note.guid)) {
             console.log('marking note ' + note.guid + ' as tainted');
             manifest.taintedNotes.push(note.guid);
