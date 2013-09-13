@@ -912,7 +912,10 @@ app.directive('wysiwyg', ['$q', function($q){
     var setupWysiwyg = function (tElement, scope) {
         var parserRules = {
             classes: {
-                'middle': 1
+                // for urls
+                'internal': 1,
+                'url': 1,
+                'title': 0
             },
             tags: {
                 'strike': {

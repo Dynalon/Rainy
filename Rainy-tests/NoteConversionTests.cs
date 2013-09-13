@@ -49,17 +49,33 @@ namespace Rainy.Tests.XmlNoteConversion
 		[Test]
 		public void SizeTags ()
 		{
-			string html_body = "<size:small>Foobar</size:small>";
-			var result = html_body.ToHtml ();
-			string expected = "<h3>Foobar</h3>";
+			string note_body = "<size:small>Foobar</size:small>";
+			var result = note_body.ToHtml ();
+			string expected = "<small>Foobar</small>";
 			Assert.AreEqual (expected, result);
 		}
 		[Test]
 		public void HighlightTag ()
 		{
-			string html_body = "<highlight>Foobar</highlight>";
-			var result = html_body.ToHtml ();
+			string note_body = "<highlight>Foobar</highlight>";
+			var result = note_body.ToHtml ();
 			string expected = "<span class=\"highlight\">Foobar</span>";
+			Assert.AreEqual (expected, result);
+		}
+		[Test]
+		public void InternalLink ()
+		{
+			string note_body = "<link:internal>Foobar</link:internal>";
+			var result = note_body.ToHtml ();
+			string expected = "<a class=\"internal\">Foobar</a>";
+			Assert.AreEqual (expected, result);
+		}
+		[Test]
+		public void UrlLink ()
+		{
+			string note_body = "<link:url>http://www.example.com/index.php?foo=bar</link:url>";
+			var result = note_body.ToHtml ();
+			string expected = "<a class=\"url\" href=\"http://www.example.com/index.php?foo=bar\">http://www.example.com/index.php?foo=bar</a>";
 			Assert.AreEqual (expected, result);
 		}
 	}
@@ -93,9 +109,9 @@ namespace Rainy.Tests.XmlNoteConversion
 		}
 
 		[Test]
-		public void SizeTags ()
+		public void SizeTagsSmall ()
 		{
-			string html_body = "<h3>Foobar</h3>";
+			string html_body = "<small>Foobar</small>";
 			var result = html_body.ToTomboyXml ();
 			string expected = "<size:small>Foobar</size:small>";
 			Assert.AreEqual (expected, result);
@@ -106,7 +122,25 @@ namespace Rainy.Tests.XmlNoteConversion
 		{
 			string html_body = "<span class=\"highlight\">Foobar</span>";
 			var result = html_body.ToTomboyXml ();
-			string expected = "<size:small>Foobar</size:small>";
+			string expected = "<highlight>Foobar</highlight>";
+			Assert.AreEqual (expected, result);
+		}
+
+		[Test]
+		public void InternalLink ()
+		{
+			string html_body = "<a class=\"internal\">Foobar</a>";
+			var result = html_body.ToTomboyXml ();
+			string expected = "<link:internal>Foobar</link:internal>";
+			Assert.AreEqual (expected, result);
+		}
+
+		[Test]
+		public void UrlLink ()
+		{
+			string html_body = "<a class=\"url\" href=\"http://www.example.com/index.php?foo=bar\">http://www.example.com/index.php?foo=bar</a>";
+			var result = html_body.ToTomboyXml ();
+			string expected = "<link:url>http://www.example.com/index.php?foo=bar</link:url>";
 			Assert.AreEqual (expected, result);
 		}
 	}

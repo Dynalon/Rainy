@@ -22,7 +22,13 @@ namespace Rainy.NoteConversion
 			note["strikethrough"].ReplaceOuterWithTag ("<strike/>");
 			note["monospace"].ReplaceOuterWithTag ("<pre/>");
 			note["highlight"].ReplaceOuterWithTag ("<span class=\"highlight\" />");
-			note["link\\:internal"].ReplaceOuterWithTag ("<a/>");
+			note["link\\:internal"].ReplaceOuterWithTag ("<a class=\"internal\" />");
+
+			note["link\\:url"].ReplaceOuterWithTag ("<a class=\"url\" />");
+			// we have to set the href attribtue for those links
+			note["a[class='url']"].Each (e => {
+				e.SetAttribute ("href", e.InnerText);
+			});
 
 			return note.Render ();
 		}
@@ -55,7 +61,10 @@ namespace Rainy.NoteConversion
 			html["small"].ReplaceOuterWithTag ("<size:small/>");
 			html["strike"].ReplaceOuterWithTag ("<strikethrough/>");
 			html["pre"].ReplaceOuterWithTag ("<monospace/>");
-			html["a"].ReplaceOuterWithTag ("<link:internal/>");
+			html["a[class='internal']"].ReplaceOuterWithTag ("<link:internal/>");
+			html["a[class='url']"].ReplaceOuterWithTag ("<link:url/>");
+
+			html["a"].ReplaceOuterWithTag ("<link:url/>");
 
 			html["span[class='highlight']"].ReplaceOuterWithTag ("<highlight/>");
 
