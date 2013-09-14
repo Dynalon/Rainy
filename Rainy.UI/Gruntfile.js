@@ -61,6 +61,12 @@ module.exports = function (grunt) {
                 flatten: true,
                 src: [ 'app_admin/css/wysihtml5_style.css' ],
                 dest: 'dist/wysihtml5_style.css'
+            },
+            favicon: {
+                expand: false,
+                flatten: true,
+                src: [ 'app_admin/favicon.ico' ],
+                dest: 'dist/favicon.ico'
             }
         },
         watch: {
