@@ -179,7 +179,6 @@ app.directive('wysiwyg', ['$q', function($q){
 
                     scope.setWysiText = function (text) {
                         scope.wysiEditor.setValue(text);
-                        console.log('set');
                     };
 
                     // HACK we sometimes miss any character for any reason?

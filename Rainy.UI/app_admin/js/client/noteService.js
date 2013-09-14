@@ -1,13 +1,19 @@
 app.factory('noteService', function($http, $rootScope, $q, loginService) {
 
     var noteService = {};
-    var notes = [];
+    var notes, latest_sync_revision, manifest;
 
-    var latest_sync_revision = 0;
-    var manifest = {
-        taintedNotes: [],
-        deletedNotes: [],
-    };
+    function initialize () {
+        notes = null;
+
+        latest_sync_revision = 0;
+        manifest = {
+            taintedNotes: [],
+            deletedNotes: [],
+        };
+    }
+
+    initialize();
 
     Object.defineProperty(noteService, 'notebooks', {
         get: function () {
@@ -28,9 +34,9 @@ app.factory('noteService', function($http, $rootScope, $q, loginService) {
     });
 
     $rootScope.$on('loginStatus', function(ev, isLoggedIn) {
-        // TODO is this needed at all?
         if (!isLoggedIn) {
-            latest_sync_revision = 0;
+            console.log('cleaning note service');
+            initialize();
         }
     });
 
@@ -108,7 +114,10 @@ app.factory('noteService', function($http, $rootScope, $q, loginService) {
         return _.findWhere(notes, {guid: guid});
     };
 
-    noteService.fetchNotes = function() {
+    noteService.fetchNotes = function(force) {
+
+        if (notes !== null && !force) return;
+
         manifest.taintedNotes = [];
         manifest.deletedNotes = [];
 
@@ -153,7 +162,7 @@ app.factory('noteService', function($http, $rootScope, $q, loginService) {
                 data: req
             }).success(function (data, status, headers, config) {
                 console.log('successfully synced');
-                noteService.fetchNotes();
+                noteService.fetchNotes(true);
                 dfd_complete.resolve(note_changes);
             }).error(function () {
                 dfd_complete.reject();
@@ -194,8 +203,6 @@ app.factory('noteService', function($http, $rootScope, $q, loginService) {
             manifest.taintedNotes.push(note.guid);
         }
     };
-
-    noteService.fetchNotes();
 
     return noteService;
 });

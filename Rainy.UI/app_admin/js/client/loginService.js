@@ -45,7 +45,6 @@ app.factory('loginService', function($q, $http, $rootScope) {
     loginService.logout = function () {
         loginService.accessToken = '';
         loginService.username = '';
-        loginService.notes = [];
 
         if (useStorage) {
             window.localStorage.removeItem('accessToken');

@@ -8,6 +8,7 @@ function NoteCtrl($scope,$location, $routeParams, $timeout, $q, $rootScope,
     $scope.enableSyncButton = false;
     $scope.config = configService.serverConfig;
 
+    noteService.fetchNotes();
 
     // deep watching, will get triggered if a note content's changes, too
     $scope.$watch('noteService.notes', function (newval, oldval) {
