@@ -30,6 +30,7 @@ namespace Rainy.NoteConversion
 				e.SetAttribute ("href", e.InnerText);
 			});
 
+
 			return note.Render ();
 		}
 		private static CQ ReplaceOuterWithTag (this CQ element, string tag)
@@ -67,6 +68,13 @@ namespace Rainy.NoteConversion
 			html["a"].ReplaceOuterWithTag ("<link:url/>");
 
 			html["span[class='highlight']"].ReplaceOuterWithTag ("<highlight/>");
+			
+			// hack replace <div> which get inserted by the wysihtml5
+			html["div"].Each (domobj => {
+				CQ e = new CQ (domobj);
+				var all = new CQ(e.Html());
+				e.ReplaceWith(all);
+			});
 
 			return html.Render ();
 		}

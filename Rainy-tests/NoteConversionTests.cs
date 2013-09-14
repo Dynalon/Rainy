@@ -143,6 +143,15 @@ namespace Rainy.Tests.XmlNoteConversion
 			string expected = "<link:url>http://www.example.com/index.php?foo=bar</link:url>";
 			Assert.AreEqual (expected, result);
 		}
+
+		[Test]
+		public void DivsAreRemoved ()
+		{
+			string html_body = "<div><b>Bla</b>foobar</div>";
+			var result = html_body.ToTomboyXml ();
+			string expected = "<bold>Bla</bold>foobar";
+			Assert.AreEqual (expected, result);
+		}
 	}
 }
 

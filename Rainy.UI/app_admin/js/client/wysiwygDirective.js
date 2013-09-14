@@ -9,15 +9,12 @@ app.directive('wysiwyg', ['$q', function($q){
                 'title': 0
             },
             tags: {
-                'strike': {
-                    'remove': 0,
+                'div': {
+                    'remove': 1
                 },
-                'del': {
-                    'remove': 0,
-                },
-                'blockquote': {
-                    rename_tag: 'span'
-                },
+                'strike': {},
+                'del': {},
+                'span': {},
                 'small': {},
                 'i': {},
                 'a': {},
@@ -26,10 +23,7 @@ app.directive('wysiwyg', ['$q', function($q){
                 'li': {},
                 'ul': {},
                 'h1': {},
-                'h2': {},
-                'h3': {
-                    rename_tag: 'small'
-                },
+                'h2': {}
             }
         };
 
@@ -38,6 +32,10 @@ app.directive('wysiwyg', ['$q', function($q){
             link: false,
             image: false,
             color: false,
+            // HACK this identity function prevents the wysi to sometimes remove valid
+            // tags from the editor; see http://stackoverflow.com/a/17656572/777928
+            // this renders our parser rules obsolete
+            parser: function (html) { return html; },
             parserRules: parserRules,
             stylesheets: ['wysihtml5_style.css'],
             events: {
@@ -181,6 +179,7 @@ app.directive('wysiwyg', ['$q', function($q){
 
                     scope.setWysiText = function (text) {
                         scope.wysiEditor.setValue(text);
+                        console.log('set');
                     };
 
                     // HACK we sometimes miss any character for any reason?

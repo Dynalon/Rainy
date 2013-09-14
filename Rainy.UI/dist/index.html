@@ -149,7 +149,7 @@
                     <div class="" ng-repeat="(name,notes) in notebooks">
                     <li class="nav-header" ng-show="(notes | filter: search_term).length > 0">{{ name }}</li>
                         <li ng-repeat="note in notes | filter: search_term">
-                        <a href="#/notes/{{ note.guid }}">{{ note.title }} </a>
+                            <a href="#/notes/{{ note.guid }}">{{ note.title }} </a>
                         </li>
                     </div>
                 </ul>
@@ -157,8 +157,11 @@
         </div><!--/span-->
 
         <div class="span6" ng-show="selectedNote">
-                <textarea ng-show="config.DevelopmentMode" style="width:500px; height: 100px;">{{ selectedNote['note-content'] }}</textarea>
-                <wysiwyg></wysiwyg>
+            <!-- DEBUG TXTAREA SHOWING THE RAW HTML SRC OF A NOTE - ONLY IN DEVELOPMENT MODE -->
+            <textarea ng-show="config.DevelopmentMode" style="width:500px; height: 100px;">{{ selectedNote['note-content'] }}</textarea>
+
+            <wysiwyg />
+
         </div><!--/span-->
     </div><!--/row-->
 </div><!--/.fluid-container-->
@@ -278,7 +281,7 @@
 <div>
     <h2 style="width: 650px;" ng-model="selectedNote.noteTitle" contenteditable="true">{{ selectedNote.title }}</h2>
     <textarea
-        id="#txtarea"
+        id="txtarea"
         style="width: 650px; height: 450px;"
         rows="20"
         class="span10"

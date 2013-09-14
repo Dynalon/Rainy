@@ -27,7 +27,6 @@ function NoteCtrl($scope,$location, $routeParams, $timeout, $q, $rootScope,
 
     var initialAutosyncSeconds = 300;
     function startAutosyncTimer () {
-
         $timeout.cancel($rootScope.timer_dfd);
         $rootScope.autosyncSeconds = initialAutosyncSeconds;
         $scope.enableSyncButton = true;
@@ -43,9 +42,7 @@ function NoteCtrl($scope,$location, $routeParams, $timeout, $q, $rootScope,
                 $rootScope.timer_dfd = $timeout(autosync, 1000);
             }
         }, 1000);
-
     }
-
     function stopAutosyncTimer () {
         $rootScope.autosyncSeconds = initialAutosyncSeconds;
         $timeout.cancel($rootScope.timer_dfd);
