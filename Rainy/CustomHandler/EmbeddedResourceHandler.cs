@@ -122,7 +122,9 @@ namespace Rainy.CustomHandler
 
 				if (file_content == null)
 					throw new HttpException(404, "Not found");
-				
+
+				r.ContentType = MimeTypes.GetMimeType(requested_relative_path);
+
 				TimeSpan maxAge;
 				if (r.ContentType != null && EndpointHost.Config.AddMaxAgeForStaticMimeTypes.TryGetValue(r.ContentType, out maxAge))
 				{
@@ -131,7 +133,6 @@ namespace Rainy.CustomHandler
 				
 				if (request.HasNotModifiedSince(lastModified))
 				{
-					r.ContentType = MimeTypes.GetMimeType(requested_relative_path);
 					r.StatusCode = 304;
 					return;
 				}

@@ -62,7 +62,7 @@ namespace Rainy
 			// this will be fatal (duplicate key error) for unit tests so we clear the headers
 			EndpointHostConfig.Instance.GlobalResponseHeaders.Clear ();
 
-			SetConfig (new EndpointHostConfig {
+			var endpoint_config = new EndpointHostConfig {
 
 				EnableFeatures = Feature.All.Remove (Feature.Metadata),
 				//DefaultRedirectPath = "/admin/",
@@ -88,7 +88,12 @@ namespace Rainy
 					// for authentication
 					{ "Access-Control-Allow-Headers", "Content-Type, Authority, AccessToken" },
 				}, 
-			});
+			};
+			endpoint_config.AddMaxAgeForStaticMimeTypes.Add ("text/html", new TimeSpan (1, 0, 0));
+			endpoint_config.AddMaxAgeForStaticMimeTypes.Add ("text/css", new TimeSpan (1, 0, 0));
+			endpoint_config.AddMaxAgeForStaticMimeTypes.Add ("text/javascript", new TimeSpan (1, 0, 0));
+			SetConfig (endpoint_config);
+
 			
 		}
 	}

@@ -132,6 +132,7 @@ namespace Rainy.CustomHandler
 					}
                 }
 
+                r.ContentType = MimeTypes.GetMimeType(fileName);
                 TimeSpan maxAge;
                 if (r.ContentType != null && EndpointHost.Config.AddMaxAgeForStaticMimeTypes.TryGetValue(r.ContentType, out maxAge))
                 {
