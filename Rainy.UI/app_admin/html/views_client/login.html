@@ -7,6 +7,9 @@
         <h2>Login</h2><hr />
         <form name="formLogin" ng-submit="doLogin()">
             <div class="row">
+                <div class="alert span5" ng-show="isTestServer">For testing, you can use:<br>
+                    Username: <b>testuser</b>, Password: <b>testpass</b>
+                </div>
                 <div class="span3">
                     <div class="control-group">
                         <label class="control-label" for="inputEmail">Username</label>

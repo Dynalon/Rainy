@@ -395,6 +395,7 @@ function LoginCtrl($scope, $location, $rootScope,
     $scope.username = '';
     $scope.password = '';
     $scope.rememberMe = false;
+    $scope.isTestServer = $location.host() === 'testserver.notesync.org';
 
     $scope.serverConfig = configService.serverConfig;
 
