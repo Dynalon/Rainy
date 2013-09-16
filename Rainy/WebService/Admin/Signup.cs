@@ -30,6 +30,9 @@ namespace Rainy.WebService.Signup
 
 		public object Post (SignupUserRequest req)
 		{
+			if (!JsonConfig.Config.Global.AllowSignup)
+				throw new Rainy.ErrorHandling.UnauthorizedException ();
+
 			req.AdditionalData = "";
 			req.Username = req.Username.ToLower ();
 
