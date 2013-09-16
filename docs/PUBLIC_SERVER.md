@@ -38,6 +38,7 @@ You can also use unattended authentication by appending `/<username>/<password>/
 
 	User	Password
 	-----------------
+	testuser	testpass
 	aiden	QSmCmH
 	alexander	fcOYGZ
 	alexis	XwG4Hy
