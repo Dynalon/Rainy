@@ -41,6 +41,7 @@ using HttpResponseWrapper = ServiceStack.WebHost.Endpoints.Extensions.HttpRespon
 using ServiceStack.WebHost.Endpoints.Support;
 using ServiceStack.WebHost.Endpoints;
 using System.Linq;
+using ServiceStack;
 
 namespace Rainy.CustomHandler
 {
@@ -84,9 +85,19 @@ namespace Rainy.CustomHandler
 
 			string abs_path = request.GetAbsolutePath();
 
+			if (this.HtdocsPath.Contains ("swagger-ui")) {
+
+				if (abs_path.StartsWith ("/swagger-ui/")) {
+					return this;
+				}
+			}
+			if (abs_path.StartsWith ("/resource")) {
+				return null;
+			}
+			
 			if (abs_path.StartsWith ("/oauth/") || abs_path.StartsWith ("/api/")) {
 				return null;
-			} else if (abs_path.StartsWith ("/admin/") || abs_path.StartsWith ("swagger-ui")) {
+			} else if (abs_path.StartsWith ("/admin/")) {
 				return this;
 			} else if (abs_path.Count (c => c == '/') == 1) {
 				return this;
@@ -106,10 +117,15 @@ namespace Rainy.CustomHandler
 
         public void ProcessRequest(IHttpRequest request, IHttpResponse response, string operationName)
 		{
-            response.EndHttpRequest(skipClose: true, afterBody: r => {
+            response.EndHttpHandlerRequest(skipClose: true, afterBody: r => {
 
 				// i.e. /static/folder/file.html => folder/file.html
-				var requested_relative_path = request.GetAbsolutePath().Substring(RoutePath.Length);
+				var abs_path = request.GetAbsolutePath();
+				string requested_relative_path = "";
+				if (abs_path == "/")
+					requested_relative_path = "./";
+				else
+					requested_relative_path = abs_path.Substring(RoutePath.Length);
 
 				var fileName = Path.Combine (HtdocsPath, requested_relative_path);
                 var fi = new FileInfo(fileName);

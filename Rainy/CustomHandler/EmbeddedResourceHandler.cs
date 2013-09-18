@@ -45,6 +45,7 @@ using ServiceStack.WebHost.Endpoints.Support;
 using ServiceStack.WebHost.Endpoints;
 using System.Reflection;
 using System.Linq;
+using ServiceStack;
 
 namespace Rainy.CustomHandler
 {
@@ -106,7 +107,7 @@ namespace Rainy.CustomHandler
 		
 		public void ProcessRequest(IHttpRequest request, IHttpResponse response, string operationName)
 		{
-			response.EndHttpRequest(skipClose: true, afterBody: r => {
+			response.EndHttpHandlerRequest (skipClose: true, afterBody: r => {
 				
 				// i.e. /static/folder/file.html => folder/file.html
 				var requested_relative_path = request.GetAbsolutePath().Substring(RoutePath.Length);

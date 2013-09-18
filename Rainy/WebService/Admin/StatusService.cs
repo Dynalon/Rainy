@@ -2,7 +2,6 @@ using ServiceStack.ServiceHost;
 using Rainy.Db;
 using ServiceStack.OrmLite;
 using System;
-using ServiceStack.ServiceInterface.Cors;
 using ServiceStack.Common.Web;
 
 namespace Rainy.WebService.Admin

@@ -39,8 +39,12 @@ namespace Rainy
 			this.ExceptionHandler = Rainy.ErrorHandling.ExceptionHandler.CustomExceptionHandler;
 			this.ServiceExceptionHandler = Rainy.ErrorHandling.ExceptionHandler.CustomServiceExceptionHandler;
 
-			var swagger_path = Path.Combine(Path.GetDirectoryName(this.GetType ().Assembly.Location), "../../swagger-ui/");
-			//var swagger_handler = new FilesystemHandler ("/swagger-ui/", swagger_path);
+			string swagger_path;
+			if (JsonConfig.Config.Global.Development)
+			    swagger_path = Path.Combine(Path.GetDirectoryName(this.GetType ().Assembly.Location), "../../swagger-ui/");
+			else
+				swagger_path = Path.Combine(Path.GetDirectoryName(this.GetType ().Assembly.Location), "swagger-ui/");
+			var swagger_handler = new FilesystemHandler ("/swagger-ui/", swagger_path);
 
 			IHttpHandlerDecider uihandler;
 			if (JsonConfig.Config.Global.Development) {
@@ -72,8 +76,8 @@ namespace Rainy
 				DefaultContentType = ContentType.Json,
 
 				RawHttpHandlers = { 
-					//swagger_handler.CheckAndProcess,
-					uihandler.CheckAndProcess
+					uihandler.CheckAndProcess,
+					swagger_handler.CheckAndProcess
 				},
 
 				// enable cors
