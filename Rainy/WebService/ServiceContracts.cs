@@ -8,7 +8,10 @@ using System.Collections.Generic;
 namespace Rainy.WebService
 {
 
-	[Route("/api/1.0/", "GET")]
+	[Api ("Sync API")]
+	[Route("/api/1.0/", "GET",
+	       Summary = "Root API entrance. Supplies all information for further requests",
+	       Notes = "see the REST specification at https://wiki.gnome.org/Apps/Tomboy/Synchronization/REST/1.0")]
 	[Route("/{Username}/{Password}/api/1.0/", "GET")]
 	// TODO check if we can remove the DataContract attributes
 	[DataContract]
@@ -20,32 +23,41 @@ namespace Rainy.WebService
 		public string Password { get; set; }
 	}
 
-	[Route("/api/1.0/{Username}/", "GET")]
+	[Api ("Sync API")]
+	[Route("/api/1.0/{Username}/", "GET",
+	       Summary = "Get user details for sync",
+	       Notes = "Requires OAuth authentication beforehand. See the REST specification at https://wiki.gnome.org/Apps/Tomboy/Synchronization/REST/1.0")]
 	[OAuthRequired]
 	[DataContract]
 	public class UserRequest : IReturn<DTO.UserResponse>
 	{
 		[DataMember (Name="Username")]
+		[ApiMember (Description="The username to get the notes from. ")]
 		public string Username { get; set; }
 	}
 
-	[Route("/api/1.0/{Username}/notes", "GET")]
+	[Route("/api/1.0/{Username}/notes", "GET",
+	       Summary = "Get notes of a user",
+	       Notes = "Requires OAuth authentication beforehand. See the REST specification at https://wiki.gnome.org/Apps/Tomboy/Synchronization/REST/1.0")]
 	[OAuthRequired]
 	[DataContract]
 	public class GetNotesRequest : IReturn<DTO.GetNotesResponse>
 	{
 		[DataMember (Name="Username")]
+		[ApiMember (Description="The username to get the notes from. Requires OAuth authentication beforehand.")]
 		public string Username { get; set; }
 	}
 
-	[Route("/api/1.0/{Username}/notes", "PUT,POST")]
+	[Route("/api/1.0/{Username}/notes", "PUT,POST",
+	       Summary = "Update notes of a user",
+	       Notes = "Requires OAuth authentication beforehand. See the REST specification at https://wiki.gnome.org/Apps/Tomboy/Synchronization/REST/1.0")]
 	[OAuthRequired]
 	[DataContract]
 	public class PutNotesRequest : DTO.PutNotesRequest, IReturn<DTO.GetNotesResponse>
 	{
 		[DataMember (Name="Username")]
 		public string Username { get; set; }
-	} 
+	}
 
 
 	// NOTE HISTORY API

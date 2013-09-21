@@ -42,7 +42,10 @@ namespace Rainy.WebService.OAuth
 		public string RedirectUrl { get; set; }
 	}
 
-	[Route("/oauth/temporary_access_token", "POST")]
+	[Route("/oauth/temporary_access_token", "POST",
+	       Summary = "Retrieves a temporary access token. This allows bypassing the full OAuth procedure.",
+	       Notes  = "OAuth token exchange can be cumbersome and hard to implement. Therefore this bypass can be used to retrieve a temporary access token."
+	       + "Instead of signing a request, the token can be attached in the Header as 'AccessToken': <token> for all requests where OAuth signing would be required")]
 	public class OAuthTemporaryAccessTokenRequest : IReturn<OAuthTemporaryAccessTokenResponse>
 	{
 		[ApiMember (Description="Can either be the username or email the user is registered with",
@@ -55,7 +58,6 @@ namespace Rainy.WebService.OAuth
 		[ApiMember (Description="Amount of minutes after issuing after which the token will become invalid.",
 		            DataType="integer")]
 		public int Expiry { get; set; }
-
 	}
 	public class OAuthTemporaryAccessTokenResponse
 	{

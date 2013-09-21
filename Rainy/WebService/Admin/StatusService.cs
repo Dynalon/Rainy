@@ -6,7 +6,8 @@ using ServiceStack.Common.Web;
 
 namespace Rainy.WebService.Admin
 {
-	[Route("/api/admin/status/","GET, OPTIONS")]
+	[Route("/api/admin/status/","GET, OPTIONS",
+	       Summary = "Get status information about the server.")]
 	[AdminPasswordRequired]
 	public class StatusRequest : IReturn<Status>
 	{
