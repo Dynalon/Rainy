@@ -21,9 +21,26 @@ If possible, inlude a full debug log of Rainy when hitting the bug. A log will b
 Add code or features
 --------------------
 
-New code is always welcome, just clone the [Rainy sourcecode][rainy] and send a pull-request. If you are not familiar with git, patches are welcome too!
+Currently Rainy consists of two major parts that you can contribute to independently, depending on your technical background and skills:
 
-If you want to implement a feature, it would be nice if you open up an issue on the [issue tracker]][gh-issue-tracker] describing the feature and assign yourself to it, so others can see what areas are worked on.
+### Backend (C#/.NET)
+
+If you are familiar with C# (or Java which is very similiar) or another OO-language, your help is greatly welcome. You don't need Windows or Visual Studio, as Rainy is mainly developed using [MonoDevelop][monodevelop] (Linux) or [Xamarin Studio][xamstudio] (OS X / Windows) (both are free as in beer).
+
+Check the [backend section in the Hacking HOWTO][hackingbackend] to get started!
+
+### Frontend (HTML5/Javascript)
+
+If you are more a web developer type, you can also help to improve Rainy. Rainy's frontend is built using [AngularJS][angular] and [Bootstrap][bootstrap]. Even if you don't know any of those, basic HTML/CSS/Javascript knowledge is enough to get started. There is __no need__ to know any backend technologies, as the frontend is a standalone single-page application completely independent of any server-side code.
+
+Check the [frontend section in the Hacking HOWTO][hackingfrontend] to get started!
+
+ [bootstrap]: http://getbootstrap.com
+ [angular]: http://www.angularjs.org
+ [monodevelop]: http://www.monodevelop.com
+ [xamstudio]: http://www.xamarin.com/download
+ [hackingbackend]: /developer/hacking.md#backend
+ [hackingfrontend]: /developer/hacking.md#frontend
 
 Improve documentation and website
 ---------------------------------

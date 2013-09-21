@@ -10,8 +10,10 @@
 
 [Developer]()
 
+  * [Hacking HOWTO](developer/hacking.md)
   * [OAuth docs](developer/oauth.md)
   * [Crypto docs](developer/crypto.md)
+  * [Rainy REST API docs](http://www.notesync.org/apidoc)
 
 [gimmick:theme(inverse: true)](united)
 

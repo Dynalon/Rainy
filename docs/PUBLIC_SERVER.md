@@ -15,7 +15,7 @@ Since this is for testing purposes only, there are no private account registrati
 
 To use the HTML5/Javascript based in-browser client, use any of belows username/password pairs and login at:
 
-[https://www.notesync.org/](https://www.notesync.org/)
+[https://testserver.notesync.org/](https://testserver.notesync.org/)
 
 Note: You will have to add a security exception for the SSL certification, as the test server does not use an expensive CA signed certificate but a self-signed one.
 
@@ -23,15 +23,15 @@ Note: You will have to add a security exception for the SSL certification, as th
 
 Pick a username/password combination below, and then use this URL in Tomboy/Tomdroid as a sync url:
 
-	https://notesync.org/
+	https://testserver.notesync.org/
 
-You will have to enter the username/password pair once you add this erver in Tomboy/Tomdroid.
+You will have to enter the username/password pair later, after you added this server in Tomboy/Tomdroid.
 
-Note: Double-check you enter _HTTPS_ (with a trailing 's'), using _HTTP_ will not work.
+Note: Double-check you enter _HTTPS_ (with a trailing 's'), as using _HTTP_ will not work.
 
 You can also use unattended authentication by appending `/<username>/<password>/` to the Url:
 
-	https://notesync.org/<username>/<password>/
+	https://testserver.notesync.org/<username>/<password>/
 
 - - -
 ### Public account list

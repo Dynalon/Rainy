@@ -100,6 +100,7 @@ Building from source
 
 ### 0. Install requirements:
   * Same as when using a binary release, **plus**
+  * mono >= 3.0 for building (for running a precompiled Rainy, mono >=2.10.8 is still ok)
   * git
   * automake / autotools
 
@@ -111,6 +112,9 @@ On Debian/Ubuntu:
 ### 1. Building from source:
 
 	git clone https://github.com/Dynalon/Rainy.git
+
+  # will install trusted SSL certificates into mono's trust store
+  mozroots --import --sync
 
 	# will fetch any deps and compile rainy from source result will be compiled
 	# into ./release/Rainy.exe single packed .exe that can be run with mono
