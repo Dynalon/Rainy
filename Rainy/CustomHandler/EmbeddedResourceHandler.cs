@@ -93,7 +93,11 @@ namespace Rainy.CustomHandler
 		public IHttpHandler CheckAndProcess (IHttpRequest request)
 		{
 			var abs_path = request.GetAbsolutePath();
-		
+	
+			if (abs_path.StartsWith ("/resource")) {
+				return null;
+			}
+
 			if (abs_path.StartsWith ("/oauth/") || abs_path.StartsWith ("/api/")) {
 				return null;
 			} else if (abs_path.StartsWith ("/admin/") || abs_path.StartsWith ("swagger-ui")) {
