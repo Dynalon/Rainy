@@ -4,6 +4,20 @@ Follow @timodoerr for all rainy-related announcements!
 [gimmick:twitterfollow](@timodoerr) &nbsp; [gimmick:FacebookLike ( layout: 'buttoncount') ](http://www.facebook.com/pages/Rainy-note-sync-server-for-Tomboy/116321368557123) &nbsp; <script type="text/javascript" src="https://apis.google.com/js/plusone.js"></script> <g:plusone size="medium" href="http://www.notesync.org"></g:plusone>
 * * *
 
+###### September, 22nd 2013
+## Rainy post-GSoC Release v0.5.0
+
+After three great months of hacking, the Google Summer of Code 2013 is over. A lot of changes went into the code tree, and I rolled all of them into a new unstable release v0.5.0. Head over to the [download section](DOWNLOAD.md) to get it. Amongst the new features are:
+
+  * server-side note encryption in the backend
+  * HTML5 based administration and note editing interfaces
+  * dual PostgreSQL/SQLite support
+  * removed requirements to add username/password to the server url
+
+...and many more. Check out [my blog][myblog] for a in-depth view of what has changed.
+
+- - -
+
 ###### June, 2. 2013
 ## Rainy accepted at Google Summer of Code 2013!
 
