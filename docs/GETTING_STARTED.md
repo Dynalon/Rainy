@@ -11,7 +11,7 @@ Using a downloaded binary release
 ---------------------------------
 
 ### 0. Install requirements:
-  * mono
+  * mono (>= 2.10.8)
   * sqlite3 (usually no need to install this, as it comes with most distros by default)
 
 On a Debian/Ubuntu based system, you could install the above requirements with:
@@ -32,11 +32,11 @@ Fetch the latest version from the [download page](DOWNLOAD.md) and unzip:
 
 ### 2. Edit settings.conf
 
-There is a sample settings.conf which needs to be edited, i.e. change username/password and set the `DataPath`, which will tell Rainy where to store your notes. _Double check_ your settings.conf is valid JSON (besides the comment lines and the missing quotes for keys). Pay special attention not to have any invalid value delimiters (like a comma) in place where it does not belong.
+There is a sample settings.conf which needs to be edited, add an adminstrator password and set the `DataPath`, which will tell Rainy where to store your notes. _Double check_ your settings.conf is valid JSON (besides the comment lines and the missing quotes for keys). Pay special attention not to have any invalid value delimiters (like a comma) in place where it does not belong.
 
 ### 3. SSL setup
 
-If you use a `ListenUrl` that starts with the 'https://' prefix, rainy will use SSL for communication (recommended). Upon first start, a self-signed certificate and a private key will be created and stored in your `DataPath` (default: './data/').
+If you use a `ListenUrl` that starts with the 'https://' prefix, rainy will use SSL for communication (default). Upon first start, a self-signed certificate and a private key will be created and stored in your `DataPath` (default: './data/').
 
 Using a self-signed certificate with rainy is secure and imposes no risks. However, you will receive a warning message when the browser authentication takes place, as the certificate is not in your system's trusted certificate store. You have to manually add an exception for this certificate to proceed.
 
@@ -62,21 +62,23 @@ Alternately, if you want to start Rainy on startup in detached mode, you can use
 
     screen -X rainy-session -d -m mono 'Rainy.exe -c settings.conf'
 
-or use `mono-service`:
+An alternative for screen os to use `mono-service`:
 
     mono-service Rainy.exe -c settings.conf
+
+See the manpage of `mono-service` for more info.
 
 ### 5. First sync in Tomboy
 
 Now open up Tomboy (or another client, like [Tomdroid][tomdroid]), and point the synchronisation url to Rainy:
 
-    https://yourserver.com:8080/<username>/<password>/
+    https://yourserver.com:8080/
 
-For the default settings.conf, there is a user `johndoe` with password set to `none`. In this case the example url would be:
+Click "Connect to server"; a browser instance should fire up asking for your login name and password. After submit, you can close the browser and start the first sync in Tomboy.
 
-    https://yourserver.com:8080/johndoe/none/
+If you want immediate authentication, you can also embed the username and password into the server url to avoid being prompted for username and password in the browser (usefull on mobile devices):
 
-Click "Connect to server"; a browser instance should fire up and telling you immediatelly that the Tomboy authorization was successfull. You can now close the browser and start the first sync in Tomboy.
+    https://yourserver.com:8080/username/password/
 
 ![](tomboy-url.png "Sample configuration in Tomboy")
 
@@ -90,10 +92,12 @@ There are currently some issues in Tomboy and Tomdroid that you should know of b
 * Tomdroid
   * The Tomdroid version in the Google Play store is outdated and syncing might not work
   * Syncing works best (two-way sync) when using at least version 0.7.2 from the [Tomdroid website][tomdroid]
+  * If you have SSL enabled, you need to use [latest daily development build 0.7.3][tomdroiddev] (unstable, be warned!). SSL will not work on versions of Tomdroid lower than 0.7.3.
 
 
   [tomboy-bug]: https://bugzilla.gnome.org/show_bug.cgi?id=665679
   [tomdroid]: https://launchpad.net/tomdroid
+  [tomdroiddev]: http://goo.gl/fKg6N
 
 Building from source
 --------------------
@@ -111,20 +115,20 @@ On Debian/Ubuntu:
 
 ### 1. Building from source:
 
-	git clone https://github.com/Dynalon/Rainy.git
+    git clone https://github.com/Dynalon/Rainy.git
 
-  # will install trusted SSL certificates into mono's trust store
-  mozroots --import --sync
+    # will install trusted SSL certificates into mono's trust store
+    mozroots --import --sync
 
-	# will fetch any deps and compile rainy from source result will be compiled
-	# into ./release/Rainy.exe single packed .exe that can be run with mono
-	make
+    # will fetch any deps and compile rainy from source result will be compiled
+    # into ./release/Rainy.exe single packed .exe that can be run with mono
+    make
 
-	# OPTIONAL: create a single, statically linked bundle for easy deployment
-	# which required no other dependencies except sqlite3 (so no mono is required
-	# to run, but executable will not be plattform independent).
-	# The executable can then be found in ./release/linux/
-	make linux_bundle
+    # OPTIONAL: create a single, statically linked bundle for easy deployment
+    # which required no other dependencies except sqlite3 (so no mono is required
+    # to run, but executable will not be plattform independent).
+    # The executable can then be found in ./release/linux/
+    make linux_bundle
 
 Now follow the same steps as when using a binary release.
 

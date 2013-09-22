@@ -4,11 +4,12 @@ Rainy is a free synchronization/cloud server intended for use with [Tomboy][tomb
 
 ### Some Facts:
 
-  * has two different data backends that can be chosen: plain XML files (one per note) or single sqlite database
-  * written in C# and runs with [mono][mono] on all major platforms (could for example be hosted at a small home server, NAS or cheap VPS/cloud server)
+  * written in C# and runs with [mono][mono] on all major platforms (could for example be hosted at a small home server, NAS, cheap VPS/cloud server, or [RaspberryPi][raspberrypi])
+  * Built-in modern HTML5/[AngularJS][angularjs] based interface for note editing and administration
   * easy deployment through single _Rainy.exe_ file that only requires mono to run, all other libraries are packed, merged and statically linked
-  * re-uses the existing [tomboy-library][tomboylib], which is a C# library that should one day put in place into Tomboy, and could be used by other potential clients
   * uses the awesome [ServiceStack][servicestack] framework for providing the [Tomboy REST API][tomboyrest] and the [ServiceStack.ORMLite][ss-ormlite] O/R Mapper  for database access
+  * support SQLite and PostgreSQL backend databases
+  * re-uses the existing [tomboy-library][tomboylib], which is a C# library that should one day put in place into Tomboy, and could be used by other potential clients
   * licensed under the free [GNU AGPLv3 license][agplv3]
 
 
@@ -17,6 +18,8 @@ Rainy is a free synchronization/cloud server intended for use with [Tomboy][tomb
   [tomdroid]: https://launchpad.net/tomdroid
   [tomboyrest]: https://live.gnome.org/Tomboy/Synchronization/REST/1.0
   [snowy]: http://git.gnome.org/browse/snowy
+  [angularjs]: http://www.angularjs.org
+  [raspberrypi]: http://jjjjango.blogspot.de/2013/02/tomboys-new-sync-server-rainy-running.html
   [servicestack]: http://www.servicestack.net/
   [ss-ormlite]: https://github.com/ServiceStack/ServiceStack.OrmLite
   [mono]: http://www.mono-project.com

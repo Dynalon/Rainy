@@ -5,7 +5,7 @@ Rainy public hosted cloud server
 
 ### About
 
-There is test server running the latest rainy release available, that can be used by anyone who wants to try out rainy, or want to develop a [Tomboy sync API][restapi] compatible application.
+There is a test server running the latest rainy release available, that can be used by anyone who wants to try out rainy, or want to develop a [Tomboy sync API][restapi] compatible application.
 
 Since this is for testing purposes only, there are no private account registration possible (yet).  Below you will find a list of valid username/password combinations, each representing a single account. If you pick one randomly, chances are good that no one will interfere with your notes while testing.
 
