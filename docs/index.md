@@ -16,6 +16,9 @@ After three great months of hacking, the Google Summer of Code 2013 is over. A l
 
 ...and many more. Check out [my blog][myblog] for a in-depth view of what has changed.
 
+![The new HTML5 interface "HTML5 Interface Client"](http://exceptionrethrown.files.wordpress.com/2013/09/notes1.png)
+![The new HTML5 interface "HTML5 Interface Admin"](http://exceptionrethrown.files.wordpress.com/2013/09/admin1.png)
+
 - - -
 
 ###### June, 2. 2013
