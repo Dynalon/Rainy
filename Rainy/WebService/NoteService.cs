@@ -3,13 +3,12 @@ using System.Collections.Generic;
 using System.Linq;
 using ServiceStack.Common;
 using ServiceStack.ServiceHost;
-using Tomboy;
 using Rainy.Interfaces;
-using Tomboy.Sync.Web.DTO;
 using DTO = Tomboy.Sync.Web.DTO;
 using Rainy.ErrorHandling;
 using ServiceStack.OrmLite;
 using Rainy.NoteConversion;
+using Tomboy.Sync.Web.DTO;
 
 
 namespace Rainy.WebService

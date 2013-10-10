@@ -12,6 +12,7 @@ using ServiceStack.OrmLite;
 using Tomboy.Sync.Web.DTO;
 using Rainy.WebService;
 using Rainy.Db;
+using Tomboy.Db;
 
 namespace Rainy.Tests.Db
 {

@@ -98,25 +98,13 @@
       <Project>{7BB12286-1E31-4CBE-9C07-9E66D4AF0336}</Project>
       <Name>Rainy</Name>
     </ProjectReference>
-    <ProjectReference Include="..\tomboy-library\Tomboy-library\Tomboy-library.csproj">
-      <Project>{040AA912-9738-438A-A7FD-5BB02C40C30A}</Project>
-      <Name>Tomboy-library</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\tomboy-library\Tomboy-library\Tomboy-library-tests\Tomboy-library-tests.csproj">
-      <Project>{216746A7-D297-4108-933A-1E926EB9B167}</Project>
-      <Name>Tomboy-library-tests</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\tomboy-library-websync\tomboy-library-websync.csproj">
-      <Project>{BA3396DF-4D7E-45C0-9BF1-3F52FE6FFA92}</Project>
-      <Name>tomboy-library-websync</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\tomboy-library-websync\DevDefined.OAuth\src\DevDefined.OAuth\DevDefined.OAuth.csproj">
-      <Project>{61B700B6-3911-4CEF-8751-7F42CA765068}</Project>
-      <Name>DevDefined.OAuth</Name>
-    </ProjectReference>
     <ProjectReference Include="..\JsonConfig\JsonConfig\JsonConfig.csproj">
       <Project>{10095092-E1E5-441F-9380-B6329F3CFEB4}</Project>
       <Name>JsonConfig</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\DevDefined.OAuth\src\DevDefined.OAuth\DevDefined.OAuth.csproj">
+      <Project>{61B700B6-3911-4CEF-8751-7F42CA765068}</Project>
+      <Name>DevDefined.OAuth</Name>
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>

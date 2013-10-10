@@ -3,8 +3,6 @@ using System.Threading;
 using System.Collections.Generic;
 using System.IO;
 
-using Tomboy;
-using Tomboy.Sync;
 using System.Xml;
 using System.Text;
 using Rainy.OAuth;
@@ -13,6 +11,8 @@ using Rainy.Interfaces;
 using ServiceStack.OrmLite;
 using JsonConfig;
 using Rainy.WebService;
+using Tomboy.Sync;
+using Tomboy;
 
 
 namespace Rainy

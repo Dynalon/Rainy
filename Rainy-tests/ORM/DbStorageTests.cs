@@ -50,11 +50,13 @@ namespace Rainy.Tests.Db
 		{
 			var sample_notes = GetSampleNotes ();
 
-			using (var store = new DbStorage (connFactory, testUser)) {
-				sample_notes.ForEach (n => store.SaveNote (n));
+			using (var store = new DbStorage (connFactory, testUser.Username, testUser.Manifest)) {
+				foreach (var note in sample_notes) {
+					store.SaveNote (note);
+				}
 			}
 			// now check if we have stored that notes
-			using (var store = new DbStorage (connFactory, testUser)) {
+			using (var store = new DbStorage (connFactory, testUser.Username, testUser.Manifest)) {
 				var stored_notes = store.GetNotes ().Values.ToList ();
 
 				Assert.AreEqual (sample_notes.Count, stored_notes.Count);
@@ -74,7 +76,7 @@ namespace Rainy.Tests.Db
 		{
 			StoreSomeNotes ();
 
-			using (var store = new DbStorage (connFactory, testUser)) {
+			using (var store = new DbStorage (connFactory, testUser.Username, testUser.Manifest)) {
 				var stored_notes = store.GetNotes ().Values.ToList ();
 
 				var deleted_note = stored_notes[0];
@@ -97,7 +99,7 @@ namespace Rainy.Tests.Db
 		[Test]
 		public void DateUtcIsCorrectlyStored ()
 		{
-			DbStorage storage = new DbStorage(connFactory, testUser);
+			DbStorage storage = new DbStorage(connFactory, testUser.Username, testUser.Manifest);
 
 			var tomboy_note = new Note ();
 			tomboy_note.ChangeDate = new DateTime (2000, 1, 1, 0, 0, 0, DateTimeKind.Utc);
@@ -115,7 +117,7 @@ namespace Rainy.Tests.Db
 		[Test]
 		public void DateLocalIsCorrectlyStored ()
 		{
-			DbStorage storage = new DbStorage(connFactory, testUser);
+			DbStorage storage = new DbStorage(connFactory, testUser.Username, testUser.Manifest);
 			
 			var tomboy_note = new Note ();
 			tomboy_note.ChangeDate = new DateTime (2000, 1, 1, 0, 0, 0, DateTimeKind.Local);
@@ -137,14 +139,14 @@ namespace Rainy.Tests.Db
 		{
 			var sample_notes = DbStorageTests.GetSampleNotes ();
 
-			using (var storage = new DbStorage (this.connFactory, this.testUser, use_history: true)) {
+			using (var storage = new DbStorage (this.connFactory, this.testUser.Username, this.testUser.Manifest, use_history: true)) {
 				foreach(var note in sample_notes) {
 					storage.SaveNote (note);
 				}
 			}
 
 			// modify the notes
-			using (var storage = new DbStorage (this.connFactory, this.testUser, use_history: true)) {
+			using (var storage = new DbStorage (this.connFactory, this.testUser.Username, this.testUser.Manifest, use_history: true)) {
 				foreach(var note in sample_notes) {
 					note.Title = "Random new title";
 					storage.SaveNote (note);

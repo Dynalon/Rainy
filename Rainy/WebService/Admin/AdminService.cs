@@ -10,6 +10,7 @@ using Rainy.WebService.Admin;
 using Rainy.ErrorHandling;
 using Rainy.Crypto;
 using System.Collections.Generic;
+using Tomboy.Db;
 
 namespace Rainy.WebService.Management.Admin
 {

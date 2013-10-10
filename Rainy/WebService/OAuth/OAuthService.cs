@@ -14,6 +14,7 @@ using Rainy.Crypto;
 using Rainy.Db;
 using ServiceStack.OrmLite;
 using ServiceStack.WebHost.Endpoints.Extensions;
+using Tomboy.Db;
 
 namespace Rainy.WebService.OAuth
 {

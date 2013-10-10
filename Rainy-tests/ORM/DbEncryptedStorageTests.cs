@@ -7,6 +7,7 @@ using ServiceStack.OrmLite;
 using Tomboy;
 using Rainy.Db;
 using System.Security.Cryptography;
+using Tomboy.Db;
 
 namespace Rainy.Tests.Db
 {
@@ -84,7 +85,7 @@ namespace Rainy.Tests.Db
 				}
 			}
 
-			storage = new DbStorage (this.connFactory, this.testUser);
+			storage = new DbStorage (this.connFactory, this.testUser.Username, this.testUser.Manifest);
 			sample_notes = DbStorageTests.GetSampleNotes ();
 			foreach(var note in sample_notes) {
 				storage.SaveNote (note);

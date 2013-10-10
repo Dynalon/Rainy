@@ -6,74 +6,38 @@ using ServiceStack.Common;
 using ServiceStack.OrmLite;
 using Tomboy;
 using Tomboy.Sync.Web.DTO;
-using Rainy.WebService;
+using Tomboy.Sync;
+using Tomboy.Db;
 
 namespace Rainy.Db
 {
-	public interface IDbStorageFactory
-	{
-		DbStorage GetDbStorage (IUser user);
-	}
-	public class DbStorageFactory : IDbStorageFactory
-	{
-		protected bool useHistory;
-		protected IDbConnectionFactory connFactory;
-		public DbStorageFactory (IDbConnectionFactory conn_factory, bool use_history = true)
-		{
-			this.useHistory = use_history;
-			this.connFactory = conn_factory;
-		}
-		public virtual DbStorage GetDbStorage (IUser user) {
-			var db_user = new DBUser () { Username = user.Username };
-			return new DbStorage (connFactory, db_user, useHistory);
-		}
-	}
-	public class DbEncryptedStorageFactory : DbStorageFactory
-	{
-		public DbEncryptedStorageFactory (IDbConnectionFactory conn_factory, bool use_history = true)
-			: base (conn_factory, use_history)
-		{
-		}
-		public override DbStorage GetDbStorage (IUser user)
-		{
-			DBUser db_user;
-			using (var db = connFactory.OpenDbConnection ()) {
-				db_user = db.First<DBUser> (u => u.Username == user.Username);
-				// TODO why doesn't ormlite raise this error?
-				if (db_user == null)
-					throw new ArgumentException(user.Username);
-			}
-
-			if (string.IsNullOrEmpty (user.EncryptionMasterKey)) {
-				throw new ArgumentException ("MasterKey is required", "EncryptionMasterKey");
-			}
-			var master_key = user.EncryptionMasterKey;
-
-			return (DbStorage) new DbEncryptedStorage (connFactory, db_user, master_key, useHistory);
-		}
-	}
-
-	public class DbStorage : DbAccessObject, IStorage, IDisposable
+	public class DbStorage : IStorage, IDisposable
 	{
 		public readonly DBUser User;
 		public readonly bool UseHistory;
 		protected IDbConnection db;
+		protected IDbConnectionFactory connFactory;
+		protected SyncManifest Manifest;
 		protected IDbTransaction trans;
 
-		public DbStorage (IDbConnectionFactory factory, DBUser user, bool use_history = true) : base (factory)
+		public DbStorage (IDbConnectionFactory factory, string username, bool use_history = true)
 		{
-			if (user == null)
-				throw new ArgumentNullException ("user");
+			if (factory == null)
+				throw new ArgumentNullException ("factory");
+			this.connFactory = factory;
+
+			using (var dbu = connFactory.OpenDbConnection ()) {
+				this.User = dbu.Select<DBUser> (u => u.Username == username)[0];
+			}
+			this.Manifest = this.User.Manifest;
 
 			this.UseHistory = use_history;
-			this.User = user;
 			db = factory.OpenDbConnection ();
 
 			// start everything as a transaction
 			trans = db.BeginTransaction ();
 
 		}
-		#region IStorage implementation
 		public virtual Dictionary<string, Note> GetNotes ()
 		{
 			// TODO remove double copying
@@ -115,8 +79,8 @@ namespace Rainy.Db
 					var archived_note = new DBArchivedNote ().PopulateWith (old_note);
 					// set the last known revision
 
-					if (User.Manifest.NoteRevisions.Keys.Contains (db_note.Guid)) {
-						archived_note.LastSyncRevision = User.Manifest.NoteRevisions[db_note.Guid];
+					if (Manifest.NoteRevisions.Keys.Contains (db_note.Guid)) {
+						archived_note.LastSyncRevision = Manifest.NoteRevisions[db_note.Guid];
 					}
 					db.Insert<DBArchivedNote> (archived_note);
 				}
@@ -135,8 +99,8 @@ namespace Rainy.Db
 
 			if (UseHistory) {
 				var archived_note = new DBArchivedNote ().PopulateWith(dbNote);
-				if (User.Manifest.NoteRevisions.ContainsKey (note.Guid)) {
-					archived_note.LastSyncRevision = User.Manifest.NoteRevisions[note.Guid];
+				if (Manifest.NoteRevisions.ContainsKey (note.Guid)) {
+					archived_note.LastSyncRevision = Manifest.NoteRevisions[note.Guid];
 				}
 				var stored_note = db.FirstOrDefault<DBArchivedNote> (n => n.CompoundPrimaryKey == archived_note.CompoundPrimaryKey);
 				// if that revision already exists, do not store
@@ -158,10 +122,7 @@ namespace Rainy.Db
 		{
 			throw new System.NotImplementedException ();
 		}
-		#endregion
 
-
-		#region IDisposable implementation
 		public void Dispose ()
 		{
 			trans.Commit ();
@@ -169,6 +130,5 @@ namespace Rainy.Db
 
 			db.Dispose ();
 		}
-		#endregion
 	}
 }

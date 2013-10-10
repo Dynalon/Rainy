@@ -10,6 +10,7 @@ using Rainy.Interfaces;
 using Rainy.Crypto;
 using Rainy.WebService;
 using DevDefined.OAuth.Storage.Basic;
+using Tomboy.Db;
 
 namespace Rainy
 {
@@ -148,7 +149,10 @@ namespace Rainy
 		{
 			this.storage = storageFactory.GetDbStorage (user);
 			engine = new Engine (storage);
-			this.dbUser = storage.User;
+
+			using (var db = connFactory.OpenDbConnection ()) {
+				this.dbUser = db.Select<DBUser> (u => u.Username == user.Username)[0];
+			}
 
 			if (dbUser.Manifest == null || string.IsNullOrEmpty (dbUser.Manifest.ServerId)) {
 				// the user may not yet have synced

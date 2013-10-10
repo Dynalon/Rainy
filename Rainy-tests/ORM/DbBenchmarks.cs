@@ -7,6 +7,7 @@ using NUnit.Framework;
 using ServiceStack.OrmLite;
 using Rainy.Tests.Db;
 using Rainy.Db;
+using Tomboy.Db;
 
 namespace Rainy.Tests.Benchmarks
 {

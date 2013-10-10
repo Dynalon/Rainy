@@ -6,6 +6,7 @@ using DevDefined.OAuth.Framework;
 using Rainy.Db;
 using System;
 using DevDefined.OAuth.Storage;
+using Tomboy.Db;
 
 namespace Rainy.OAuth
 {

@@ -51,7 +51,6 @@ deps:
 
 	@mono tools/NuGet.exe install -o packages Rainy/packages.config
 	@mono tools/NuGet.exe install -o packages Rainy-tests/packages.config
-	@mono tools/NuGet.exe install -o packages tomboy-library-websync/packages.config
 	@echo "Successfully fetched dependencies."
 
 build: checkout deps
@@ -70,7 +69,7 @@ release: clean pack
 linux_bundle: pack
 	echo "Statically linking mono runtime to create .NET-free, self-sustained executable"
 	mkdir -p $(RELEASEDIR)/linux/
-	$(MKBUNDLE) -z --static -o $(RELEASEDIR)/linux/rainy $(RELEASEDIR)/$(PACKED_EXE)
+	$(MKBUNDLE) --deps -z --static -o $(RELEASEDIR)/linux/rainy $(RELEASEDIR)/$(PACKED_EXE)
 
 clean:
 	rm -rf Rainy/obj/*

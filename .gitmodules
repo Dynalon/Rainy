@@ -4,7 +4,6 @@
 [submodule "JsonConfig"]
 	path = JsonConfig
 	url = https://github.com/Dynalon/JsonConfig.git
-[submodule "tomboy-library-websync"]
-	path = tomboy-library-websync
-	url = https://github.com/Dynalon/tomboy-library-websync.git
-
+[submodule "DevDefined.OAuth"]
+	path = DevDefined.OAuth
+	url = git@github.com:bittercoder/DevDefined.OAuth.git

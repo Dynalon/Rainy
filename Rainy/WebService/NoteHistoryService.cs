@@ -6,6 +6,7 @@ using Rainy.Db;
 using Rainy.ErrorHandling;
 using DTO = Tomboy.Sync.Web.DTO;
 using Rainy.Crypto;
+using Tomboy.Db;
 
 namespace Rainy.WebService
 {
@@ -54,7 +55,7 @@ namespace Rainy.WebService
 						note.Text = "";
 					}
 
-					history.Note = note.ToDTONote ();
+					history.Note = ((DBNote) note).ToDTONote ();
 					return history;
 				}).ToArray ();
 			}

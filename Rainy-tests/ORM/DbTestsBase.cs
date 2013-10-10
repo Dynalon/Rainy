@@ -6,6 +6,7 @@ using Rainy.Db;
 using ServiceStack.OrmLite;
 using Tomboy.Sync.Web.DTO;
 using Rainy.Tests;
+using Tomboy.Db;
 
 namespace Rainy.Tests.Db
 {
@@ -59,7 +60,7 @@ namespace Rainy.Tests.Db
 		}
 		protected DBNote GetDBSampleNote ()
 		{
-			var db_note = GetDTOSampleNote ().ToDBNote (testUser);
+			var db_note = GetDTOSampleNote ().ToDBNote (testUser.Username);
 			return db_note;
 		}
 		protected List<DTONote> GetDTOSampleNotes (int num)

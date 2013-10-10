@@ -6,19 +6,65 @@ using Tomboy;
 using Tomboy.Sync.Web.DTO;
 using Rainy.Crypto;
 using System.Security.Cryptography;
+using Rainy.WebService;
+using Tomboy.Db;
 
 namespace Rainy.Db
 {
+	public interface IDbStorageFactory
+	{
+		DbStorage GetDbStorage (IUser user);
+	}
+	public class DbStorageFactory : IDbStorageFactory
+	{
+		protected bool useHistory;
+		protected IDbConnectionFactory connFactory;
+		public DbStorageFactory (IDbConnectionFactory conn_factory, bool use_history = true)
+		{
+			this.useHistory = use_history;
+			this.connFactory = conn_factory;
+		}
+		public virtual DbStorage GetDbStorage (IUser user) {
+			var db_user = new DBUser () { Username = user.Username };
+			return new DbStorage (connFactory, db_user.Username, db_user.Manifest, useHistory);
+		}
+	}
+	public class DbEncryptedStorageFactory : DbStorageFactory
+	{
+		public DbEncryptedStorageFactory (IDbConnectionFactory conn_factory, bool use_history = true)
+			: base (conn_factory, use_history)
+		{
+		}
+		public override DbStorage GetDbStorage (IUser user)
+		{
+			DBUser db_user;
+			using (var db = connFactory.OpenDbConnection ()) {
+				db_user = db.First<DBUser> (u => u.Username == user.Username);
+				// TODO why doesn't ormlite raise this error?
+				if (db_user == null)
+					throw new ArgumentException(user.Username);
+			}
+
+			if (string.IsNullOrEmpty (user.EncryptionMasterKey)) {
+				throw new ArgumentException ("MasterKey is required", "EncryptionMasterKey");
+			}
+			var master_key = user.EncryptionMasterKey;
+
+			return (DbStorage) new DbEncryptedStorage (connFactory, db_user, master_key, useHistory);
+		}
+	}
 	public class DbEncryptedStorage : DbStorage
 	{
 		private string encryptionMasterKey;
+		private DBUser User;
 		private bool encryptNotes {
 			get { return !string.IsNullOrEmpty (encryptionMasterKey); }
 		}
 
 		public DbEncryptedStorage (IDbConnectionFactory factory, DBUser user, string encryption_master_key,
-		                           bool use_history = true) : base (factory, user, use_history)
+		                           bool use_history = true) : base (factory, user.Username, user.Manifest, use_history)
 		{
+			this.User = user;
 
 			if (encryption_master_key == null)
 				throw new ArgumentNullException ("encryption_master_key");
@@ -36,7 +82,7 @@ namespace Rainy.Db
 
 		public override void SaveNote (Note note)
 		{
-			var db_note = note.ToDTONote ().ToDBNote (User);
+			var db_note = note.ToDTONote ().ToDBNote (Username);
 
 			db_note.EncryptedKey = GetEncryptedNoteKey (db_note);
 			EncryptNoteBody (db_note);
