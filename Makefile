@@ -51,7 +51,7 @@ deps: checkout
 
 	@mono tools/NuGet.exe install -o packages Rainy/packages.config
 	@mono tools/NuGet.exe install -o packages Rainy-tests/packages.config
-	@pushd tomboy-library/ && make deps && popd
+	@pushd tomboy-library/ && make && popd
 	@echo "Successfully fetched dependencies."
 
 build: checkout deps
