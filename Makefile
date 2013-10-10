@@ -42,7 +42,7 @@ ifndef TEAMCITY
 	@git submodule update --init --recursive
 endif
 
-deps:
+deps: checkout
 	# if the next steps fails telling about security authentication, make sure
 	# you have imported trusted ssl CA certs with this command and re-run:
 	#
@@ -51,6 +51,7 @@ deps:
 
 	@mono tools/NuGet.exe install -o packages Rainy/packages.config
 	@mono tools/NuGet.exe install -o packages Rainy-tests/packages.config
+	@pushd tomboy-library/ && make deps && popd
 	@echo "Successfully fetched dependencies."
 
 build: checkout deps
