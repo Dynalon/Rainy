@@ -72,6 +72,10 @@ linux_bundle: pack
 	mkdir -p $(RELEASEDIR)/linux/
 	$(MKBUNDLE) --deps -z --static -o $(RELEASEDIR)/linux/rainy $(RELEASEDIR)/$(PACKED_EXE)
 
+
+install: pack
+	cp $(RELEASEDIR)/$(PACKED_EXE) /usr/bin/Rainy.exe
+
 clean:
 	rm -rf Rainy/obj/*
 	rm -rf $(ZIPDIR)
