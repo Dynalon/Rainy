@@ -23,6 +23,10 @@ var app = angular.module('clientApp', [
             template: '<div ng-controller="LogoutCtrl"></div>',
             controller: 'LogoutCtrl'
         });
+        $routeProvider.when('/settings', {
+            templateUrl: 'settings.html',
+            controller: 'SettingsCtrl'
+        });
         $routeProvider.when('/signup', {
             templateUrl: 'signup.html',
             controller: 'SignupCtrl'

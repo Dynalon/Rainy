@@ -286,6 +286,10 @@ var app = angular.module('clientApp', [
             template: '<div ng-controller="LogoutCtrl"></div>',
             controller: 'LogoutCtrl'
         });
+        $routeProvider.when('/settings', {
+            templateUrl: 'settings.html',
+            controller: 'SettingsCtrl'
+        });
         $routeProvider.when('/signup', {
             templateUrl: 'signup.html',
             controller: 'SignupCtrl'
@@ -461,6 +465,7 @@ function NoteCtrl($scope,$location, $routeParams, $timeout, $q, $rootScope,
 
     $scope.notebooks = {};
     $scope.notes = [];
+    $scope.enableAutosync = false;
     $scope.noteService = noteService;
     $scope.username = loginService.username;
     $scope.enableSyncButton = false;
@@ -835,7 +840,7 @@ app.factory('noteService', function($http, $rootScope, $q, loginService) {
 
         $http({
             method: 'GET',
-            url: '/api/1.0/' + loginService.username + '/notes?include_notes=true&notes_as_html=true',
+            url: '/api/1.0/' + loginService.username + '/notes?since=0&include_notes=true&notes_as_html=true',
             headers: { 'AccessToken': loginService.accessToken }
         }).success(function (data, status, headers, config) {
             notes = data.notes;
@@ -919,6 +924,12 @@ app.factory('noteService', function($http, $rootScope, $q, loginService) {
     return noteService;
 });
 
+function SettingsCtrl($scope, $location, loginService) {
+    $scope.enableAutosync = false;
+
+    $scope.username = loginService.username;
+}
+
 app.directive('wysiwyg', ['$q', function($q){
 
     var setupWysiwyg = function (tElement, scope) {
@@ -957,6 +968,8 @@ app.directive('wysiwyg', ['$q', function($q){
             // tags from the editor; see http://stackoverflow.com/a/17656572/777928
             // this renders our parser rules obsolete
             parser: function (html) { return html; },
+
+
             parserRules: parserRules,
             stylesheets: ['wysihtml5_style.css'],
             events: {

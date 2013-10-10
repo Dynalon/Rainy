@@ -29,6 +29,12 @@
 	                <li data-match-route="/logout" ng-show="isLoggedIn">
 	                    <a href="#/logout"><i class="icon-circle-arrow-right icon-white"></i> Logout</a>
 	                </li>
+                    <li data-match-route="/notes/">
+                        <a href="#/notes/"><i class="icon-th-list icon-white"></i> Notes</a>
+                    </li>
+<!--                     <li data-match-route="/settings">
+                        <a href="#/settings"><i class="icon-preferences"></i> Settings</a>
+                    </li> -->
 	            </ul>
                 <ul class="pull-right nav">
                     <li class="pull-right">
@@ -143,6 +149,7 @@
                 <i class="icon-refresh"></i>
                 Sync
             </a>
+
         </div>
     </div><!-- /row -->
     <div class="row-fluid">
@@ -166,6 +173,30 @@
             <wysiwyg />
 
         </div><!--/span-->
+    </div><!--/row-->
+</div><!--/.fluid-container-->
+</script>
+
+<script type="text/ng-template" id="settings.html">
+
+<div class="container-fluid">
+    <div class="row-fluid">
+        <h3>{{ username }}'s settings</h3>
+    </div>
+    <div class="span6">
+        <div class="row-fluid">
+            Push notes after edit
+            <div id="sw1" class="make-switch pull-right">
+                <input type="checkbox" checked>
+            </div>
+        </div>
+
+        <div id="sw2" class="row-fluid">
+            Offline mode
+            <div class="make-switch pull-right">
+                <input type="checkbox" checked>
+            </div>
+        </div>
     </div><!--/row-->
 </div><!--/.fluid-container-->
 </script>

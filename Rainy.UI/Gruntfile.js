@@ -21,7 +21,8 @@ module.exports = function (grunt) {
                     'bower_components/underscore/underscore-min.js',
                     'bower_components/noty/js/noty/jquery.noty.js',
                     'bower_components/noty/js/noty/themes/default.js',
-                    'bower_components/noty/js/noty/layouts/topCenter.js'
+                    'bower_components/noty/js/noty/layouts/topCenter.js',
+                    'bower_components/bootstrap-switch/static/js/bootstrap-switch.js',
                 ],
                 dest: 'dist/common.js'
             },
@@ -42,7 +43,8 @@ module.exports = function (grunt) {
             },
             css_client: {
                 src: [
-                    'bower_components/bootstrap-wysihtml5/dist/bootstrap-wysihtml5-0.0.2.css'
+                    'bower_components/bootstrap-wysihtml5/dist/bootstrap-wysihtml5-0.0.2.css',
+                    'bower_components/bootstrap-switch/static/stylesheets/bootstrap-switch.css'
                 ],
                 dest: 'dist/client.css'
             },

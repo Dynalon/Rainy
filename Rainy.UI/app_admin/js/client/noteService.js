@@ -123,7 +123,7 @@ app.factory('noteService', function($http, $rootScope, $q, loginService) {
 
         $http({
             method: 'GET',
-            url: '/api/1.0/' + loginService.username + '/notes?include_notes=true&notes_as_html=true',
+            url: '/api/1.0/' + loginService.username + '/notes?since=0&include_notes=true&notes_as_html=true',
             headers: { 'AccessToken': loginService.accessToken }
         }).success(function (data, status, headers, config) {
             notes = data.notes;

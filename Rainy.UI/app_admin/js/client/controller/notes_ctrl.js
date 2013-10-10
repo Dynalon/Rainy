@@ -3,6 +3,7 @@ function NoteCtrl($scope,$location, $routeParams, $timeout, $q, $rootScope,
 
     $scope.notebooks = {};
     $scope.notes = [];
+    $scope.enableAutosync = false;
     $scope.noteService = noteService;
     $scope.username = loginService.username;
     $scope.enableSyncButton = false;
