@@ -48,6 +48,20 @@ namespace Rainy.WebService
 		public string Username { get; set; }
 	}
 
+	[Route("/api/1.0/{Username}/notes/{Guid}", "GET", Summary = "Get a single note frm a a user")]
+	[OAuthRequired]
+	[DataContract]
+	public class GetSingleNoteRequest : IReturn<DTO.GetNotesResponse>
+	{
+		[DataMember (Name="Username")]
+		[ApiMember (Description="The username to get the notes from. Requires OAuth authentication beforehand.")]
+		public string Username { get; set; }
+		[DataMember (Name="guid")]
+		[ApiMember (Description="The Guid of note. Requires OAuth authentication beforehand.")]
+		public string Guid { get; set; }
+	}
+
+
 	[Route("/api/1.0/{Username}/notes", "PUT,POST",
 	       Summary = "Update notes of a user",
 	       Notes = "Requires OAuth authentication beforehand. See the REST specification at https://wiki.gnome.org/Apps/Tomboy/Synchronization/REST/1.0")]

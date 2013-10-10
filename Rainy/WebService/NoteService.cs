@@ -52,6 +52,16 @@ namespace Rainy.WebService
 			}
 			return null;
 		}
+		public object Get (GetSingleNoteRequest request) 
+		{
+			using (var note_repo = GetNotes ()) {
+				var notes = note_repo.Engine.GetNotes ();
+				if (!notes.ContainsKey (request.Guid))
+					throw new InvalidRequestDtoException ();
+				return notes[request.Guid];
+			}
+
+		}
 
 		// webservice method: HTTP GET request
 		public object Get (GetNotesRequest request)
