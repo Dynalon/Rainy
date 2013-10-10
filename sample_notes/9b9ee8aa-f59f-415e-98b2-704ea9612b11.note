@@ -1,0 +1,21 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<note version="0.3" xmlns:link="http://beatniksoftware.com/tomboy/link" xmlns:size="http://beatniksoftware.com/tomboy/size" xmlns="http://beatniksoftware.com/tomboy">
+  <title>Timezone parsing bug</title>
+  <text xml:space="preserve"><note-content version="0.1">Timezone parsing bug
+
+Bug #520543
+<link:url>https://bugs.launchpad.net/<link:internal>tomdroid</link:internal></link:url><link:url>/+bug/520543</link:url>
+
+Worst bug ever. It looked like I didn't thought about half of the world..
+
+This note's timezone is in the +.</note-content></text>
+  <last-change-date>2010-02-15T23:01:39.5612380+05:00</last-change-date>
+  <last-metadata-change-date>2010-02-15T23:01:39.5612380+05:00</last-metadata-change-date>
+  <create-date>2010-02-15T23:00:20.2040570+05:00</create-date>
+  <cursor-position>191</cursor-position>
+  <width>450</width>
+  <height>360</height>
+  <x>358</x>
+  <y>296</y>
+  <open-on-startup>False</open-on-startup>
+</note>

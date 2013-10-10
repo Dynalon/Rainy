@@ -27,6 +27,7 @@ namespace Rainy.WebService
 		}
 		protected static DTO.GetNotesResponse GetStoredNotes (INoteRepository note_repo)
 		{
+			try {
 			var notes = new List<DTO.DTONote> ();
 			var stored_notes = note_repo.Engine.GetNotes ();
 			
@@ -46,6 +47,10 @@ namespace Rainy.WebService
 			return_notes.LatestSyncRevision = note_repo.Manifest.LastSyncRevision;
 
 			return return_notes;
+			} catch (Exception e) {
+				throw e;
+			}
+			return null;
 		}
 
 		// webservice method: HTTP GET request
@@ -76,11 +81,14 @@ namespace Rainy.WebService
 					// select only those notes that changed since last sync
 					// which means, only those notes that have a HIGHER revision as "since"
 					var changed_notes = notes.Notes.Where (n => {
-						if (note_repo.Manifest.NoteRevisions.Keys.Contains (n.Guid)) {
-							if (note_repo.Manifest.NoteRevisions [n.Guid] > since_revision)
+						if (!note_repo.Manifest.NoteRevisions.Keys.Contains (n.Guid))
+							// the note is in the storage, but not in the manifest
+							// this might happen when low-level adding nodes to the storage
+							return true;
+						else if (note_repo.Manifest.NoteRevisions [n.Guid] > since_revision)
 								return true;
-						}
-						return false;
+						else
+							return false;
 					});
 
 					if (include_note_body) {

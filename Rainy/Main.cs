@@ -18,6 +18,8 @@ using Rainy.OAuth;
 using DevDefined.OAuth.Storage.Basic;
 using DevDefined.OAuth.Storage;
 using Rainy.Crypto;
+using Rainy.WebService;
+using Tomboy;
 
 namespace Rainy
 {
@@ -146,27 +148,7 @@ namespace Rainy
 					});
 					break;
 				}
-				if (Config.Global.Development == true) {
-					// create a dummy user
-					var fac = container.Resolve<IDbConnectionFactory> ();
-					using (var db = fac.OpenDbConnection ()) {
 
-						if (db.FirstOrDefault<DBUser> (u => u.Username == "dummy") == null) {
-
-							var user = new DBUser ();
-							user.Username = "dummy";
-							user.CreateCryptoFields ("foobar123");
-							user.FirstName = "John Dummy";
-							user.LastName = "Doe";
-							user.AdditionalData  = "Dummy user that is created when in development mode";
-							user.IsActivated = true;
-							user.IsVerified = true;
-							user.EmailAddress = "dummy@doe.com";
-							db.Insert<DBUser> (user);
-						}
-					}
-				}
-//
 				container.Register<IAuthenticator> (c => {
 					var factory = c.Resolve<IDbConnectionFactory> ();
 //					var sfactory = new OrmLiteConnectionFactory ();
@@ -245,8 +227,44 @@ namespace Rainy
 					return handler;
 				});
 */
+				AddDummyUserIfRequired (container);
 			}
 
+		}
+
+		public static void AddDummyUserIfRequired (Funq.Container container)
+		{
+			// create a dummy user
+			var fac = container.Resolve<IDbConnectionFactory> ();
+			using (var db = fac.OpenDbConnection ()) {
+
+				if (db.FirstOrDefault<DBUser> (u => u.Username == "dummy") == null) {
+
+					var user = new DBUser ();
+					user.Username = "dummy";
+					user.CreateCryptoFields ("foobar123");
+					user.FirstName = "John Dummy";
+					user.LastName = "Doe";
+					user.AdditionalData  = "Dummy user that is created when in development mode";
+					user.IsActivated = true;
+					user.IsVerified = true;
+					user.EmailAddress = "dummy@doe.com";
+					db.Insert<DBUser> (user);
+					// insert some sample notes
+					var f = container.Resolve<IDbStorageFactory> ();
+					var key = user.GetPlaintextMasterKey ("foobar123");
+					var r = new RequestingUser {
+						Username = "dummy",
+						EncryptionMasterKey = key.ToHexString ()
+					};
+					using (var storage = f.GetDbStorage (r)) {
+						var sample_notes = new DiskStorage ();
+						sample_notes.SetPath ("../../../sample_notes/");
+						sample_notes.CopyTo (storage);
+					}
+
+				}
+			}
 		}
 
 		public static void Main (string[] args)

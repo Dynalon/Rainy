@@ -1,0 +1,35 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<note version="0.3" xmlns:link="http://beatniksoftware.com/tomboy/link" xmlns:size="http://beatniksoftware.com/tomboy/size" xmlns="http://beatniksoftware.com/tomboy">
+  <title>The testing of bullet nesting</title>
+  <text xml:space="preserve"><note-content version="0.1">The testing of bullet nesting
+
+<list><list-item dir="ltr">
+<list><list-item><list><list-item><list><list-item dir="ltr">4 (starting at the top!)
+</list-item><list-item dir="ltr">me too!
+</list-item><list-item dir="ltr">me three!
+</list-item></list></list-item></list></list-item></list></list-item><list-item dir="ltr">Hey, guys, no fair!
+<list><list-item><list><list-item dir="ltr">
+</list-item><list-item dir="ltr">the previous note is empty.</list-item></list></list-item></list></list-item></list>
+----------------------
+<list><list-item dir="ltr">1
+<list><list-item dir="ltr">2
+<list><list-item dir="ltr">3
+<list><list-item dir="ltr">4</list-item></list></list-item></list></list-item></list></list-item></list>
+-----------------------
+<list><list-item dir="ltr">
+<list><list-item dir="ltr">
+<list><list-item dir="ltr">
+<list><list-item dir="ltr">4 (but all the above are empty.)
+</list-item></list></list-item><list-item dir="ltr">3
+</list-item></list></list-item><list-item dir="ltr">2
+</list-item></list></list-item><list-item dir="ltr">1 ~ After a nice trip downhill. </list-item></list></note-content></text>
+  <last-change-date>2011-02-11T18:17:10.2365640-08:00</last-change-date>
+  <last-metadata-change-date>2011-02-11T18:17:10.2365640-08:00</last-metadata-change-date>
+  <create-date>2011-02-11T16:32:32.6521110-08:00</create-date>
+  <cursor-position>164</cursor-position>
+  <width>404</width>
+  <height>360</height>
+  <x>0</x>
+  <y>0</y>
+  <open-on-startup>False</open-on-startup>
+</note>

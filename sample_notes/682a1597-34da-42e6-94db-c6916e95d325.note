@@ -1,0 +1,18 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<note version="0.3" xmlns:link="http://beatniksoftware.com/tomboy/link" xmlns:size="http://beatniksoftware.com/tomboy/size" xmlns="http://beatniksoftware.com/tomboy">
+  <title>test &amp; validate bug 364850</title>
+  <text xml:space="preserve"><note-content version="0.1">test &amp; validate bug 364850
+
+Décrivez votre nouvelle note ici.
+
+Can I reproduce?</note-content></text>
+  <last-change-date>2010-01-31T17:27:00.1200590-05:00</last-change-date>
+  <last-metadata-change-date>2010-01-31T17:27:00.1200590-05:00</last-metadata-change-date>
+  <create-date>2010-01-31T17:26:24.7795970-05:00</create-date>
+  <cursor-position>79</cursor-position>
+  <width>450</width>
+  <height>360</height>
+  <x>833</x>
+  <y>184</y>
+  <open-on-startup>False</open-on-startup>
+</note>

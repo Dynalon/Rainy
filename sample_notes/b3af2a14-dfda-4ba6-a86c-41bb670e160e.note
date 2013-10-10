@@ -1,0 +1,29 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<note version="0.3" xmlns:link="http://beatniksoftware.com/tomboy/link" xmlns:size="http://beatniksoftware.com/tomboy/size" xmlns="http://beatniksoftware.com/tomboy">
+  <title>tomdroid bug483101</title>
+  <text xml:space="preserve"><note-content version="0.1">tomdroid bug483101
+
+trying to trigger bug 483101
+
+<list><list-item dir="ltr">level 1 list item
+</list-item><list-item dir="ltr">level 1 list item &amp; a twist
+<list><list-item dir="ltr">level 2
+</list-item><list-item dir="ltr">level 2 &amp; a twist
+<list><list-item dir="ltr">level 3
+<list><list-item dir="ltr">4
+</list-item></list></list-item><list-item dir="ltr">&amp; a twist
+</list-item></list></list-item><list-item dir="ltr">back to level 2
+<list><list-item dir="ltr">3 &amp; ...
+</list-item></list></list-item></list></list-item><list-item dir="ltr">one</list-item></list>
+
+is it going to survive this?</note-content></text>
+  <last-change-date>2010-01-31T20:47:50.8766840-05:00</last-change-date>
+  <last-metadata-change-date>2010-01-31T20:47:50.8766840-05:00</last-metadata-change-date>
+  <create-date>2010-01-31T20:45:44.5281070-05:00</create-date>
+  <cursor-position>99</cursor-position>
+  <width>450</width>
+  <height>360</height>
+  <x>467</x>
+  <y>328</y>
+  <open-on-startup>False</open-on-startup>
+</note>

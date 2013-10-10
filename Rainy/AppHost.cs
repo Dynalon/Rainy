@@ -93,13 +93,10 @@ namespace Rainy
 					{ "Access-Control-Allow-Headers", "Content-Type, Authority, AccessToken" },
 				}, 
 			};
-			endpoint_config.AddMaxAgeForStaticMimeTypes.Clear ();
-			endpoint_config.AddMaxAgeForStaticMimeTypes.Add ("text/html", new TimeSpan (1, 0, 0));
-			endpoint_config.AddMaxAgeForStaticMimeTypes.Add ("text/css", new TimeSpan (1, 0, 0));
-			endpoint_config.AddMaxAgeForStaticMimeTypes.Add ("text/javascript", new TimeSpan (1, 0, 0));
+			endpoint_config.AddMaxAgeForStaticMimeTypes["text/html"] = new TimeSpan (1, 0, 0);
+			endpoint_config.AddMaxAgeForStaticMimeTypes["text/css"] = new TimeSpan (1, 0, 0);
+			endpoint_config.AddMaxAgeForStaticMimeTypes["text/javascript"] = new TimeSpan (1, 0, 0);
 			SetConfig (endpoint_config);
-
-			
 		}
 	}
 }

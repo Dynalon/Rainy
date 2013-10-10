@@ -1,0 +1,18 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<note version="0.3" xmlns:link="http://beatniksoftware.com/tomboy/link" xmlns:size="http://beatniksoftware.com/tomboy/size" xmlns="http://beatniksoftware.com/tomboy">
+  <title>breaking title parser</tit>
+  <text xml:space="preserve"><note-content version="0.1">breaking title parser
+
+This note is simply invalid XML and should break the Sync Services.
+
+Created to test the error reporting features.</note-content></text>
+  <last-change-date>2011-09-05T16:48:41.0216110-04:00</last-change-date>
+  <last-metadata-change-date>2011-09-05T16:48:41.0216110-04:00</last-metadata-change-date>
+  <create-date>2011-09-05T16:47:56.3967460-04:00</create-date>
+  <cursor-position>73</cursor-position>
+  <width>450</width>
+  <height>360</height>
+  <x>0</x>
+  <y>0</y>
+  <open-on-startup>False</open-on-startup>
+</note>

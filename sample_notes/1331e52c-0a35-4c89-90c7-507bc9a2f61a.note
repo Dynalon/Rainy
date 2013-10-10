@@ -1,0 +1,59 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<note version="0.3" xmlns:link="http://beatniksoftware.com/tomboy/link" xmlns:size="http://beatniksoftware.com/tomboy/size" xmlns="http://beatniksoftware.com/tomboy">
+  <title>Test Case</title>
+  <text xml:space="preserve"><note-content version="0.1">Test Case
+
+This is a test case trying to make Tomboy write to a note most of its XML note format attributes/element.
+
+This is <bold><link:broken>bold</link:broken></bold>.
+
+This is <italic>italic</italic>.
+
+This is <strikethrough>striked</strikethrough>.
+
+This is <highlight>highlighted</highlight>.
+
+<monospace>This has fixed width.</monospace>
+
+What about fontsize?
+
+<size:small>This is small</size:small>
+
+This is Normal
+
+<size:large>This is Large</size:large>
+
+<size:huge>This is Huge</size:huge>
+
+This is an <link:url>http://weblink.com</link:url>
+
+This is an <link:url>email@address.com</link:url>
+
+This is a phone number: 514-555-1337
+
+Bullets
+<list><list-item dir="ltr">I am a bullet
+</list-item><list-item dir="ltr">Me too</list-item></list>
+
+Nested bullets
+<list><list-item dir="ltr">I am a bullet
+<list><list-item dir="ltr">I am a <bold>bold nested bullet</bold>
+</list-item></list></list-item><list-item dir="ltr">Back to normal
+<list><list-item dir="ltr">Not so quickly
+<list><list-item dir="ltr">Grand children</list-item></list></list-item></list></list-item></list>
+
+<link:internal>Linked note</link:internal>
+
+<link:internal>In another notebook?</link:internal>
+
+<link:broken>This is a deleted note</link:broken></note-content></text>
+  <last-change-date>2008-10-21T22:17:05.8281250-04:00</last-change-date>
+  <last-metadata-change-date>2008-10-21T22:17:05.8281250-04:00</last-metadata-change-date>
+  <create-date>2008-10-21T21:58:25.8906250-04:00</create-date>
+  <cursor-position>434</cursor-position>
+  <width>448</width>
+  <height>360</height>
+  <x>44</x>
+  <y>58</y>
+  <open-on-startup>False</open-on-startup>
+</note>
