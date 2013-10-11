@@ -50,14 +50,11 @@ namespace Rainy.WebService
 
 	[Route("/api/1.0/{Username}/notes/{Guid}", "GET", Summary = "Get a single note frm a a user")]
 	[OAuthRequired]
-	[DataContract]
-	public class GetSingleNoteRequest : IReturn<DTO.GetNotesResponse>
+	public class GetSingleNoteRequest : IReturn<DTO.GetSingleNoteResponse>
 	{
 		[DataMember (Name="Username")]
-		[ApiMember (Description="The username to get the notes from. Requires OAuth authentication beforehand.")]
 		public string Username { get; set; }
-		[DataMember (Name="guid")]
-		[ApiMember (Description="The Guid of note. Requires OAuth authentication beforehand.")]
+		[DataMember (Name="Guid")]
 		public string Guid { get; set; }
 	}
 

@@ -52,13 +52,20 @@ namespace Rainy.WebService
 			}
 			return null;
 		}
-		public object Get (GetSingleNoteRequest request) 
+
+		public GetSingleNoteResponse Get (GetSingleNoteRequest request) 
 		{
+			List<DTONote> ret = new List<DTONote> ();
 			using (var note_repo = GetNotes ()) {
 				var notes = note_repo.Engine.GetNotes ();
-				if (!notes.ContainsKey (request.Guid))
+				if (!notes.ContainsKey (request.Guid)) {
+					Logger.Debug ("this guid does not exist");
 					throw new InvalidRequestDtoException ();
-				return notes[request.Guid];
+				}
+				ret.Add (notes[request.Guid].ToDTONote ());
+				var gnr = new GetSingleNoteResponse ();
+				gnr.Notes = ret;
+				return gnr;
 			}
 
 		}

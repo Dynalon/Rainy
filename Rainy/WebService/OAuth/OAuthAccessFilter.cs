@@ -41,6 +41,8 @@ namespace Rainy.WebService.OAuth
 				username = ((UserRequest)requestDto).Username;
 			} else if (requestDto is GetNotesRequest) {
 				username = ((GetNotesRequest)requestDto).Username;
+			} else if (requestDto is GetSingleNoteRequest) {
+				username = ((GetSingleNoteRequest)requestDto).Username;
 			} else if (requestDto is PutNotesRequest) {
 				username = ((PutNotesRequest)requestDto).Username;
 			} else if (!check_oauth_signature && !use_temp_access_token) {
