@@ -248,6 +248,7 @@ namespace Rainy
 					user.AdditionalData  = "Dummy user that is created when in development mode";
 					user.IsActivated = true;
 					user.IsVerified = true;
+					user.Manifest.LastSyncRevision = 0;
 					user.EmailAddress = "dummy@doe.com";
 					db.Insert<DBUser> (user);
 					// insert some sample notes
