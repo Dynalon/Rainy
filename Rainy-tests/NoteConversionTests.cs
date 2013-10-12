@@ -39,9 +39,9 @@ namespace Rainy.Tests.XmlNoteConversion
 		}
 
 		[Test]
-		public void UnorderedLists ()
+		public void UnorderedListsLinebreakRemove ()
 		{
-			string note_body = "<list><list-item dir=\"ltr\" class>Foo</list-item><list-item>Bar</list-item></list>";
+			string note_body = "<list><list-item dir=\"ltr\" class>Foo\n</list-item><list-item>Bar\n</list-item></list>";
 			var result = note_body.ToHtml ();
 			Assert.AreEqual ("<ul><li>Foo</li><li>Bar</li></ul>", result);
 		}
@@ -91,11 +91,12 @@ namespace Rainy.Tests.XmlNoteConversion
 			Assert.AreEqual ("<bold>Bold1</bold><bold>Bold2</bold>", result);
 		}
 		[Test]
-		public void UnorderedLists ()
+		public void UnorderedListsHaveLinebreaks ()
 		{
 			string html_body = "<ul><li>Foo</li><li>Bar</li></ul>";
 			var result = html_body.ToTomboyXml ();
-			string expected = "<list><list-item>Foo</list-item><list-item>Bar</list-item></list>";
+			// watch for the \n - it is a bug in tomboy, list-items have to end with newline
+			string expected = "<list><list-item>Foo\n</list-item><list-item>Bar\n</list-item></list>";
 			Assert.AreEqual (expected, result);
 		}
 

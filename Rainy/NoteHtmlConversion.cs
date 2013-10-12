@@ -1,5 +1,6 @@
 using System;
 using CsQuery;
+using System.Text.RegularExpressions;
 
 namespace Rainy.NoteConversion
 {
@@ -7,7 +8,10 @@ namespace Rainy.NoteConversion
 	{
 		public static string ToHtml (this string note_body)
 		{
-			var body = note_body.Replace ("\n", "<br>");
+			// remove explicity line breaks after list-item that tomboy requires
+			var body = Regex.Replace (note_body, "\n</list-item>", "</list-item>");
+			body = body.Replace ("\n", "<br>");
+
 			CQ note = body;
 
 			note["bold"].ReplaceOuterWithTag("<b/>");
@@ -30,8 +34,8 @@ namespace Rainy.NoteConversion
 				e.SetAttribute ("href", e.InnerText);
 			});
 
-
-			return note.Render ();
+			var render = note.Render ();
+			return render;
 		}
 		private static CQ ReplaceOuterWithTag (this CQ element, string tag)
 		{
@@ -56,7 +60,7 @@ namespace Rainy.NoteConversion
 			html["b"].ReplaceOuterWithTag("<bold/>");
 			html["i"].ReplaceOuterWithTag ("<i/>");
 			html["ul"].ReplaceOuterWithTag ("<list/>");
-			html["li"].ReplaceOuterWithTag ("<list-item/>");
+			html["li"].ReplaceOuterWithTag ("<list-item />");
 			html["h1"].ReplaceOuterWithTag ("<size:huge/>");
 			html["h2"].ReplaceOuterWithTag ("<size:large/>");
 			html["small"].ReplaceOuterWithTag ("<size:small/>");
@@ -76,7 +80,11 @@ namespace Rainy.NoteConversion
 				e.ReplaceWith(all);
 			});
 
-			return html.Render ();
+
+			var render = html.Render ();
+			// maybe bug int tomboy - </list-items> need a single \n in from of them
+			render = Regex.Replace (render, @"(?!\n)</list-item>", "\n</list-item>", RegexOptions.ExplicitCapture);
+			return render;
 		}
 	}
 }
