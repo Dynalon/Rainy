@@ -35,7 +35,10 @@ app.directive('wysiwyg', ['$q', function($q){
             // HACK this identity function prevents the wysi to sometimes remove valid
             // tags from the editor; see http://stackoverflow.com/a/17656572/777928
             // this renders our parser rules obsolete
-            parser: function (html) { return html; },
+            parser: function (html) {
+                return html;
+            },
+
             parserRules: parserRules,
             stylesheets: ['wysihtml5_style.css'],
             events: {
@@ -64,20 +67,33 @@ app.directive('wysiwyg', ['$q', function($q){
 
         $('[data-wysihtml5-command=underline]').remove();
 
-        var huge_btn= $('<a data-wysihtml5-command="formatBlock" data-wysihtml5-command-value="h1"><h3>Huge</h3></a>');
-        $('[data-wysihtml5-command-value=h1]').replaceWith(huge_btn);
+        // remove the text formatting dropdown
+        $('.wysihtml5-toolbar li.dropdown').remove();
 
-        var large_btn= $('<a data-wysihtml5-command="formatBlock" data-wysihtml5-command-value="h2"><h4>Large</h4></a>');
-        $('[data-wysihtml5-command-value=h2]').replaceWith(large_btn);
+        var font_btns = $('<div class="btn-group"></div>');
+        font_btns.insertBefore($('div.btn-group').eq(0));
 
-        var small_btn = $('<a data-wysihtml5-command="formatInline" data-wysihtml5-command-value="small"><small>Small</small></a>');
-        $('[data-wysihtml5-command-value=h3]').replaceWith(small_btn);
+        var small_btn = $('<a class="btn" data-wysihtml5-command="formatInline" data-wysihtml5-command-value="small">Small</a>');
+        small_btn.appendTo(font_btns);
+
+        var huge_btn= $('<a class="btn" data-wysihtml5-command="formatBlock" data-wysihtml5-command-value="h1">Huge</a>');
+        huge_btn.appendTo(font_btns);
+
+        var large_btn= $('<a class="btn" data-wysihtml5-command="formatBlock" data-wysihtml5-command-value="h2">Large</a>');
+        large_btn.appendTo(font_btns);
 
         var strike_btn = $('<a class="btn" data-wysihtml5-command="formatInline" data-wysihtml5-command-value="strike"><del>Strike</del></a>');
         strike_btn.insertAfter($('[data-wysihtml5-command=italic]'));
 
         var highlight_btn = $('<a class="btn highlight" data-wysihtml5-command="highlight">Highlight</a>');
         highlight_btn.insertAfter(strike_btn);
+
+        // speech recognition is not good on chrome
+        /* var speech_btn= $('<a class="btn" data-wysihtml5-command="insertSpeech">Speech</a>');
+        speech_btn.insertAfter(strike_btn); */
+
+        $('span.current-font').text('Text formatting');
+        $('span.current-font').parent('a').attr('href', '');
 
         var fixed_btn = $('<a style="font-family: monospace;" class="btn" data-wysihtml5-command="fixedwidth">Fixed</a>');
         fixed_btn.insertAfter(strike_btn);
