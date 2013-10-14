@@ -1,8 +1,6 @@
 Rainy public hosted cloud server
 ================================
 
-- - -
-
 ### About
 
 There is a test server running the latest rainy release available, that can be used by anyone who wants to try out rainy, or want to develop a [Tomboy sync API][restapi] compatible application.
@@ -91,8 +89,7 @@ You can also use unattended authentication by appending `/<username>/<password>/
 	jacob	hhx9q0
 
 
-Private accounts
-----------------
+### Private accounts
 
 If you are _a developer_ and for some reason need a private account for testing, [contact me][mymail] and I will set you up with an account.
 

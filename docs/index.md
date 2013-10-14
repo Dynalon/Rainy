@@ -1,8 +1,11 @@
-Rainy is an open source synchronization server that allows to sync notes with Tomboy and Tomdroid.
-Follow @timodoerr for all rainy-related announcements!
-* * *
+![Rainy logo](rainy_logo.png)
+Rainy is an open source synchronization server that allows to sync notes with Tomboy and Tomdroid. Follow [@timodoerr](https://twitter.com/timodoerr) for all rainy-related announcements!
 [gimmick:twitterfollow](@timodoerr) &nbsp; [gimmick:FacebookLike ( layout: 'buttoncount') ](http://www.facebook.com/pages/Rainy-note-sync-server-for-Tomboy/116321368557123) &nbsp; <script type="text/javascript" src="https://apis.google.com/js/plusone.js"></script> <g:plusone size="medium" href="http://www.notesync.org"></g:plusone>
-* * *
+
+News
+-----
+
+- - -
 
 ###### September, 22nd 2013
 ## Rainy post-GSoC Release v0.5.0
