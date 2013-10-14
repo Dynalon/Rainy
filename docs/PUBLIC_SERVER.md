@@ -1,7 +1,7 @@
 Rainy public hosted cloud server
 ================================
 
-### About
+## About
 
 There is a test server running the latest rainy release available, that can be used by anyone who wants to try out rainy, or want to develop a [Tomboy sync API][restapi] compatible application.
 
@@ -9,7 +9,7 @@ Since this is for testing purposes only, there are no private account registrati
 
   [restapi]: https://live.gnome.org/Tomboy/Synchronization/REST
 
-### HTML5 WebGUI
+## HTML5 WebGUI
 
 To use the HTML5/Javascript based in-browser client, use any of belows username/password pairs and login at:
 
@@ -17,7 +17,7 @@ To use the HTML5/Javascript based in-browser client, use any of belows username/
 
 Note: You will have to add a security exception for the SSL certification, as the test server does not use an expensive CA signed certificate but a self-signed one.
 
-### Tomboy/Tomdroid
+## Tomboy/Tomdroid
 
 Pick a username/password combination below, and then use this URL in Tomboy/Tomdroid as a sync url:
 
@@ -32,7 +32,7 @@ You can also use unattended authentication by appending `/<username>/<password>/
 	https://testserver.notesync.org/<username>/<password>/
 
 - - -
-### Public account list
+## Public account list
 
 	User	Password
 	-----------------
@@ -89,7 +89,7 @@ You can also use unattended authentication by appending `/<username>/<password>/
 	jacob	hhx9q0
 
 
-### Private accounts
+## Private accounts
 
 If you are _a developer_ and for some reason need a private account for testing, [contact me][mymail] and I will set you up with an account.
 

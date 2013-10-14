@@ -1,8 +1,6 @@
 Download
 ========
 
-- - -
-
 Stable version
 --------------
 
