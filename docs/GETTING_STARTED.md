@@ -90,14 +90,11 @@ There are currently some issues in Tomboy and Tomdroid that you should know of b
   * There is a [bug in Tomboy][tomboy-bug] regarding note templates, especially the "New Note Template" note that will always reappear and cause conflicts. If you happen to get a window in Tomboy telling you that a note with the title "New Note Template" already exists, choose to *rename the local note version*. **Do not chose overwrite the local note!**. The renamed note must be kept and not deleted.
 
 * Tomdroid
-  * The Tomdroid version in the Google Play store is outdated and syncing might not work
-  * Syncing works best (two-way sync) when using at least version 0.7.2 from the [Tomdroid website][tomdroid]
-  * If you have SSL enabled, you need to use [latest daily development build 0.7.3][tomdroiddev] (unstable, be warned!). SSL will not work on versions of Tomdroid lower than 0.7.3.
+  * Syncing works best (two-way sync) when using at least version 0.7.3 from the [Tomdroid website][tomdroid] or via the Google Play Beta channel.
 
 
   [tomboy-bug]: https://bugzilla.gnome.org/show_bug.cgi?id=665679
   [tomdroid]: https://launchpad.net/tomdroid
-  [tomdroiddev]: http://goo.gl/fKg6N
 
 Building from source
 --------------------
