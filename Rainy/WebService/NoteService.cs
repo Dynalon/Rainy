@@ -5,20 +5,34 @@ using ServiceStack.Common;
 using ServiceStack.ServiceHost;
 using Tomboy;
 using Rainy.Interfaces;
+using Tomboy.Sync.Web.DTO;
+using DTO = Tomboy.Sync.Web.DTO;
+using Rainy.ErrorHandling;
+using ServiceStack.OrmLite;
+using Rainy.NoteConversion;
+
 
 namespace Rainy.WebService
 {
-	public class NotesService : RainyServiceBase
+	public interface IUser
 	{
-		protected static IDataBackend DataBackend;
-		protected static Tomboy.Sync.DTO.GetNotesResponse GetStoredNotes (INoteRepository note_repo)
+		string Username { get; set; }
+		// this is plaintext representation of the master key!
+		string EncryptionMasterKey { get; set; }
+	}
+
+	public class NotesService : RainyNoteServiceBase
+	{
+		public NotesService (IDataBackend backend, IDbConnectionFactory factory) : base (factory, backend)
 		{
-			var notes = new List<Tomboy.Sync.DTO.DTONote> ();
+		}
+		protected static DTO.GetNotesResponse GetStoredNotes (INoteRepository note_repo)
+		{
+			var notes = new List<DTO.DTONote> ();
 			var stored_notes = note_repo.Engine.GetNotes ();
 			
 			foreach (var kvp in stored_notes) {
-				var note = new Tomboy.Sync.DTO.DTONote ();
-				note.PopulateWith (kvp.Value);
+				var note = kvp.Value.ToDTONote ();
 
 				// if we have a sync revision, set it	
 				if (note_repo.Manifest.NoteRevisions.Keys.Contains (note.Guid)) {
@@ -28,7 +42,7 @@ namespace Rainy.WebService
 				notes.Add (note);
 			}
 			
-			var return_notes = new Tomboy.Sync.DTO.GetNotesResponse ();
+			var return_notes = new DTO.GetNotesResponse ();
 			return_notes.Notes = notes;
 			return_notes.LatestSyncRevision = note_repo.Manifest.LastSyncRevision;
 
@@ -39,20 +53,26 @@ namespace Rainy.WebService
 		public object Get (GetNotesRequest request)
 		{
 			try {
-				using (var note_repo = GetNotes (request.Username)) {
+				using (var note_repo = GetNotes ()) {
 					var notes = GetStoredNotes (note_repo);
 
 					// check if we need to include the note body
 					bool include_note_body = true; 
 					string include_notes = Request.GetParam ("include_notes");
 					if (!string.IsNullOrEmpty (include_notes) && !bool.TryParse (include_notes, out include_note_body))
-						throw new Exception ("unable to parse parameter include_notes to boolean");
+						throw new InvalidRequestDtoException () {ErrorMessage = "unable to parse parameter include_notes to boolean"};
+
+					// check if we transform the note content to HTML
+					bool notes_as_html = false; 
+					string to_html = Request.GetParam ("notes_as_html");
+					if (!string.IsNullOrEmpty (to_html) && !bool.TryParse (to_html, out notes_as_html))
+						throw new InvalidRequestDtoException () {ErrorMessage = "unable to parse parameter notes_as_html to boolean"};
 
 					// if since is given, we might only need to return a subset of notes
 					string since = Request.GetParam ("since");
 					long since_revision = -1;
 					if (!string.IsNullOrEmpty (since) && !long.TryParse (since, out since_revision))
-						throw new Exception ("unable to parse parameter since to long");
+						throw new InvalidRequestDtoException () {ErrorMessage = "unable to parse parameter since to long"};
 
 					// select only those notes that changed since last sync
 					// which means, only those notes that have a HIGHER revision as "since"
@@ -66,6 +86,10 @@ namespace Rainy.WebService
 
 					if (include_note_body) {
 						notes.Notes = changed_notes.ToList ();
+
+						if (notes_as_html) {
+							notes.Notes = notes.Notes.Select (n => { n.Text = n.Text.ToHtml (); return n; }).ToList ();
+						}
 					} else {
 						// empty the note Text
 						notes.Notes = changed_notes.Select (n => {
@@ -88,7 +112,13 @@ namespace Rainy.WebService
 		public object Put (PutNotesRequest request)
 		{
 			try {
-				using (var note_repo = GetNotes (request.Username)) {
+				// check if we need to include the note body
+				bool notes_as_html = false; 
+				string as_html = Request.GetParam ("notes_as_html");
+				if (!string.IsNullOrEmpty (as_html) && !bool.TryParse (as_html, out notes_as_html))
+					throw new InvalidRequestDtoException () {ErrorMessage = "unable to parse parameter notes_as_html to boolean"};
+
+				using (var note_repo = GetNotes ()) {
 
 					// constraint taken from snowy source code at http://git.gnome.org/browse/snowy/tree/api/handlers.py:143
 					var new_sync_rev = note_repo.Manifest.LastSyncRevision + 1;
@@ -103,9 +133,12 @@ namespace Rainy.WebService
 					//	throw new Exception ("Sync revisions differ by more than one, sth went wrong");
 
 					foreach (var dto_note in request.Notes) {
-						var note = new Note ("note://tomboy/" + dto_note.Guid);
 						// map from the DTO 
-						note.PopulateWith (dto_note);
+						if (notes_as_html) {
+							dto_note.Text = dto_note.Text.ToTomboyXml ();
+						}
+
+						var note = dto_note.ToTomboyNote ();
 
 						if (dto_note.Command == "delete") {
 							note_repo.Engine.DeleteNote (note);
@@ -115,7 +148,6 @@ namespace Rainy.WebService
 							note_repo.Engine.SaveNote (note, false);
 						}
 					}
-
 
 					// only update the sync revision if changes were sent
 					if (request.Notes.Count > 0)

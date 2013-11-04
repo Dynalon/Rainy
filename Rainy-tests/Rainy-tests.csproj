@@ -28,43 +28,69 @@
     <WarningLevel>4</WarningLevel>
     <ConsolePause>False</ConsolePause>
   </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Testing|AnyCPU' ">
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Testing</OutputPath>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
   <ItemGroup>
     <Reference Include="System" />
     <Reference Include="System.Security" />
     <Reference Include="System.Core" />
     <Reference Include="System.Web" />
-    <Reference Include="ServiceStack.Common">
-      <HintPath>..\tomboy-library\Tomboy-library\Libs\ServiceStack-v3.9.32\ServiceStack.Common.dll</HintPath>
-    </Reference>
-    <Reference Include="ServiceStack.Text">
-      <HintPath>..\tomboy-library\Tomboy-library\Libs\ServiceStack-v3.9.32\ServiceStack.Text.dll</HintPath>
-    </Reference>
-    <Reference Include="ServiceStack.OrmLite.Sqlite">
-      <HintPath>..\lib\ServiceStack-v3.9.32\ServiceStack.OrmLite.Sqlite.dll</HintPath>
-    </Reference>
-    <Reference Include="ServiceStack.OrmLite">
-      <HintPath>..\lib\ServiceStack-v3.9.32\ServiceStack.OrmLite.dll</HintPath>
-    </Reference>
-    <Reference Include="Mono.Data.Sqlite" />
     <Reference Include="System.Data" />
-    <Reference Include="ServiceStack.Interfaces">
-      <HintPath>..\tomboy-library\Tomboy-library\Libs\ServiceStack-v3.9.32\ServiceStack.Interfaces.dll</HintPath>
-    </Reference>
     <Reference Include="nunit.framework, Version=2.4.8.0, Culture=neutral, PublicKeyToken=96d09a1eb7f44a77">
       <Private>False</Private>
     </Reference>
+    <Reference Include="Microsoft.CSharp" />
+    <Reference Include="Npgsql">
+      <HintPath>..\lib\Npgsql.dll</HintPath>
+    </Reference>
+    <Reference Include="ServiceStack">
+      <HintPath>..\packages\ServiceStack.3.9.61\lib\net35\ServiceStack.dll</HintPath>
+    </Reference>
+    <Reference Include="ServiceStack.Common">
+      <HintPath>..\packages\ServiceStack.Common.3.9.61\lib\net35\ServiceStack.Common.dll</HintPath>
+    </Reference>
+    <Reference Include="ServiceStack.Interfaces">
+      <HintPath>..\packages\ServiceStack.Common.3.9.61\lib\net35\ServiceStack.Interfaces.dll</HintPath>
+    </Reference>
+    <Reference Include="ServiceStack.OrmLite.PostgreSQL">
+      <HintPath>..\packages\ServiceStack.OrmLite.PostgreSQL.3.9.61\lib\net35\ServiceStack.OrmLite.PostgreSQL.dll</HintPath>
+    </Reference>
+    <Reference Include="ServiceStack.OrmLite">
+      <HintPath>..\packages\ServiceStack.OrmLite.PostgreSQL.3.9.61\lib\net35\ServiceStack.OrmLite.dll</HintPath>
+    </Reference>
+    <Reference Include="Mono.Data.Sqlite">
+      <HintPath>..\packages\ServiceStack.OrmLite.Sqlite.Mono.3.9.61\lib\net35\Mono.Data.Sqlite.dll</HintPath>
+    </Reference>
+    <Reference Include="ServiceStack.OrmLite.Sqlite">
+      <HintPath>..\packages\ServiceStack.OrmLite.Sqlite.Mono.3.9.61\lib\net35\ServiceStack.OrmLite.Sqlite.dll</HintPath>
+    </Reference>
+    <Reference Include="ServiceStack.Text">
+      <HintPath>..\packages\ServiceStack.Text.3.9.61\lib\net35\ServiceStack.Text.dll</HintPath>
+    </Reference>
+    <Reference Include="ServiceStack.ServiceInterface">
+      <HintPath>..\packages\ServiceStack.3.9.61\lib\net35\ServiceStack.ServiceInterface.dll</HintPath>
+    </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="RainyWebSyncServerTests.cs" />
     <Compile Include="OAuthTests.cs" />
-    <Compile Include="RainyTestBase.cs" />
-    <Compile Include="RainyTestServerTests.cs" />
-    <Compile Include="RainySyncManagerTests.cs" />
     <Compile Include="ORM\DbBasicTests.cs" />
     <Compile Include="ORM\DbBenchmarks.cs" />
     <Compile Include="ORM\DbTestsBase.cs" />
     <Compile Include="ORM\DbStorageTests.cs" />
-    <Compile Include="ORM\DatabaseBackendTests.cs" />
+    <Compile Include="TestServerTests.cs" />
+    <Compile Include="TestBase.cs" />
+    <Compile Include="DtoConversionTests.cs" />
+    <Compile Include="Admin\TestUserManagement.cs" />
+    <Compile Include="WebSyncServerTests.cs" />
+    <Compile Include="CryptoTests.cs" />
+    <Compile Include="NoteHistoryTests.cs" />
+    <Compile Include="PublicNoteShareTestsSqlite.cs" />
+    <Compile Include="Admin\TestUserSignup.cs" />
+    <Compile Include="NoteConversionTests.cs" />
+    <Compile Include="ORM\DbEncryptedStorageTests.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <ItemGroup>
@@ -80,12 +106,25 @@
       <Project>{216746A7-D297-4108-933A-1E926EB9B167}</Project>
       <Name>Tomboy-library-tests</Name>
     </ProjectReference>
-    <ProjectReference Include="..\tomboy-library\DevDefined.OAuth\src\DevDefined.OAuth\DevDefined.OAuth.csproj">
+    <ProjectReference Include="..\tomboy-library-websync\tomboy-library-websync.csproj">
+      <Project>{BA3396DF-4D7E-45C0-9BF1-3F52FE6FFA92}</Project>
+      <Name>tomboy-library-websync</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\tomboy-library-websync\DevDefined.OAuth\src\DevDefined.OAuth\DevDefined.OAuth.csproj">
       <Project>{61B700B6-3911-4CEF-8751-7F42CA765068}</Project>
       <Name>DevDefined.OAuth</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\JsonConfig\JsonConfig\JsonConfig.csproj">
+      <Project>{10095092-E1E5-441F-9380-B6329F3CFEB4}</Project>
+      <Name>JsonConfig</Name>
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
     <Folder Include="ORM\" />
+    <Folder Include="Admin\" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="UbuntuOneWebSyncServerTests.cs" />
+    <None Include="packages.config" />
   </ItemGroup>
 </Project>

@@ -2,28 +2,23 @@ using ServiceStack.ServiceHost;
 using Rainy.Db;
 using ServiceStack.OrmLite;
 using System;
-using ServiceStack.ServiceInterface.Cors;
 using ServiceStack.Common.Web;
 
 namespace Rainy.WebService.Admin
 {
-	[Route("/api/admin/status/","GET, OPTIONS")]
+	[Route("/api/admin/status/","GET, OPTIONS",
+	       Summary = "Get status information about the server.")]
 	[AdminPasswordRequired]
 	public class StatusRequest : IReturn<Status>
 	{
 	}
 
-	public class StatusService : RainyServiceBase
-	{
-		public StatusService () : base ()
+	public class StatusService : ServiceBase {
+
+		public StatusService (IDbConnectionFactory fac) : base (fac)
 		{
 		}
 
-		[EnableCors]
-		public HttpResult Options (StatusRequest req)
-		{
-			return new HttpResult ();
-		}
 		public Status Get (StatusRequest req)
 		{
 			var s = new Status ();
@@ -31,10 +26,12 @@ namespace Rainy.WebService.Admin
 			s.NumberOfRequests = MainClass.ServedRequests;
 
 			// determine number of users
-			using (var conn = DbConfig.GetConnection ()) {
+			using (var conn = connFactory.OpenDbConnection ()) {
 				s.NumberOfUser = conn.Scalar<int>("SELECT COUNT(*) FROM DBUser");
 				s.TotalNumberOfNotes = conn.Scalar<int>("SELECT COUNT(*) FROM DBNote");
-				s.AverageNotesPerUser = (float)s.TotalNumberOfNotes / (float)s.NumberOfUser; 
+
+				if (s.NumberOfUser > 0)
+					s.AverageNotesPerUser = (float)s.TotalNumberOfNotes / (float)s.NumberOfUser; 
 			};
 			return s;
 		}

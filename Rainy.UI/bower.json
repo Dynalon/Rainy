@@ -1,0 +1,17 @@
+{
+  "name": "Rainy-UI",
+  "version": "0.0.1",
+  "devDependencies": {
+    "jquery": "~2.0.3",
+    "angular-strap": "~0.7.5",
+    "angular": "~1.0.7",
+    "bootstrap.zip": "http://getbootstrap.com/2.3.2/assets/bootstrap.zip",
+    "bootswatch-united": "http://netdna.bootstrapcdn.com/bootswatch/2.3.2/united/bootstrap.min.css",
+    "underscore": "~1.5.1"
+  },
+  "dependencies": {
+    "noty": "~2.1.0",
+    "wysihtml5": "~0.3.0",
+    "bootstrap-wysihtml5": "*"
+  }
+}

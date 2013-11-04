@@ -1,5 +1,4 @@
 using System;
-using System.IO;
 using System.Data;
 
 using Rainy.OAuth;
@@ -8,42 +7,128 @@ using ServiceStack.OrmLite;
 using Tomboy;
 using Tomboy.Sync;
 using Rainy.Interfaces;
+using Rainy.Crypto;
+using Rainy.WebService;
+using DevDefined.OAuth.Storage.Basic;
 
 namespace Rainy
 {
-	public class DatabaseBackend : IDataBackend
+	public class DbAccessObject
 	{
-		OAuthHandlerBase oauthHandler;
-
-		public DatabaseBackend (string database_path, CredentialsVerifier auth = null, bool reset = false)
+		protected IDbConnectionFactory connFactory;
+		public DbAccessObject (IDbConnectionFactory factory)
 		{
-			if (auth == null)
-				oauthHandler = new OAuthDatabaseHandler (DbAuthenticator);
-			else
-				oauthHandler = new OAuthDatabaseHandler (auth);
-
-			DbConfig.CreateSchema (reset);
+			connFactory = factory;
 		}
-		// verifies a given user/password combination
-		protected bool DbAuthenticator (string username, string password)
+	}
+
+	/// <summary>
+	/// Authenticates a user against a database. User objects in the database always employ hashed passwords.
+	/// </summary>
+	public class DbAuthenticator : IAuthenticator
+	{
+		private IDbConnectionFactory connFactory;
+
+		public DbAuthenticator (IDbConnectionFactory factory)
+		{
+			if (factory == null)
+				throw new ArgumentNullException ("factory");
+
+			connFactory = factory;
+		}
+
+		public bool VerifyCredentials (string username, string password)
 		{
 			DBUser user = null;
-			using (var conn = DbConfig.GetConnection ()) {
-				user = conn.FirstOrDefault<DBUser> (u => u.Username == username && u.Password == password);
+			using (var conn = connFactory.OpenDbConnection ()) {
+				user = conn.FirstOrDefault<DBUser> (u => u.Username == username);
 			}
-			if (user != null)
-				return true;
-			else
+			if (user == null)
 				return false;
+
+			if (user.IsActivated == false) {
+				throw new Rainy.ErrorHandling.UnauthorizedException () {
+					UserStatus = "Moderation required",
+				};
+			}
+
+			//if (user.IsVerified == false)
+			//	return false;
+
+			var supplied_hash = user.ComputePasswordHash (password);
+			if (supplied_hash == user.PasswordHash)
+				return true;
+
+			return false;
+
+		}
+
+	}
+
+	public class DatabaseBackend : DbAccessObject, IDataBackend
+	{
+		OAuthHandler oauthHandler;
+		IDbStorageFactory storageFactory;
+
+		public DatabaseBackend (IDbConnectionFactory conn_factory, IDbStorageFactory storage_factory, IAuthenticator auth,
+		                        OAuthHandler handler) : base (conn_factory)
+		{
+			oauthHandler = handler;
+			storageFactory = storage_factory;
+
+			// TODO move this into (Encrypted)DbStorageFactory implementation
+			CreateSchema (conn_factory);
+		}
+
+		public static void CreateSchema (IDbConnectionFactory connFactory, bool reset = false)
+		{
+			if (connFactory == null)
+				throw new ArgumentNullException ("connFactory");
+
+			using (var db = connFactory.OpenDbConnection ()) {
+				if (reset) {
+					// postgresql ormlite workaround
+					var ormfac = connFactory as OrmLiteConnectionFactory;
+					if (ormfac.DialectProvider == PostgreSqlDialect.Provider) {
+						try {
+						var cmd = db.CreateCommand ();
+						cmd.CommandText = "DROP SCHEMA IF EXISTS PUBLIC CASCADE;";
+						cmd.ExecuteNonQuery ();
+						cmd = db.CreateCommand ();
+						cmd.CommandText = "CREATE SCHEMA public AUTHORIZATION rainy";
+						cmd.ExecuteNonQuery ();
+						} catch (Exception e) {
+							Console.WriteLine (e.Message);
+						}
+						db.CreateTableIfNotExists <DBUser> ();
+						db.CreateTableIfNotExists <DBNote> ();
+						db.CreateTableIfNotExists <DBArchivedNote> ();
+						db.CreateTableIfNotExists <DBAccessToken> ();
+						db.CreateTableIfNotExists <DBRequestToken> ();
+					} else {
+						db.DropAndCreateTable <DBUser> ();
+						db.DropAndCreateTable <DBNote> ();
+						db.DropAndCreateTable <DBArchivedNote> ();
+						db.DropAndCreateTable <DBAccessToken> ();
+						db.DropAndCreateTable <DBRequestToken> ();
+					}
+				} else {
+					db.CreateTableIfNotExists <DBUser> ();
+					db.CreateTableIfNotExists <DBNote> ();
+					db.CreateTableIfNotExists <DBArchivedNote> ();
+					db.CreateTableIfNotExists <DBAccessToken> ();
+					db.CreateTableIfNotExists <DBRequestToken> ();
+				}
+			}
 		}
 
 		#region IDataBackend implementation
-		public INoteRepository GetNoteRepository (string username)
+		public INoteRepository GetNoteRepository (IUser user)
 		{
-			var rep = new DatabaseNoteRepository (username);
+			var rep = new DatabaseNoteRepository (connFactory, storageFactory, user);
 			return rep;
 		}
-		public OAuthHandlerBase OAuth {
+		public OAuthHandler OAuth {
 			get {
 				return oauthHandler;
 			}
@@ -53,36 +138,20 @@ namespace Rainy
 	}
 
 	// maybe move into DatabaseBackend as nested class
-	public class DatabaseNoteRepository : Rainy.Interfaces.INoteRepository
+	public class DatabaseNoteRepository : DbAccessObject, INoteRepository
 	{
-
-		private readonly string username;
 		private DbStorage storage;
-		private string manifestPath;
-
 		private Engine engine;
-		private SyncManifest manifest;
-		private IDbConnection dbConnection;
 		private DBUser dbUser;
 
-		public DatabaseNoteRepository (string username)
+		public DatabaseNoteRepository (IDbConnectionFactory factory, IDbStorageFactory storageFactory, IUser user) : base (factory)
 		{
-			username = username;
-
-			dbConnection = DbConfig.GetConnection ();
-			storage = new DbStorage (username);
+			this.storage = storageFactory.GetDbStorage (user);
 			engine = new Engine (storage);
-
-			var db_user = dbConnection.Select <DBUser> ("Username = {0}", username);
-			if (db_user.Count == 0) {
-				dbUser = new DBUser () { Username = username };
-			}
-			else
-				dbUser = db_user[0];
+			this.dbUser = storage.User;
 
 			if (dbUser.Manifest == null || string.IsNullOrEmpty (dbUser.Manifest.ServerId)) {
 				// the user may not yet have synced
-				dbUser.Manifest = new SyncManifest ();
 				dbUser.Manifest.ServerId = Guid.NewGuid ().ToString ();
 			}
 		}
@@ -92,15 +161,15 @@ namespace Rainy
 		{
 			storage.Dispose ();
 
+			// TODO why is this needed? find a better way...
 			// write back the user
-
-			using (var trans = dbConnection.BeginTransaction ()) {
-				dbConnection.Delete (dbUser);
-				dbConnection.Insert (dbUser);
-				trans.Commit ();
+			using (var db = connFactory.OpenDbConnection ()) {
+				using (var trans = db.OpenTransaction ()) {
+					db.Delete (dbUser);
+					db.Insert (dbUser);
+					trans.Commit ();
+				}
 			}
-
-			dbConnection.Dispose ();
 		}
 		#endregion
 		#region INoteRepository implementation

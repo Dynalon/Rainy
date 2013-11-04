@@ -1,70 +1,213 @@
 using System;
-using ServiceStack.ServiceClient.Web;
+using System.IO;
+using System.Linq;
+using System.Net;
 using DevDefined.OAuth.Consumer;
 using DevDefined.OAuth.Framework;
-using System.Net;
-using System.Linq;
-using Tomboy.Sync.DTO;
-using Rainy.OAuth;
-using System.IO;
+using ServiceStack.OrmLite;
+using ServiceStack.ServiceClient.Web;
 using Tomboy.Sync.Web;
-using DevDefined.OAuth.Storage.Basic;
+using Tomboy.Sync.Web.DTO;
 using Rainy.Db;
 using Rainy.Interfaces;
+using Rainy.Db.Config;
+using Rainy.OAuth;
+using Rainy.Crypto;
+using DevDefined.OAuth.Storage.Basic;
+using DevDefined.OAuth.Storage;
 
 namespace Rainy
 {
+	public class DummyAuthenticator : IAuthenticator
+	{
+		public bool VerifyCredentials (string username, string password)
+		{
+			return true;
+		}
+	}
+	public class DummyAdminAuthenticator : IAdminAuthenticator
+	{
+		string Password;
+		public DummyAdminAuthenticator ()
+		{
+		}
+		public DummyAdminAuthenticator (string pass)
+		{
+			Password = pass;
+		}
+		public bool VerifyAdminPassword (string password)
+		{
+			if (string.IsNullOrEmpty (Password))
+				return true;
+			else return Password == password;
+		}
+	}
 
 	// simple server that can be used from within unit tests
-	public static class RainyTestServer
+	// TODO make non-static
+	public class RainyTestServer
 	{
-		public static string TEST_USER = "johndoe";
+		public static string TEST_USER = "test";
 		public static string TEST_PASS = "none";
-		public static string RainyListenUrl = "http://127.0.0.1:8080/";
+		public static string ADMIN_TEST_PASS = "foobar";
+		public static Funq.Container Container;
+		public string ListenUrl = "http://127.0.0.1:8080/";
 
-		public static string BaseUri {
+		public string BaseUri {
 			// i.e. http://127.0.0.1:8080/johndoe/none/
 			get {
-				return RainyListenUrl + TEST_USER + "/" + TEST_PASS + "/";
+				return ListenUrl + TEST_USER + "/" + TEST_PASS + "/";
 			}
 		}
 
-		private static RainyStandaloneServer rainyServer;
-		private static string tmpPath;
+		private RainyStandaloneServer rainyServer;
+		private string tmpPath;
+		private ComposeObjectGraphDelegate ObjectGraphComposer;
 
-		public static void StartNewServer (string use_backend = "sqlite")
+		public RainyTestServer (ComposeObjectGraphDelegate composer = null)
 		{
-			tmpPath = "/tmp/rainy-test-data/";
-			if (Directory.Exists (tmpPath)) {
-				Directory.Delete (tmpPath, true);
-			}	
-			Directory.CreateDirectory (tmpPath);
-			DbConfig.SetSqliteFile (Path.Combine (tmpPath, "rainy-test.db"));
-			// tmpPath = Path.GetTempPath () + Path.GetRandomFileName ();
+			if (composer == null) {
+				// specifies which default scenario to use
+				this.ScenarioSqlite ();
+			}
 
-			// for debugging, we only use a simple single user authentication 
-			CredentialsVerifier debug_authenticator = (user,pass) => {
-				if (user == TEST_USER  && pass == TEST_PASS) return true;
-				else return false;
-			};
+			rainyServer = new RainyStandaloneServer (ListenUrl, (c) => {
+				if (this.ObjectGraphComposer == null)
+					throw new Exception ("need to setup a composer/scenario for RainyTestServer!");
+				this.ObjectGraphComposer(c);
+			});
+		}
 
-			IDataBackend backend;
-			if (use_backend == "sqlite")
-				backend = new DatabaseBackend (tmpPath, auth: debug_authenticator, reset: true);
-			else
-				backend = new RainyFileSystemBackend (tmpPath, debug_authenticator);
-
-			rainyServer = new RainyStandaloneServer (backend, RainyListenUrl, test_server: true);
-
+		public void Start ()
+		{	
 			rainyServer.Start ();
 		}
-		public static void Stop ()
+		public void Stop ()
 		{
 			rainyServer.Dispose ();
-			//Directory.Delete (tmpPath, true);
 		}
 
-		public static JsonServiceClient GetJsonClient ()
+		public void ScenarioSqlite ()
+		{
+			this.ObjectGraphComposer = (c) => {
+				this.WireupSqliteTestserver (c);
+				this.WireupGenericTestClasses (c);
+			};
+		}
+		public void ScenarioPostgres ()
+		{
+			this.ObjectGraphComposer = (c) => {
+				this.WireupPostgresServer (c);
+				this.WireupGenericTestClasses (c);
+			};
+		}
+		private void WireupSqliteTestserver (Funq.Container container)
+		{
+			Container = container;
+
+			container.Register<SqliteConfig> (c => {
+				var test_db_file = "/tmp/rainy-test.db";
+				if (File.Exists (test_db_file))
+					File.Delete (test_db_file);
+
+				SqliteConfig cnf = new SqliteConfig () {
+					File = test_db_file
+				};
+				return cnf;
+			});
+			container.Register<IDbConnectionFactory> (c => {
+				var connection_string = container.Resolve<SqliteConfig> ().ConnectionString;
+				return new OrmLiteConnectionFactory (connection_string, SqliteDialect.Provider);
+			});
+		}
+		private void WireupPostgresServer (Funq.Container container)
+		{
+			Container = container;
+
+			container.Register<PostgreConfig> (c => {
+				var cnf = new PostgreConfig {
+					Host = "localhost",
+					Username = "rainy",
+					Password = "rainy",
+					Port = 5432,
+					Database = "rainy"
+				};
+				return cnf;
+			});
+
+			container.Register<IDbConnectionFactory> (c => {
+				var connection_string = container.Resolve<PostgreConfig> ().ConnectionString;
+				return new OrmLiteConnectionFactory (connection_string, PostgreSqlDialect.Provider);
+			});
+		}
+		private void WireupGenericTestClasses (Funq.Container container)
+		{
+			container.Register<IAuthenticator> (c => {
+				var factory = c.Resolve<IDbConnectionFactory> ();
+				var dbauth = new DbAuthenticator (factory);
+				//var dbauth = new DbTestAuthenticator ();
+
+				var test_user = new DBUser {
+					Username = RainyTestServer.TEST_USER,
+					IsActivated = true,
+					IsVerified = true
+				};
+				test_user.CreateCryptoFields (RainyTestServer.TEST_PASS);
+
+				// insert a dummy testuser
+				using (var db = factory.OpenDbConnection ()) {
+					db.InsertParam<DBUser> (test_user);
+				}
+
+				return dbauth;
+			});
+
+			container.Register<IAdminAuthenticator> (c => {
+				var admin_auth = new DummyAdminAuthenticator (ADMIN_TEST_PASS);
+				return (IAdminAuthenticator)admin_auth;
+			});
+
+			container.Register<IDbStorageFactory> (c => {
+				var conn_factory = c.Resolve<IDbConnectionFactory> ();
+
+				IDbStorageFactory storage_factory;
+				bool use_encryption = true;
+				if (use_encryption)
+					storage_factory = new DbEncryptedStorageFactory (conn_factory, use_history: true);
+				else
+					storage_factory = new DbStorageFactory (conn_factory, use_history: true);
+
+				return (IDbStorageFactory) storage_factory;
+			});
+
+			container.Register<IDataBackend> (c => {
+				var conn_factory = c.Resolve<IDbConnectionFactory> ();
+				var storage_factory = c.Resolve<IDbStorageFactory> ();
+				var auth = c.Resolve<IAuthenticator> ();
+				var handler = c.Resolve<OAuthHandler> ();
+				return new DatabaseBackend (conn_factory, storage_factory, auth, handler);
+			});
+
+			container.Register<OAuthHandler> (c => {
+				var auth = c.Resolve<IAuthenticator> ();
+				var factory = c.Resolve<IDbConnectionFactory> ();
+//				ITokenRepository<AccessToken> access_tokens = new SimpleTokenRepository<AccessToken> ();
+//				ITokenRepository<RequestToken> request_tokens = new SimpleTokenRepository<RequestToken> ();
+				ITokenRepository<AccessToken> access_tokens = new DbAccessTokenRepository<AccessToken> (factory);
+				ITokenRepository<RequestToken> request_tokens = new DbRequestTokenRepository<RequestToken> (factory);
+				ITokenStore token_store = new RainyTokenStore (access_tokens, request_tokens);
+				OAuthHandler handler = new OAuthHandler (auth, access_tokens, request_tokens, token_store);
+				return handler;
+			});
+
+			var connFactory = container.Resolve<IDbConnectionFactory> ();
+			DatabaseBackend.CreateSchema (connFactory, true);
+
+			// HACK so the user is inserted when a fixture SetUp is run
+			container.Resolve<IAuthenticator> ();
+		}
+
+		public JsonServiceClient GetJsonClient ()
 		{
 			var rest_client = new JsonServiceClient ();
 			rest_client.SetAccessToken (GetAccessToken ());
@@ -72,14 +215,15 @@ namespace Rainy
 			return rest_client;
 		}
 
-		public static ApiResponse GetRootApiRef () 
+		public ApiResponse GetRootApiRef () 
 		{
 			var rest_client = new JsonServiceClient ();
+			var url = new Rainy.WebService.ApiRequest ().ToUrl("GET");
 
-			return rest_client.Get<ApiResponse> (BaseUri + "/api/1.0/");
+			return rest_client.Get<ApiResponse> (BaseUri + url);
 		}
 
-		public static UserResponse GetUserInfo ()
+		public UserResponse GetUserInfo ()
 		{
 			var api_ref = GetRootApiRef ();
 			var user_service_url = api_ref.UserRef.ApiRef;
@@ -92,14 +236,15 @@ namespace Rainy
 		// this performs our main OAuth authentication, performing
 		// the request token retrieval, authorization, and exchange
 		// for an access token
-		public static IToken GetAccessToken ()
+		public IToken GetAccessToken ()
 		{
 			var consumerContext = new OAuthConsumerContext () {
 				ConsumerKey = "anyone"
 			};
 
-			var restClient = new JsonServiceClient (BaseUri);
-			var api_ref = restClient.Get<ApiResponse> ("/api/1.0");
+			var rest_client = new JsonServiceClient (BaseUri);
+			var url = new Rainy.WebService.ApiRequest ().ToUrl("GET");
+			var api_ref = rest_client.Get<ApiResponse> (url);
 
 			var session = new OAuthSession (consumerContext, api_ref.OAuthRequestTokenUrl,
 			                                api_ref.OAuthAuthorizeUrl, api_ref.OAuthAccessTokenUrl);

@@ -26,6 +26,8 @@ using DevDefined.OAuth.Storage;
 using DevDefined.OAuth.Storage.Basic;
 using System.Collections.Generic;
 using DevDefined.OAuth.Tests;
+using System.Security.Cryptography;
+using Rainy.Crypto;
 
 #endregion
 
@@ -33,19 +35,19 @@ using System;
 using DevDefined.OAuth.Framework;
 using DevDefined.OAuth.Utility;
 
-namespace Rainy.OAuth.SimpleStore
+namespace Rainy.OAuth
 {
 	/// <summary>
 	/// Simple token store. Holds our RequestTokens and AccessTokens.
 	/// </summary>
-	public class SimpleTokenStore : ITokenStore
+	public class RainyTokenStore : ITokenStore
 	{
 		public ITokenRepository<AccessToken> _accessTokenRepository { get; set; }
 		// we only want the accessTokenRepository to get serialized and permanently stores
 		// so don't use properties on the request tokens
 		readonly ITokenRepository<RequestToken> _requestTokenRepository;
 		
-		public SimpleTokenStore(ITokenRepository<AccessToken> accessTokenRepository, ITokenRepository<RequestToken> requestTokenRepository)
+		public RainyTokenStore(ITokenRepository<AccessToken> accessTokenRepository, ITokenRepository<RequestToken> requestTokenRepository)
 		{
 			if (accessTokenRepository == null) throw new ArgumentNullException("accessTokenRepository");
 			if (requestTokenRepository == null) throw new ArgumentNullException("requestTokenRepository");
@@ -56,13 +58,19 @@ namespace Rainy.OAuth.SimpleStore
 		public IToken CreateRequestToken(IOAuthContext context)
 		{
 			if (context == null) throw new ArgumentNullException("context");
-			
+
+			// for request tokens, 128 bit entropy should be enough
+			var rng = new RNGCryptoServiceProvider ();
+			var key = rng.Create256BitLowerCaseHexKey ();
+			var token_rnd = key.Substring(0, 32);
+			var token_secret = key.Substring(32, 32);
+
 			var token = new RequestToken
 			{
 				ConsumerKey = context.ConsumerKey,
 				Realm = context.Realm,
-				Token = Guid.NewGuid().ToString(),
-				TokenSecret = Guid.NewGuid().ToString(),
+				Token = token_rnd,
+				TokenSecret = token_secret,
 				CallbackUrl = context.CallbackUrl
 			};
 			
@@ -105,7 +113,13 @@ namespace Rainy.OAuth.SimpleStore
 		public IToken GetAccessTokenAssociatedWithRequestToken(IOAuthContext requestContext)
 		{
 			RequestToken requestToken = GetRequestToken(requestContext);
-			return requestToken.AccessToken;
+			var access_token = requestToken.AccessToken;
+
+			// unlink the access token so we can't issue it again
+			requestToken.AccessToken = null;
+			this._requestTokenRepository.SaveToken (requestToken);
+
+			return access_token;
 		}
 		
 		public RequestForAccessStatus GetStatusOfRequestForAccess(IOAuthContext accessContext)

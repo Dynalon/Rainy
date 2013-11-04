@@ -4,6 +4,10 @@ using ServiceStack.ServiceHost;
 using log4net;
 using JsonConfig;
 using ServiceStack.Common.Web;
+using System.Text.RegularExpressions;
+using Rainy.ErrorHandling;
+using ServiceStack.WebHost.Endpoints;
+using Rainy.Interfaces;
 
 namespace Rainy.WebService.Admin
 {
@@ -17,6 +21,31 @@ namespace Rainy.WebService.Admin
 			char[] safe_chars = new char[] { '_', '-', '.' };
 			var arr = string_sequence.ToCharArray ();
 			return arr.All (c => char.IsLetter (c) || char.IsNumber (c) || safe_chars.Contains (c));
+		}
+		public static int PasswordScore (this string password)
+		{
+			int score = 0;
+			if (password.Length < 8)
+				return -1;
+
+			if (password.Length > 12)
+				score++;
+
+			if (Regex.IsMatch(password, @"[0-9]+(\.[0-9][0-9]?)?"))
+				score++;
+			if (Regex.IsMatch(password, @"^(?=.*[a-z])(?=.*[A-Z]).+$"))
+				score++;
+			if (Regex.IsMatch(password, @"[!,@,#,$,%,^,&,*,?,_,~,-,£,(,),\.,€]"))
+				score++;
+
+			return score;
+		}
+		public static bool IsSafeAsPassword (this string password)
+		{
+			if (PasswordScore (password) > 2)
+				return true;
+			else
+				return false;
 		}
 	}
 
@@ -35,30 +64,14 @@ namespace Rainy.WebService.Admin
 
 		public void RequestFilter (IHttpRequest request, IHttpResponse response, object requestDto)
 		{
-			var authFailedResponse = new HttpResult () {
-				StatusCode = System.Net.HttpStatusCode.Unauthorized
-			};
-			// jQuery & Co. do not send the Authority header for options preflight
-
-			// so we need to accept OPTIONS requests without password
-			if (request.HttpMethod == "OPTIONS")
+			var admin_auther = EndpointHost.Container.Resolve<IAdminAuthenticator> ();
+			var authority_header = request.Headers ["Authority"];
+			if (!string.IsNullOrEmpty (authority_header) &&
+				admin_auther.VerifyAdminPassword (authority_header)) {
+				// auth worked
 				return;
-
-			try {
-				if (request.Headers ["Authority"] != Config.Global.AdminPassword) {
-					response.StatusCode = 401;
-					response.StatusDescription = "Unauthorized.";
-					response.Close ();
-				}
-			} catch (Exception e) {
-				Logger.Warn ("Admin authentication failed");
-					response.StatusCode = 401;
-					response.StatusDescription = "Unauthorized.";
-					response.Close ();
 			}
-
-			// auth worked
-			return;
+			throw new UnauthorizedException () {ErrorMessage = "Wrong admin password"};
 		}
 	}
 }

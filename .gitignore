@@ -11,7 +11,9 @@ test-results/
 Rainy/obj/
 Rainy-tests/obj/
 *.zip
-
+docs/reference
+# nuget packages
+packages/
 
 # release folders
 rainy-?.??

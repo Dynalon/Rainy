@@ -1,0 +1,60 @@
+<script type="text/ng-template" id="login.html">
+
+<div class="row">
+    <div class="span3"></div>
+    <div class="span6">
+        <!-- login form -->
+        <h2>Login</h2><hr />
+        <form name="formLogin" ng-submit="doLogin()">
+            <div class="row">
+                <div class="alert span5" ng-show="isTestServer">For testing, you can use:<br>
+                    Username: <b>testuser</b>, Password: <b>testpass</b>
+                </div>
+                <div class="span3">
+                    <div class="control-group">
+                        <label class="control-label" for="inputEmail">Username</label>
+                        <div class="controls">
+                            <input type="text" ng-model="username" id="inputUsername" placeholder="Username" required>
+                        </div>
+                    </div>
+                </div>
+                <div class="span3">
+                    <div class="control-group">
+                        <label class="control-label" for="inputPassword">Password</label>
+                        <div class="controls">
+                          <input type="password" ng-model="password" id="inputPassword" placeholder="Password" required ng-minLength="6">
+                        </div>
+                    </div>
+                </div>
+            </div> <!-- /row -->
+            <div class="row">
+                <div class="span6"
+                    <div class="control-group">
+                        <div class="controls">
+                            <label class="checkbox">
+                                <input type="checkbox" ng-model="rememberMe"> Remember me
+                            </label>
+                            <div class="alert alert-info" ng-show="rememberMe">
+                            Note: Chosing to remember the login will store a token on this computer that can be used to access your notes. For security reasons, that token lasts only 14 days or until you logout.
+                            </div>
+
+                            <button type="submit" ng-disabled="!formLogin.$valid" class="btn">Sign in</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </form>
+        <div class="span3"></div>
+    </div>
+</div><!-- /row -->
+
+<div class="row" ng-show="serverConfig.AllowSignup">
+    <div class="span3"></div>
+    <div class="span6">
+        <div class="alert">Don&#39;t have an account yet? Click <a href="#/signup">here to sign up!</a>
+    </div>
+
+    <div class="span3"></div>
+</div>
+
+</script>

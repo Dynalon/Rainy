@@ -27,20 +27,19 @@ using DevDefined.OAuth.Storage.Basic;
 using DevDefined.OAuth.Testing;
 using DevDefined.OAuth.Provider;
 using DevDefined.OAuth.Provider.Inspectors;
-using Rainy.OAuth.SimpleStore;
+using Rainy.OAuth;
 using Rainy.Interfaces;
 
 namespace Rainy.OAuth
 {
-	// TODO: replace with Interface
-	public abstract class OAuthHandlerBase : IDisposable
+	// TODO: replace with Interface and wire in DI composition root
+	public class OAuthHandler: IDisposable
 	{
-		// the data stores required by the OAuth process
-		public ITokenRepository<AccessToken> AccessTokens;
-		public ITokenRepository<RequestToken> RequestTokens;
-		public ITokenStore TokenStore;
+		public readonly ITokenRepository<AccessToken> AccessTokens;
+		public readonly ITokenRepository<RequestToken> RequestTokens;
+		protected ITokenStore TokenStore;
+		protected IAuthenticator Authenticator;
 
-		public CredentialsVerifier Authenticator;
 		public OAuthProvider Provider;
 
 		protected INonceStore NonceStore;
@@ -48,42 +47,51 @@ namespace Rainy.OAuth
 
 		protected List<IContextInspector> inspectors = new List<IContextInspector> ();
 
-		public OAuthHandlerBase (CredentialsVerifier auth)
+		public OAuthHandler (IAuthenticator auth,
+		                     ITokenRepository<AccessToken> access_token_repo,
+		                     ITokenRepository<RequestToken> request_token_repo,
+		                     ITokenStore token_store)
 		{
-			Authenticator = auth;
 
-			ConsumerStore = new RainyConsumerStore ();
-			NonceStore = new TestNonceStore ();
+			this.Authenticator = auth;
+			this.AccessTokens = access_token_repo;
+			this.RequestTokens = request_token_repo;
+			this.TokenStore = token_store;
+
+			this.ConsumerStore = new RainyConsumerStore ();
+			//this.NonceStore = new DummyNonceStore ();
 			// initialize those classes that are not persisted
 			// TODO request tokens should be persisted in the future
-			RequestTokens = new SimpleTokenRepository<RequestToken> ();
+			//RequestTokens = new SimpleTokenRepository<RequestToken> ();
 
+
+			SetupInspectors ();
 		}
 
 		protected void SetupInspectors ()
 		{
-			inspectors.Add(new NonceStoreInspector (NonceStore));
+			//inspectors.Add(new NonceStoreInspector (NonceStore));
 			inspectors.Add(new OAuth10AInspector (TokenStore));
 
-			// request tokens may only be 1 hour old
-			inspectors.Add(new TimestampRangeInspector (new TimeSpan (1, 0, 0)));
+			// request tokens may only be 36 hour old
+			// HACK this will compare client & server times. if the client time is of
+			// by more than 36 ours, the request will fail totally
+			inspectors.Add(new TimestampRangeInspector (new TimeSpan (36, 0, 0)));
 				
-				// TODO signature validation currently fails
-				// don't know if it makes sense to enable this since this 
-				// verifies the get request_token step, but our conumser_key and consumer_secret are
-				// publically known
-				// new SignatureValidationInspector (ConsumerStore),
+			// TODO HACK signature validation currently fails
+			// this is not so bad, as we rely on SSL for encryption, we just have to make sure
+			// the access token is valid elsewhere
+			//inspectors.Add(new SignatureValidationInspector (ConsumerStore));
 				
-				// will check the consumer_key to be known
-				// might be disabled since our consumer_key is public
-				// new ConsumerValidationInspector (ConsumerStore)
+			// will check the consumer_key to be known
+			// might be disabled since our consumer_key is public (="anyone")
+			// new ConsumerValidationInspector (ConsumerStore)
 
 			Provider = new OAuthProvider (TokenStore, inspectors.ToArray ());
 		}
 
 		public virtual void Dispose ()
 		{
-			Console.WriteLine ("disposing base");
 		}
 	}
 }

@@ -1,0 +1,13 @@
+/* this file is loaded by the wysihtm5 editor to get styling information */
+
+h1, h2, h3, pre, small {
+	display: inline;
+    line-height: 1em;
+}
+.highlight {
+    background-color: yellow;
+}
+
+small {
+    font-size: 8pt;
+}

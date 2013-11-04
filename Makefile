@@ -1,8 +1,7 @@
-RELEASEVER=0.2.3
+RELEASEVER=0.5.0
 ZIPDIR=rainy-$(RELEASEVER)
 BINDIR=$(shell pwd)/Rainy/bin/Debug
 RELEASEDIR=$(shell pwd)/release
-TMPDIR=$(shell pwd)/.tmp
 
 MONO=$(shell which mono)
 XBUILD=$(shell which xbuild)
@@ -12,7 +11,10 @@ MKBUNDLE=$(shell which mkbundle)
 
 UNPACKED_EXE=$(BINDIR)/Rainy.exe
 PACKED_EXE=Rainy.exe
-MIN_MONO_VERSION=2.10.9
+
+# Note this is the min version for building from source; running might work
+# on older mono versions
+MIN_MONO_VERSION=3.0.0
 
 pack: build
 	@cp Rainy/settings.conf $(RELEASEDIR)/settings.conf
@@ -34,17 +36,29 @@ pack: build
 	@echo ""
 	@echo ""
 
-build: 
-## this is not working?
-##pkg-config --atleast-version=$(MIN_MONO_VERSION) mono; if [ $$? != "0" ]; then $(error "mono >=2.10.9 is required");
-
+checkout:
+ifndef TEAMCITY
 	# Fetching Rainy's submodules
-	@git submodule init
-	@git submodule update
+	@git submodule update --init --recursive
+endif
 
-	# Fetching tomboy-library's submodules
-	@cd tomboy-library/ && git submodule init && git submodule update && cd ..
-	
+deps:
+	# if the next steps fails telling about security authentication, make sure
+	# you have imported trusted ssl CA certs with this command and re-run:
+	#
+	# mozroots --import --sync
+	#
+
+	@mono tools/NuGet.exe install -o packages Rainy/packages.config
+	@mono tools/NuGet.exe install -o packages Rainy-tests/packages.config
+	@mono tools/NuGet.exe install -o packages tomboy-library-websync/packages.config
+	@echo "Successfully fetched dependencies."
+
+build: checkout deps
+
+## this is not working?
+##pkg-config --atleast-version=$(MIN_MONO_VERSION) mono; if [ $$? != "0" ]; then $(error "mono >=$MIN_MONO_VERSION is required");
+
 	$(XBUILD) $(XBUILD_ARGS) Rainy.sln
 
 release: clean pack
@@ -62,7 +76,6 @@ clean:
 	rm -rf Rainy/obj/*
 	rm -rf $(ZIPDIR)
 	rm -rf $(ZIPDIR).zip
-	rm -rf $(TMPDIR)
 	rm -rf $(BINDIR)/*
 	rm -rf $(RELEASEDIR)/*.exe
 	rm -rf $(RELEASEDIR)/*.mdb

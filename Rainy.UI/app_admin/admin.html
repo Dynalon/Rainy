@@ -1,0 +1,54 @@
+<!doctype html>
+<html lang="en" ng-app="myApp">
+
+    <head>
+        <meta charset="utf-8">
+        <title>
+            Rainy - Admin
+        </title>
+        <link href="//netdna.bootstrapcdn.com/twitter-bootstrap/2.3.2/css/bootstrap-combined.min.css"
+        rel="stylesheet"/>
+    <!--
+        <link href="admin.css" rel="stylesheet"/>
+    -->
+    </head>
+
+    <body>
+        <div ng-controller="MainCtrl">
+            <div class="navbar navbar-inverse" bs-navbar ng-show="!hideAdminNav">
+                <div class="navbar-inner">
+                    <a class="brand" href="#/">Rainy <span class="label label-important">ADMIN</span></a>
+                    <ul class="nav">
+                        <li class="active" data-match-route="/overview">
+                            <a href="#/overview"><i class="icon-signal icon-white"></i> Overview</a>
+                        </li>
+                        <li data-match-route="/user">
+                            <a href="#/user"><i class="icon-user icon-white"></i> User</a>
+                        </li>
+                    </ul>
+                    <ul class="pull-right nav">
+                        <li class="pull-right">
+                            <a href="/">
+                                Go to notes panel
+                                <i class="icon-circle-arrow-right icon-white"></i>
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+                    </ul>
+                </div>
+            </div>
+        </div>
+        <div class="container">
+            <!-- TOPLINE NAV SELECTION -->
+            <div class="span12" ng-View>
+            </div>
+
+            <script src="../common.js" type="text/javascript">
+            </script>
+            <script src="admin.js" type="text/javascript">
+            </script>
+        </div>
+    </body>
+
+</html>

@@ -7,6 +7,12 @@ using System.Net;
 using DevDefined.OAuth.Storage.Basic;
 using Rainy.WebService;
 using log4net;
+using Rainy.OAuth;
+using ServiceStack.WebHost.Endpoints;
+using Rainy.Crypto;
+using System.Linq;
+using Rainy.ErrorHandling;
+using System.Threading;
 
 namespace Rainy.WebService.OAuth
 {
@@ -14,6 +20,7 @@ namespace Rainy.WebService.OAuth
 	public class OAuthRequiredAttribute : Attribute, IHasRequestFilter
 	{
 		protected ILog Logger;
+
 		public OAuthRequiredAttribute ()
 		{
 			Logger = LogManager.GetLogger (GetType ());
@@ -26,39 +33,59 @@ namespace Rainy.WebService.OAuth
 		
 		public void RequestFilter (IHttpRequest request, IHttpResponse response, object requestDto)
 		{
-			string Username = "";
+			bool use_temp_access_token = request.Headers.AllKeys.Contains ("AccessToken");
+			bool check_oauth_signature = request.Headers.AllKeys.Contains ("Authorization");
+
+			string username = "";
 			if (requestDto is UserRequest) {
-				Username = ((UserRequest)requestDto).Username;
+				username = ((UserRequest)requestDto).Username;
 			} else if (requestDto is GetNotesRequest) {
-				Username = ((GetNotesRequest)requestDto).Username;
+				username = ((GetNotesRequest)requestDto).Username;
 			} else if (requestDto is PutNotesRequest) {
-				Username = ((PutNotesRequest)requestDto).Username;
-			} else {
-				response.ReturnAuthRequired ();
-				return;
+				username = ((PutNotesRequest)requestDto).Username;
+			} else if (!check_oauth_signature && !use_temp_access_token) {
+				throw new UnauthorizedException ();
 			}
-			
-			var web_request = ((HttpListenerRequest)request.OriginalRequest).ToWebRequest ();
-			IOAuthContext context = new OAuthContextBuilder ().FromWebRequest (web_request, new MemoryStream ());
-		
+			Logger.Debug ("trying to acquire authorization");
+
+			IOAuthContext context = null;
+			AccessToken access_token;
+
 			try {
-				Logger.Debug ("trying to acquire authorization");
-				Logger.Debug ("Received headers:" + request.Headers.Dump ());
-				RainyStandaloneServer.OAuth.Provider.AccessProtectedResourceRequest (context);
-			} catch {
-				Logger.DebugFormat ("failed to obtain authorization, oauth context is: {0}", context.Dump ());
-				response.ReturnAuthRequired ();
+				var oauthHandler = EndpointHost.Container.Resolve<OAuthHandler> ();
+				if (check_oauth_signature) {
+					var web_request = ((HttpListenerRequest)request.OriginalRequest).ToWebRequest ();
+					context = new OAuthContextBuilder ().FromWebRequest (web_request, new MemoryStream ());
+					// HACK ServiceStack does not inject into custom attributes
+					oauthHandler.Provider.AccessProtectedResourceRequest (context);
+					// check if the access token matches the username given in an url
+					access_token = oauthHandler.AccessTokens.GetToken (context.Token);
+				} else {
+					access_token = oauthHandler.AccessTokens.GetToken (request.Headers["AccessToken"]);
+				}
+
+				if (!string.IsNullOrEmpty (username) && access_token.UserName != username) {
+					// forbidden
+					Logger.Debug ("username does not match the one in the access token, denying");
+					throw new UnauthorizedException ();
+				} else {
+					// TODO remove checks - why is it run twice?
+					if (!request.Items.Keys.Contains ("AccessToken")) {
+						if (use_temp_access_token)
+							request.Items.Add ("AccessToken", request.Headers["AccessToken"]);
+						else
+							request.Items.Add ("AccessToken", context.Token);
+					}
+					if (!request.Items.Keys.Contains ("Username"))
+						request.Items.Add ("Username", access_token.UserName);
+				}
+			} catch (Exception e) {
+				if (context != null)
+					Logger.DebugFormat ("failed to obtain authorization, oauth context is: {0}", context.Dump ());
+				throw new UnauthorizedException ();
 			}
-			
-			// check if the access token matches the username
-			var access_token = Rainy.RainyStandaloneServer.OAuth.AccessTokens.GetToken (context.Token);
-			if (access_token.UserName != Username) {
-				// forbidden
-				Logger.Debug ("username does not match the one in the access token, denying");
-				response.ReturnAuthRequired ();
-				return;
-			}
-			Logger.DebugFormat ("authorization granted for user {0}", Username);
+
+			Logger.DebugFormat ("authorization granted for user {0}", username);
 
 			// possible race condition but locking is to expensive
 			// at this point, rather accept non-precise values

@@ -21,7 +21,6 @@
     <PlatformTarget>x86</PlatformTarget>
     <ConsolePause>False</ConsolePause>
     <Commandlineparameters>-c ../../settings.conf -vvvv --nobrowser</Commandlineparameters>
-    <Externalconsole>True</Externalconsole>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|x86' ">
     <DebugType>none</DebugType>
@@ -32,38 +31,18 @@
     <PlatformTarget>x86</PlatformTarget>
     <Externalconsole>True</Externalconsole>
   </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Testing|AnyCPU' ">
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Testing</OutputPath>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
   <ItemGroup>
     <Reference Include="System" />
     <Reference Include="System.Runtime.Serialization" />
     <Reference Include="System.Core" />
     <Reference Include="System.Web" />
     <Reference Include="System.Web.Abstractions" />
-    <Reference Include="log4net">
-      <HintPath>..\lib\log4net.dll</HintPath>
-    </Reference>
     <Reference Include="Microsoft.CSharp" />
-    <Reference Include="ServiceStack.Common">
-      <HintPath>..\tomboy-library\Tomboy-library\Libs\ServiceStack-v3.9.32\ServiceStack.Common.dll</HintPath>
-    </Reference>
-    <Reference Include="ServiceStack.Interfaces">
-      <HintPath>..\tomboy-library\Tomboy-library\Libs\ServiceStack-v3.9.32\ServiceStack.Interfaces.dll</HintPath>
-    </Reference>
-    <Reference Include="ServiceStack.Text">
-      <HintPath>..\tomboy-library\Tomboy-library\Libs\ServiceStack-v3.9.32\ServiceStack.Text.dll</HintPath>
-    </Reference>
-    <Reference Include="ServiceStack.ServiceInterface">
-      <HintPath>..\lib\ServiceStack-v3.9.32\ServiceStack.ServiceInterface.dll</HintPath>
-    </Reference>
-    <Reference Include="ServiceStack">
-      <HintPath>..\lib\ServiceStack-v3.9.32\ServiceStack.dll</HintPath>
-    </Reference>
-    <Reference Include="ServiceStack.OrmLite.Sqlite">
-      <HintPath>..\lib\ServiceStack-v3.9.32\ServiceStack.OrmLite.Sqlite.dll</HintPath>
-    </Reference>
-    <Reference Include="ServiceStack.OrmLite">
-      <HintPath>..\lib\ServiceStack-v3.9.32\ServiceStack.OrmLite.dll</HintPath>
-    </Reference>
-    <Reference Include="Mono.Data.Sqlite" />
     <Reference Include="nunit.framework, Version=2.4.8.0, Culture=neutral, PublicKeyToken=96d09a1eb7f44a77">
       <Private>False</Private>
     </Reference>
@@ -71,6 +50,48 @@
     <Reference Include="System.Xml" />
     <Reference Include="Mono.Security" />
     <Reference Include="Mono.Posix" />
+    <Reference Include="log4net">
+      <HintPath>..\lib\log4net.dll</HintPath>
+    </Reference>
+    <Reference Include="Npgsql">
+      <HintPath>..\lib\Npgsql.dll</HintPath>
+    </Reference>
+    <Reference Include="CsQuery">
+      <HintPath>..\packages\CsQuery.1.3.4\lib\net40\CsQuery.dll</HintPath>
+    </Reference>
+    <Reference Include="ServiceStack">
+      <HintPath>..\packages\ServiceStack.3.9.61\lib\net35\ServiceStack.dll</HintPath>
+    </Reference>
+    <Reference Include="ServiceStack.Api.Swagger">
+      <HintPath>..\packages\ServiceStack.Api.Swagger.3.9.61\lib\net35\ServiceStack.Api.Swagger.dll</HintPath>
+    </Reference>
+    <Reference Include="ServiceStack.Common">
+      <HintPath>..\packages\ServiceStack.Common.3.9.61\lib\net35\ServiceStack.Common.dll</HintPath>
+    </Reference>
+    <Reference Include="ServiceStack.Interfaces">
+      <HintPath>..\packages\ServiceStack.Common.3.9.61\lib\net35\ServiceStack.Interfaces.dll</HintPath>
+    </Reference>
+    <Reference Include="ServiceStack.OrmLite.PostgreSQL">
+      <HintPath>..\packages\ServiceStack.OrmLite.PostgreSQL.3.9.61\lib\net35\ServiceStack.OrmLite.PostgreSQL.dll</HintPath>
+    </Reference>
+    <Reference Include="ServiceStack.OrmLite">
+      <HintPath>..\packages\ServiceStack.OrmLite.SqlServer.3.9.61\lib\net35\ServiceStack.OrmLite.dll</HintPath>
+    </Reference>
+    <Reference Include="Mono.Data.Sqlite">
+      <HintPath>..\packages\ServiceStack.OrmLite.Sqlite.Mono.3.9.61\lib\net35\Mono.Data.Sqlite.dll</HintPath>
+    </Reference>
+    <Reference Include="ServiceStack.OrmLite.Sqlite">
+      <HintPath>..\packages\ServiceStack.OrmLite.Sqlite.Mono.3.9.61\lib\net35\ServiceStack.OrmLite.Sqlite.dll</HintPath>
+    </Reference>
+    <Reference Include="ServiceStack.OrmLite">
+      <HintPath>..\packages\ServiceStack.OrmLite.Sqlite.Mono.3.9.61\lib\net35\ServiceStack.OrmLite.dll</HintPath>
+    </Reference>
+    <Reference Include="ServiceStack.Text">
+      <HintPath>..\packages\ServiceStack.Text.3.9.61\lib\net35\ServiceStack.Text.dll</HintPath>
+    </Reference>
+    <Reference Include="ServiceStack.ServiceInterface">
+      <HintPath>..\packages\ServiceStack.3.9.61\lib\net35\ServiceStack.ServiceInterface.dll</HintPath>
+    </Reference>
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <ItemGroup>
@@ -82,14 +103,17 @@
       <Project>{10095092-E1E5-441F-9380-B6329F3CFEB4}</Project>
       <Name>JsonConfig</Name>
     </ProjectReference>
-    <ProjectReference Include="..\tomboy-library\DevDefined.OAuth\src\DevDefined.OAuth\DevDefined.OAuth.csproj">
+    <ProjectReference Include="..\tomboy-library-websync\DevDefined.OAuth\src\DevDefined.OAuth\DevDefined.OAuth.csproj">
       <Project>{61B700B6-3911-4CEF-8751-7F42CA765068}</Project>
       <Name>DevDefined.OAuth</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\tomboy-library-websync\tomboy-library-websync.csproj">
+      <Project>{BA3396DF-4D7E-45C0-9BF1-3F52FE6FFA92}</Project>
+      <Name>tomboy-library-websync</Name>
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Main.cs" />
-    <Compile Include="WebService\OAuth\OAuthService.cs" />
     <Compile Include="WebService\NoteService.cs" />
     <Compile Include="WebService\OAuth\OAuthStores.cs" />
     <Compile Include="WebService\Common.cs" />
@@ -98,12 +122,8 @@
     <Compile Include="RainyStandaloneServer.cs" />
     <Compile Include="NoteRepository.cs" />
     <Compile Include="Interfaces.cs" />
-    <Compile Include="RainyTestServer.cs" />
-    <Compile Include="WebService\OAuth\SimpleTokenRepository.cs" />
-    <Compile Include="WebService\OAuth\OAuthDatabaseHandler.cs" />
     <Compile Include="WebService\OAuth\OAuthHandlerBase.cs" />
     <Compile Include="WebService\Admin\Helper.cs" />
-    <Compile Include="WebService\Admin\AdminLogService.cs" />
     <Compile Include="WebService\UserService.cs" />
     <Compile Include="WebService\ApiService.cs" />
     <Compile Include="WebService\ServiceContracts.cs" />
@@ -111,6 +131,27 @@
     <Compile Include="ORM\DbStorage.cs" />
     <Compile Include="ORM\DatabaseBackend.cs" />
     <Compile Include="makecert.cs" />
+    <Compile Include="WebService\Admin\DtoClasses.cs" />
+    <Compile Include="WebService\Admin\AdminService.cs" />
+    <Compile Include="WebService\Admin\AdminServiceContracts.cs" />
+    <Compile Include="WebService\Admin\Signup.cs" />
+    <Compile Include="ErrorHandling.cs" />
+    <Compile Include="WebService\OAuth\OAuthServiceContracts.cs" />
+    <Compile Include="WebService\OAuth\OAuthService.cs" />
+    <Compile Include="CustomHandler\EmbeddedResourceHandler.cs" />
+    <Compile Include="CustomHandler\FilesystemHandler.cs" />
+    <Compile Include="ORM\DbConfig.cs" />
+    <Compile Include="AppHost.cs" />
+    <Compile Include="RainyTestServer.cs" />
+    <Compile Include="Crypto.cs" />
+    <Compile Include="WebService\OAuth\OAuthDataStructures.cs" />
+    <Compile Include="WebService\OAuth\TokenService.cs" />
+    <Compile Include="WebService\NoteHistoryService.cs" />
+    <Compile Include="WebService\Admin\StatusService.cs" />
+    <Compile Include="CustomHandler\IHttpHandlerDecider.cs" />
+    <Compile Include="NoteHtmlConversion.cs" />
+    <Compile Include="ORM\DbEncryptedStorage.cs" />
+    <Compile Include="WebService\ConfigService.cs" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="WebService\" />
@@ -118,11 +159,58 @@
     <Folder Include="WebService\Admin\" />
     <Folder Include="WebService\Admin\UI\" />
     <Folder Include="ORM\" />
+    <Folder Include="CustomHandler\" />
+    <Folder Include="WebService\Admin\UI\admin\" />
   </ItemGroup>
   <ItemGroup>
     <None Include="settings.conf" />
     <None Include="WebService\Admin\AdminUiService.cs" />
-    <None Include="WebService\Admin\AdminService.cs" />
-    <None Include="WebService\Admin\StatusService.cs" />
+    <None Include="WebService\Admin\AdminLogService.cs" />
+    <None Include="swagger-ui\index.html" />
+    <None Include="swagger-ui\swagger-ui.js" />
+    <None Include="swagger-ui\swagger-ui.min.js" />
+    <None Include="swagger-ui\css\hightlight.default.css" />
+    <None Include="swagger-ui\css\screen.css" />
+    <None Include="swagger-ui\images\logo_small.png" />
+    <None Include="swagger-ui\images\pet_store_api.png" />
+    <None Include="swagger-ui\images\throbber.gif" />
+    <None Include="swagger-ui\images\wordnik_api.png" />
+    <None Include="swagger-ui\lib\backbone-min.js" />
+    <None Include="swagger-ui\lib\handlebars-1.0.rc.1.js" />
+    <None Include="swagger-ui\lib\highlight.7.3.pack.js" />
+    <None Include="swagger-ui\lib\jquery-1.8.0.min.js" />
+    <None Include="swagger-ui\lib\jquery.ba-bbq.min.js" />
+    <None Include="swagger-ui\lib\jquery.slideto.min.js" />
+    <None Include="swagger-ui\lib\jquery.wiggle.min.js" />
+    <None Include="swagger-ui\lib\swagger.js" />
+    <None Include="swagger-ui\lib\underscore-min.js" />
+    <None Include="sqlite\x64\sqlite3.dll" />
+    <None Include="sqlite\x86\sqlite3.def" />
+    <None Include="sqlite\x86\sqlite3.dll" />
+    <None Include="sqlite\x86\sqlite3.exe" />
+    <None Include="packages.config" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="..\Rainy.UI\dist\client.css">
+      <Link>WebService\Admin\UI\client.css</Link>
+    </EmbeddedResource>
+    <EmbeddedResource Include="..\Rainy.UI\dist\client.js">
+      <Link>WebService\Admin\UI\client.js</Link>
+    </EmbeddedResource>
+    <EmbeddedResource Include="..\Rainy.UI\dist\common.js">
+      <Link>WebService\Admin\UI\common.js</Link>
+    </EmbeddedResource>
+    <EmbeddedResource Include="..\Rainy.UI\dist\admin\admin.js">
+      <Link>WebService\Admin\UI\admin\admin.js</Link>
+    </EmbeddedResource>
+    <EmbeddedResource Include="..\Rainy.UI\dist\admin\index.html">
+      <Link>WebService\Admin\UI\admin\index.html</Link>
+    </EmbeddedResource>
+    <EmbeddedResource Include="..\Rainy.UI\dist\index.html">
+      <Link>WebService\Admin\UI\index.html</Link>
+    </EmbeddedResource>
+    <EmbeddedResource Include="..\Rainy.UI\dist\wysihtml5_style.css">
+      <Link>WebService\Admin\UI\wysihtml5_style.css</Link>
+    </EmbeddedResource>
   </ItemGroup>
 </Project>

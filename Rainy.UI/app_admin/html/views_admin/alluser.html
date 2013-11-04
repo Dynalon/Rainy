@@ -1,0 +1,117 @@
+<script type="text/ng-template" id="user.html">
+
+<!-- ADD NEW USER DIALOG -->
+<h3> Add a new user </h3>
+<form class="form-inline" name="formNewUser" ng-submit="save_user(true)">
+    <label>Username:</label>
+    <input ng-model="new_user.Username"
+        class="input-small"
+        type="text"
+        id="inputUsername"
+        ng-minLength="4"
+        autofocus
+        required />
+
+    <label>Email address:</label>
+    <input ng-model="new_user.EmailAddress" type="text" required />
+
+    <label>Password:</label>
+    <input
+        ng-blur="passwordBlur()",
+        ng-model="new_user.Password"
+        class="input-small"
+        type="text"
+        placeholder="min. 8 chars"
+        ng-minLength="8"
+        required />
+    <!--
+    <label>Send email to user </label>
+    <input type="checkbox" ng-model="sendMail" ng-disabled="sendMailDisabled" />
+    -->
+    <button type="submit" class="btn" ng-disabled="!formNewUser.$valid">
+        <i class="icon-plus"></i>Add new user
+    </button>
+</form>
+<hr>
+<h3>List of registered users</h3>
+
+
+<!-- SEARCH INPUT -->
+<div class="input-prepend pull-right" ng-show="alluser.length > 0">
+    <span class="add-on"><i class="icon-search"></i></span>
+    <input ng-model="search_term" type="text" placeholder="Search term..." />
+</div>
+
+<div ng-show="alluser.length == 0">
+    There are no users in the database. Use the above panel to add a user.
+</div>
+
+<!-- ALL USER TABLE -->
+<table class="table table-striped table-bordered table-hover table-condensed" ng-show="alluser.length > 0">
+    <thead>
+        <th>Username</th>
+        <th>EmailAddress</th>
+        <!-- <th>Password</th> -->
+        <th>Additional data</th>
+        <th>Active?</th>
+        <!--<th>Verified?</th> -->
+        <th></th>
+    </thead>
+    <tbody ng-repeat="user in alluser | filter: search_term | orderBy: 'Username' ">
+        <tr ng-show="user.Username != currently_edited_user.Username" ng-click="start_edit(user)">
+            <td>
+                {{ user.Username }}
+            </td>
+            <td>
+                {{ user.EmailAddress }}
+            </td>
+            <!-- <td>
+                ***
+            </td> -->
+            <td>
+                {{ user.AdditionalData }}
+            </td>
+            <td>
+                <i class="icon-ok" ng-show="user.IsActivated"></i>
+                <i class="icon-remove" ng-show="!user.IsActivated"></i>
+            </td>
+            <!-- <td>
+                <i class="icon-ok" ng-show="user.IsVerified"></i>
+                <i class="icon-remove" ng-show="!user.IsVerified"></i>
+            </td> -->
+            <td>
+                <a class="btn pull-right" ng-click="delete_user(user,$event)"><i class="icon-trash"></i></a>
+            </td>
+        </tr>
+
+        <!-- EDIT MODE -->
+        <tr ng-hide="user.Username != currently_edited_user.Username">
+            <td>
+                {{ user.Username }}
+            </td>
+            <td>
+                <input ng-model="currently_edited_user.EmailAddress" />
+            </td>
+            <!-- <td>
+                <input placeholder="empty = use old pw" ng-model="currently_edited_user.Password" />
+            </td> -->
+            <td>
+                <textarea rows="3" ng-model="currently_edited_user.AdditionalData"></textarea>
+            </td>
+            <td>
+                <input type="checkbox" ng-model="currently_edited_user.IsActivated" />
+            </td>
+            <!-- <td>
+                <input type="checkbox" ng-model="currently_edited_user.IsVerified" />
+            </td> -->
+            <td>
+                <span class="pull-right">
+                    <a class="btn btn-primary" ng-click="save_user(false)"><i class="icon-ok"></i>Save</a>
+                    <a class="btn" ng-click="stop_edit()"><i class="icon-remove"></i> Cancel</a>
+                </span>
+            </td>
+        </tr>
+    </tbody>
+</table>
+
+</script>

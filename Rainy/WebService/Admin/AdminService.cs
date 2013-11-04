@@ -1,104 +1,85 @@
 using System;
 using Rainy.Db;
-using ServiceStack.ServiceHost;
 using ServiceStack.OrmLite;
 using ServiceStack.Common;
 using ServiceStack.Common.Web;
 using System.Net;
+using Rainy.UserManagement;
+using System.Linq;
+using Rainy.WebService.Admin;
+using Rainy.ErrorHandling;
+using Rainy.Crypto;
 using System.Collections.Generic;
-using ServiceStack.ServiceInterface;
-using ServiceStack.ServiceInterface.Cors;
 
-namespace Rainy.WebService.Admin
+namespace Rainy.WebService.Management.Admin
 {
-	[AdminPasswordRequired]
-	[Route("/api/admin/user/","POST, PUT, DELETE, OPTIONS")]
-	[Route("/api/admin/user/{Username}","GET, OPTIONS")]
-	public class UserRequest : DBUser, IReturn<DBUser>
+	public class UserService : ServiceBase
 	{
-	}
-
-	[AdminPasswordRequired]
-	[Route("/api/admin/alluser/","GET, OPTIONS")]
-	public class AllUserRequest : IReturn<List<DBUser>>
-	{
-	}
-
-	public class UserService : RainyServiceBase
-	{
-		public UserService () : base ()
+		private IDbConnectionFactory connFactory;
+		public UserService (IDbConnectionFactory factory) : base ()
 		{
-		}
-	
-		public HttpResult Options (UserRequest req)
-		{
-			return new HttpResult ();
-		}
-		public HttpResult Options (AllUserRequest req)
-		{
-			return new HttpResult ();
+			connFactory = factory;
 		}
 
 		// gets a list of all users
-		public List<DBUser> Get (AllUserRequest req)
+		public object Get (AllUserRequest req)
 		{
-			var all_user = new List<DBUser> ();
-
-			using (var conn = DbConfig.GetConnection ()) {
-				all_user = conn.Select<DBUser> ();
+			List<DTOUser> all_user;
+			using (var conn = connFactory.OpenDbConnection ()) {
+				all_user = conn.Select<DBUser> ().ToList<DTOUser> ();
 			}
-
 			return all_user;
 		}
 
-		public DBUser Get (UserRequest req)
+		public DTOUser Get (UserRequest req)
 		{
 			DBUser found_user;
 
-			using (var conn = DbConfig.GetConnection ()) {
+			using (var conn = connFactory.OpenDbConnection ()) {
 				found_user = conn.FirstOrDefault<DBUser> ("Username = {0}", req.Username);
 			}
 
-			if (found_user == null) throw new Exception ("User not found!");
-			return found_user;
+			if (found_user == null)
+				throw new InvalidRequestDtoException (){ErrorMessage = "User not found!"};
+
+			return (DTOUser) found_user;
 		}
 
 		// TODO see if we can directly use DBUser
 		// update existing user
 		public object Put (UserRequest updated_user)
 		{
-			var user = new DBUser ();
-			updated_user.Manifest = null;
-			// TODO don't touch the SyncManifest when updating the user
-			user.PopulateWith (updated_user);
-
-			using (var conn = DbConfig.GetConnection ()) {
-				var stored_user = conn.FirstOrDefault<DBUser>("Username = {0}", user.Username);
+			using (var conn = connFactory.OpenDbConnection ()) {
+				var stored_user = conn.FirstOrDefault<DBUser>("Username = {0}", updated_user.Username);
 
 				if (stored_user == null) {
 					// user did not exist, can't update
 					return new HttpResult {
 						Status = 404,
-						StatusDescription = "User " + user.Username + " was not found," +
+						StatusDescription = "User " + updated_user.Username + " was not found," +
 							" and can't be updated. Try using HTTP POST to create a new user"
 					};
 				}
 
-				if (user.Password == "") {
-					// password was not sent so use the old password
-					// TODO hashing
-					user.Password = stored_user.Password;
+				// TODO automapping
+				stored_user.IsActivated = updated_user.IsActivated;
+				stored_user.IsVerified = updated_user.IsVerified;
+				stored_user.AdditionalData = updated_user.AdditionalData;
+				stored_user.EmailAddress = updated_user.EmailAddress;
+
+				if (updated_user.Password != "") {
+					throw new NotImplementedException ("Password changing is not possible due to encryption!");
 				}
 
-				conn.Update<DBUser> (user, u => u.Username == user.Username);
+				conn.Update<DBUser> (stored_user, u => u.Username == updated_user.Username);
 			}
-			Logger.DebugFormat ("updating user information for user {0}", user.Username);
+			Logger.DebugFormat ("updating user information for user {0}", updated_user.Username);
 
 			// do not return the password over the wire
-			user.Password = "";
-			return new HttpResult (user) {
+			updated_user.Password = "";
+			return new HttpResult (updated_user) {
 				StatusCode = System.Net.HttpStatusCode.OK,
-				StatusDescription = "Successfully updated user " + user.Username
+				StatusDescription = "Successfully updated user " + updated_user.Username
 			};
 		}
 
@@ -114,42 +95,38 @@ namespace Rainy.WebService.Admin
 		public object Post (UserRequest user)
 		{
 			var new_user = new DBUser ();
+			// TODO explicit mapping
 			new_user.PopulateWith (user);
 
 			// TODO move into RequestFilter
 			if (string.IsNullOrEmpty (user.Username))
-				throw new ArgumentNullException ("user.Username");
+				throw new InvalidRequestDtoException { ErrorMessage = "Username was empty" };
 
+			if (string.IsNullOrEmpty (user.Password))
+				throw new InvalidRequestDtoException { ErrorMessage = "Password was empty" };
+			
 			// TODO move into RequestFilter
 			if (! (user.Username.IsOnlySafeChars ()
 			    && user.Password.IsOnlySafeChars ()
-				&& user.AdditionalData.IsOnlySafeChars ()
 				&& user.EmailAddress.Replace ("@", "").IsOnlySafeChars ())) {
 
-				throw new ArgumentException ("found unsafe/unallowed characters");
+				throw new ValidationException { ErrorMessage = "found unsafe/unallowed characters" };
 			}
 
 			// TODO move into RequestFilter
 			// lowercase the username
 			new_user.Username = new_user.Username.ToLower ();
 
-			using (var conn = DbConfig.GetConnection ()) {
-				try {
-					var existing_user = conn.FirstOrDefault<DBUser> ("Username = {0}", new_user.Username);
-					if (existing_user != null)
-						throw new Exception ("A user by that name already exists");
+			// TODO move into API
+			new_user.CreateCryptoFields (user.Password);
 
-					conn.Insert<DBUser> (new_user);
-				} catch (Exception e) {
-					Logger.DebugFormat ("error inserting user {0} into the database, msg was {1}",
-					                    new_user.Username, e.Message);
-					return new HttpResult {
-						StatusCode = HttpStatusCode.Conflict,
-						StatusDescription = "Conflict! " + e.Message
-					};
-				}
+			using (var conn = connFactory.OpenDbConnection ()) {
+				var existing_user = conn.FirstOrDefault<DBUser> ("Username = {0}", new_user.Username);
+				if (existing_user != null)
+					throw new ConflictException (){ErrorMessage = "A user by that name already exists"};
+
+				conn.Insert<DBUser> (new_user);
 			}
-
 
 			return new HttpResult (new_user) {
 				StatusCode = HttpStatusCode.Created,
@@ -171,12 +148,14 @@ namespace Rainy.WebService.Admin
 		/// </summary>
 		public object Delete (UserRequest user)
 		{
-			using (var conn = DbConfig.GetConnection ()) {
+			using (var conn = connFactory.OpenDbConnection ()) {
 				using (var trans = conn.BeginTransaction ()) {
 
 					try {
 						conn.Delete<DBUser> (u => u.Username == user.Username);
 						conn.Delete<DBNote> (n => n.Username == user.Username);
+						conn.Delete<DBAccessToken> (t => t.UserName == user.Username);
+						conn.Delete<DBArchivedNote> (an => an.Username == user.Username);
 						trans.Commit ();
 					} catch (Exception e) {
 						Logger.DebugFormat ("error deleting user {0}, msg was: {1}",

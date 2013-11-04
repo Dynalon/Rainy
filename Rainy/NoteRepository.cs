@@ -10,33 +10,67 @@ using System.Text;
 using Rainy.OAuth;
 using Rainy.Db;
 using Rainy.Interfaces;
+using ServiceStack.OrmLite;
+using JsonConfig;
+using Rainy.WebService;
 
 
 namespace Rainy
 {
+	public class ConfigFileAuthenticator : IAuthenticator
+	{
+		private dynamic userList;
+		public ConfigFileAuthenticator (dynamic userlist)
+		{
+			userList = userlist;
+		}
+		public bool VerifyCredentials (string username, string password)
+		{
+			// call the authenticater callback
+			if (string.IsNullOrEmpty (username) || string.IsNullOrEmpty (password))
+				return false;
+
+			foreach (dynamic credentials in userList) {
+				if (credentials.Username == username && credentials.Password == password)
+					return true;
+			}
+			return false;
+		}
+	}
+	public class ConfigFileAdminAuthenticator : IAdminAuthenticator
+	{
+		public bool VerifyAdminPassword (string password)
+		{
+			if (string.IsNullOrEmpty (password))
+				return false;
+
+			return password == Config.Global.AdminPassword;
+		}
+	}
+
 	// TODO move OAuth stuff into here
-	public class RainyFileSystemBackend : Rainy.Interfaces.IDataBackend
+	public class FileSystemBackend : Rainy.Interfaces.IDataBackend
 	{
 		string notesBasePath;
-		OAuthHandlerBase oauthHandler;
+		OAuthHandler oauthHandler;
 
-		public RainyFileSystemBackend (string data_path, CredentialsVerifier auth, bool reset = false)
+		public FileSystemBackend (string data_path, IDbConnectionFactory factory, IAuthenticator auth, OAuthHandler handler, bool reset = false)
 		{
-			oauthHandler = new OAuthDatabaseHandler (auth);
+			oauthHandler = handler;
 
 			// TODO move this into the oauth stuff
-			DbConfig.CreateSchema ();
+			//DbConfig.CreateSchema ();
 
 			this.notesBasePath = Path.Combine (data_path, "notes");
 			if (!Directory.Exists (notesBasePath)) {
 				Directory.CreateDirectory (notesBasePath);
 			}
 		}
-		public INoteRepository GetNoteRepository (string username)
+		public INoteRepository GetNoteRepository (IUser user)
 		{
-			return new DirectoryBasedNoteRepository (username, notesBasePath);
+			return new DirectoryBasedNoteRepository (user.Username, notesBasePath);
 		}
-		public OAuthHandlerBase OAuth {
+		public OAuthHandler OAuth {
 			get { return oauthHandler; }
 		}
 

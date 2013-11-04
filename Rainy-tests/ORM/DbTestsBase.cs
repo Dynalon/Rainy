@@ -1,38 +1,40 @@
 using System;
-using Tomboy.Sync.DTO;
-using NUnit.Framework;
-using System.Data;
-using ServiceStack.OrmLite;
 using System.Collections.Generic;
-using System.IO;
+using System.Data;
+using NUnit.Framework;
+using Rainy.Db;
+using ServiceStack.OrmLite;
+using Tomboy.Sync.Web.DTO;
+using Rainy.Tests;
 
-namespace Rainy.Db
+namespace Rainy.Tests.Db
 {
-	public class DbTestsBase
+	public class DbTestsBase : TestBase
 	{
-		protected OrmLiteConnectionFactory dbFactory;
-		
+		protected DBUser testUser;
+		protected IDbConnectionFactory connFactory;
+		protected string dbScenario;
+
 		[TestFixtureSetUp]
 		public void FixtureSetUp ()
 		{
-			DbConfig.SetSqliteFile ("/tmp/rainy-test-data/rainy-test.db");
-			// remove the rainy-test.db file if it exists
-			if (File.Exists (DbConfig.SqliteFile)) {
-				File.Delete (DbConfig.SqliteFile);
-			}
-
-			dbFactory = new OrmLiteConnectionFactory (DbConfig.ConnectionString, SqliteDialect.Provider);
-
 		}
 		
 		[SetUp]
-		public void SetUp ()
+		public new void SetUp ()
 		{
-			// Start with empty tables in each test run
-			using (var c = dbFactory.OpenDbConnection ()) {
-				c.DropAndCreateTable <DBNote> ();
-				c.DropAndCreateTable <DBUser> ();
-				c.DropAndCreateTable <DBAccessToken> ();
+			testServer = new RainyTestServer ();
+			if (dbScenario == "postgres") {
+				testServer.ScenarioPostgres ();
+			} else if (dbScenario == "sqlite" || string.IsNullOrEmpty (dbScenario)) {
+				testServer.ScenarioSqlite ();
+			}
+
+			testServer.Start ();
+
+			this.connFactory = RainyTestServer.Container.Resolve<IDbConnectionFactory> ();
+			using (var db = connFactory.OpenDbConnection ()) {
+				testUser = db.First<DBUser> (u => u.Username == RainyTestServer.TEST_USER);
 			}
 		}
 
@@ -55,13 +57,12 @@ namespace Rainy.Db
 				Guid = Guid.NewGuid ().ToString ()
 			};
 		}
-		protected DBNote GetDBSampleNote (string username = "test")
+		protected DBNote GetDBSampleNote ()
 		{
-			var db_note = GetDTOSampleNote ().ToDBNote ();
-			db_note.Username = username;
+			var db_note = GetDTOSampleNote ().ToDBNote (testUser);
 			return db_note;
 		}
-		protected List<DTONote> GetDTOSampleNotes (int num, string username = "test")
+		protected List<DTONote> GetDTOSampleNotes (int num)
 		{
 			var notes = new List<DTONote> ();
 
@@ -70,12 +71,12 @@ namespace Rainy.Db
 			}
 			return notes;
 		}
-		protected List<DBNote> GetDBSampleNotes (int num, string username = "test")
+		protected List<DBNote> GetDBSampleNotes (int num)
 		{
 			var notes = new List<DBNote> ();
 
 			for (int i=0; i < num; i++) {
-				notes.Add (GetDBSampleNote (username));
+				notes.Add (GetDBSampleNote ());
 			}
 
 			return notes;

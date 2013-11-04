@@ -1,0 +1,55 @@
+<!doctype html>
+<html lang="en" ng-app="clientApp">
+
+<head>
+    <meta charset="utf-8">
+    <title>
+        Rainy - 2 GO
+    </title>
+    <link href="//netdna.bootstrapcdn.com/twitter-bootstrap/2.3.2/css/bootstrap-combined.min.css"
+    rel="stylesheet"/>
+    <link href="client.css" rel="stylesheet"/>
+    <style>
+        .mainContent {
+            margin-left: 10px;
+        }
+    </style>
+</head>
+
+<body>
+	<div ng-controller="MainCtrl">
+	    <div class="navbar navbar-inverse" bs-navbar>
+	        <div class="navbar-inner">
+	            <a class="brand" href="#/notes/">Rainy <span class="label label-important">2 GO</span></a>
+	            <ul class="nav">
+	                <!-- <li data-match-route="/account">
+	                    <a href="#/account"><i class="icon-user icon-white"></i> Account</a>
+	                </li> -->
+                    <li class="divider"></li>
+	                <li data-match-route="/logout" ng-show="isLoggedIn">
+	                    <a href="#/logout"><i class="icon-circle-arrow-right icon-white"></i> Logout</a>
+	                </li>
+	            </ul>
+                <ul class="pull-right nav">
+                    <li class="pull-right">
+                        <a href="/admin/">
+                            Admin panel
+                            <i class="icon-lock icon-white"></i>
+                        </a>
+                    </li>
+                </ul>
+	        </div>
+	    </div>
+	</div>
+
+    <div class="mainContent" ng-view>
+    <!-- MAIN VIEW CONTENT-->
+    </div>
+
+        <script src="common.js" type="text/javascript">
+        </script>
+        <script src="client.js" type="text/javascript">
+        </script>
+</body>
+
+</html>

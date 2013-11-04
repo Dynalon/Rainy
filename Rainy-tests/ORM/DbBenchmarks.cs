@@ -1,19 +1,20 @@
 using System;
-using NUnit.Framework;
-using System.Data;
-using ServiceStack.OrmLite;
-using System.Diagnostics;
 using System.Collections.Generic;
+using System.Data;
+using System.Diagnostics;
 using System.Threading.Tasks;
+using NUnit.Framework;
+using ServiceStack.OrmLite;
+using Rainy.Tests.Db;
+using Rainy.Db;
 
-namespace Rainy.Db
+namespace Rainy.Tests.Benchmarks
 {
-	[Ignore]
-	[TestFixture]
-	public class DbBenchmarks : DbTestsBase
+	public abstract class DbBenchmarks : DbTestsBase
 	{
 		private int num_runs = 10;
 		private int num_notes = 200;
+		private int num_threads = 16;
 
 		[SetUp]
 		public new void SetUp ()
@@ -49,10 +50,10 @@ namespace Rainy.Db
 		protected void InsertBenchmark_Worker (List<DBNote> notes)
 		{
 			// now insert the notes
-			using (var conn = dbFactory.OpenDbConnection ()) {
+			using (var conn = connFactory.OpenDbConnection ()) {
 				using (var trans = conn.OpenTransaction ()) {
 					foreach (var note in notes) {
-						conn.Insert (note);
+						conn.Insert<DBNote> (note);
 					}
 					trans.Commit ();
 				}
@@ -63,7 +64,7 @@ namespace Rainy.Db
 		public void InsertBenchmark_MultiThreaded ()
 		{
 			Run("Insert_MultiThreaded", () => {
-				InsertBenchmark_MultiThreadedWorker (16, num_notes);
+				InsertBenchmark_MultiThreadedWorker (num_threads, num_notes);
 			});
 		}
 		
@@ -83,6 +84,26 @@ namespace Rainy.Db
 				});
 			}
 			Task.WaitAll (tasks);
+		}
+	}
+
+	[Ignore]
+	[TestFixture]
+	public class DbBenchmarksSqlite : DbBenchmarks
+	{
+		public DbBenchmarksSqlite ()
+		{
+			this.dbScenario = "sqlite";
+		}
+	}
+
+	[Ignore]
+	[TestFixture]
+	public class DbBenchmarksPostgres : DbBenchmarks
+	{
+		public DbBenchmarksPostgres ()
+		{
+			this.dbScenario = "postgres";
 		}
 	}
 }

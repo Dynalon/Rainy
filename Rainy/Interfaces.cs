@@ -1,10 +1,18 @@
 using System;
 using Tomboy.Sync;
 using Rainy.OAuth;
+using Rainy.WebService;
 
 namespace Rainy.Interfaces
 {
-	public delegate bool CredentialsVerifier (string username, string password);
+	public interface IAuthenticator
+	{
+		bool VerifyCredentials (string username, string password);
+	}
+	public interface IAdminAuthenticator
+	{
+		bool VerifyAdminPassword (string password);
+	}
 
 	public interface INoteRepository : IDisposable
 	{
@@ -14,8 +22,7 @@ namespace Rainy.Interfaces
 
 	public interface IDataBackend 
 	{
-		INoteRepository GetNoteRepository (string username);
-		OAuthHandlerBase OAuth { get; }
+		INoteRepository GetNoteRepository (IUser user);
+		OAuthHandler OAuth { get; }
 	}
-
 }

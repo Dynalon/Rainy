@@ -1,11 +1,8 @@
-using Tomboy.Sync.DTO;
+using Tomboy.Sync.Web.DTO;
 using ServiceStack.DataAnnotations;
 using Tomboy.Sync;
-using ServiceStack.OrmLite;
-using System.Data;
-using Rainy.OAuth.SimpleStore;
-using System;
 using DevDefined.OAuth.Storage.Basic;
+using Rainy.UserManagement;
 
 namespace Rainy.Db
 {
@@ -14,7 +11,7 @@ namespace Rainy.Db
 		[PrimaryKey]
 		// Guid is not feasible for primary key as on an account move as user
 		// might duplicate notes across different accounts
-		public string CompoundPrimaryKey {
+		public virtual string CompoundPrimaryKey {
 			get {
 				return Username + "_" + Guid;
 			}
@@ -24,20 +21,41 @@ namespace Rainy.Db
 	
 		// to associate a note to a username
 		public string Username { get; set; }
+
+		public bool IsEncypted { get; set; }
+		public string EncryptedKey { get; set; }
 	}
-	
-	public class DBUser
+
+	public class DBArchivedNote : DBNote
 	{
 		[PrimaryKey]
-		public string Username { get; set; }
+		public override string CompoundPrimaryKey {
+			get {
+				return Username + "_" + Guid + "_" + LastSyncRevision;
+			}
+		}
+	}
+	
+	public class DBUser : DTOUser
+	{
+		[PrimaryKey]
+		public override string Username { get; set; }
 
-		public string Password { get; set; }
+		public override string Password {
+			get { return ""; }
+			set { return; }
+		}
 
 		public SyncManifest Manifest { get; set; }
 
-		public string EmailAddress { get; set; }
+		public string PasswordSalt { get; set; }
+		public string PasswordHash { get; set; }
 
-		public string AdditionalData { get; set; }
+		public string MasterKeySalt { get; set; }
+		public string EncryptedMasterKey { get; set; }
+
+		// the verification key 
+		public string VerifySecret { get; set; }
 
 		public DBUser ()
 		{
@@ -49,72 +67,25 @@ namespace Rainy.Db
 	{
 		[PrimaryKey]
 		public new string Token { get; set; }
+
+		// a short name for the device, i.e. "my laptop", or "my phone"
+		// will be set by the user 
+		public string DeviceName { get; set; }
+
+		// the TokenKey encrypts the master_key; the so encrypted master_key
+		// is sent back as access token to the user
+		public string TokenKey { get; set; }
 	}
 
-	public static class DbConfig
+	public class DBRequestToken : RequestToken
 	{
-		private static bool isInitialized = false;
-		private static string sqliteFile = "rainy.db";
-
-		public static string SqliteFile {
-			get { return sqliteFile; }
-		}
-
-		public static string ConnectionString {
-			get { return sqliteFile; }
-		}
-
-		private static object syncRoot = new object ();
-		private static OrmLiteConnectionFactory dbFactory; 
-
-		public static void SetSqliteFile (string filename)
-		{
-			lock (syncRoot) {
-				if (isInitialized) {
-					//throw new Exception ("Filename can't be set once the class is initialized");
-				} else {
-					sqliteFile = filename;
-				}
-			}
-		}
-		public static IDbConnection GetConnection ()
-		{
-			lock (syncRoot) {
-				if (!isInitialized) {
-					isInitialized = true;
-					dbFactory = new OrmLiteConnectionFactory (ConnectionString, SqliteDialect.Provider);
-				}
-			}
-			return dbFactory.OpenDbConnection ();
-		}
-
-		public static void CreateSchema (bool overwrite = false)
-		{
-			using (var conn = GetConnection ()) {
-				if (overwrite) {
-					conn.DropAndCreateTable <DBUser> ();
-					conn.DropAndCreateTable <DBNote> ();
-					conn.DropAndCreateTable <DBAccessToken> ();
-					// insert an empty test user
-					// TODO remove this and put into the testcases
-					conn.Insert (new DBUser () {
-						Username = "johndoe",
-						Manifest = new SyncManifest {
-							ServerId = Guid.NewGuid ().ToString ()
-						}
-					});
-				} else {
-					conn.CreateTableIfNotExists <DBUser> ();
-					conn.CreateTableIfNotExists <DBNote> ();
-					conn.CreateTableIfNotExists <DBAccessToken> ();
-				}
-
-			}
-		}
+		[PrimaryKey]
+		public new string Token { get; set; }
 	}
+
 	public static class DbClassConverter
 	{
-		public static DBNote ToDBNote (this DTONote dto)
+		public static DBNote ToDBNote (this DTONote dto, DBUser user)
 		{
 			// ServiceStack's .PopulateWith is for some reasons
 			// ORDERS of magnitudes slower than manually copying
@@ -136,9 +107,11 @@ namespace Rainy.Db
 			db.OpenOnStartup = dto.OpenOnStartup;
 			db.Pinned = dto.Pinned;
 
-			return db;
+			db.Username = user.Username;
 
+			return db;
 		}
+
 		public static DTONote ToDTONote (this DBNote db)
 		{
 			var dto = new DTONote ();
