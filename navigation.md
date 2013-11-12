@@ -13,11 +13,11 @@
   * [Hacking HOWTO](developer/hacking.md)
   * [OAuth docs](developer/oauth.md)
   * [Crypto docs](developer/crypto.md)
-  * [Rainy REST API docs](http://www.notesync.org/apidoc)
+  * [Rainy REST API docs](http://testserver.notesync.org/apidoc)
 
 [gimmick:theme(inverse: true)](united)
 
 [gimmick:ForkMeOnGithub({ color: 'red', position: 'right'})](https://github.com/Dynalon/Rainy)
 
 <!-- Pixel for counting user visists -->
-<img src="http://stats.markdown.io/notesync_org.gif" style="display: none"/>
+<!-- <img src="http://stats.markdown.io/notesync_org.gif" style="display: none"/> -->
