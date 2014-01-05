@@ -6,4 +6,4 @@
 	url = https://github.com/Dynalon/JsonConfig.git
 [submodule "DevDefined.OAuth"]
 	path = DevDefined.OAuth
-	url = git@github.com:bittercoder/DevDefined.OAuth.git
+	url = https://github.com/bittercoder/DevDefined.OAuth.git
