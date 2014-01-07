@@ -1,4 +1,5 @@
 {
 	"useSideMenu": true,
-	"title": "Rainy"
+	"title": "Rainy",
+	"additionalFooterText": "Rainy &copy; by Timo Dörr and contributors (License: AGPL)."
 }
