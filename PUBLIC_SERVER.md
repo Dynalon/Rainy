@@ -9,11 +9,13 @@ Since this is for testing purposes only, there are no private account registrati
 
   [restapi]: https://live.gnome.org/Tomboy/Synchronization/REST
 
+Attention: The public testserver is running on my RaspberryPi at home, so bandwidth as well as CPU power is limited.
+
 ## HTML5 WebGUI
 
-To use the HTML5/Javascript based in-browser client, use any of belows username/password pairs and login at:
+To use the HTML5/Javascript based in-browser client, use any of belows username/password pairs and follow this link:
 
-[https://testserver.notesync.org/](https://testserver.notesync.org/)
+[Open Testserver with Web GUI](https://rpi.orion.latecrew.de/)
 
 Note: You will have to add a security exception for the SSL certification, as the test server does not use an expensive CA signed certificate but a self-signed one.
 
@@ -21,7 +23,7 @@ Note: You will have to add a security exception for the SSL certification, as th
 
 Pick a username/password combination below, and then use this URL in Tomboy/Tomdroid as a sync url:
 
-	https://testserver.notesync.org/
+	https://rpi.orion.latecrew.de/
 
 You will have to enter the username/password pair later, after you added this server in Tomboy/Tomdroid.
 
@@ -29,7 +31,7 @@ Note: Double-check you enter _HTTPS_ (with a trailing 's'), as using _HTTP_ will
 
 You can also use unattended authentication by appending `/<username>/<password>/` to the Url:
 
-	https://testserver.notesync.org/<username>/<password>/
+	https://rpi.orion.latecrew.de/<username>/<password>/
 
 - - -
 ## Public account list

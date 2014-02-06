@@ -47,7 +47,6 @@ You can now fire up MonoDevelop/XamarinStudio and open the `Rainy.sln` file in t
 
   * This wiki
   * [Tomboy REST API Specification 1.0](https://wiki.gnome.org/Apps/Tomboy/Synchronization/REST/1.0)
-  * [Rainys extended REST API documentation](http://www.notesync.org/apidoc/)
   * [ServiceStack Wiki](https://github.com/ServiceStack/ServiceStack/wiki)
 
 Don't hesitate to email the maintainer(s) directly per Email if you have questions about the sorce code or architecture, contributors are welcome!
