@@ -24,9 +24,6 @@ ATTENTION: It is advised to install the `mono-complete` or similiar meta-package
 
 Fetch the latest version from the [download page](DOWNLOAD.md) and unzip:
 
-    # replace the X.Y.Z with latest version
-    wget http://rainy.notesync.org/release/rainy-X.Y.Z.zip
-
     # unzip and cd
     unzip rainy-X.Y.Z.zip
 
