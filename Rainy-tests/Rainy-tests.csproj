@@ -88,7 +88,6 @@
     <Compile Include="WebSyncServerTests.cs" />
     <Compile Include="CryptoTests.cs" />
     <Compile Include="NoteHistoryTests.cs" />
-    <Compile Include="PublicNoteShareTestsSqlite.cs" />
     <Compile Include="Admin\TestUserSignup.cs" />
     <Compile Include="NoteConversionTests.cs" />
     <Compile Include="ORM\DbEncryptedStorageTests.cs" />
@@ -101,6 +100,7 @@
     <Compile Include="ORM\Postgres\DbBenchmarksPostgres.cs" />
     <Compile Include="ORM\Postgres\DbEncryptedStorageTestsPostgres.cs" />
     <Compile Include="ORM\Postgres\DbStorageTestsPostgres.cs" />
+    <Compile Include="ORM\Sqlite\PublicNoteShareTestsSqlite.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <ItemGroup>
@@ -132,7 +132,6 @@
     <Folder Include="ORM\Sqlite\" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="UbuntuOneWebSyncServerTests.cs" />
     <None Include="packages.config" />
   </ItemGroup>
 </Project>
