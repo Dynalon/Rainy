@@ -87,24 +87,4 @@ namespace Rainy.Tests.Benchmarks
 			Task.WaitAll (tasks);
 		}
 	}
-
-	[Ignore]
-	[TestFixture]
-	public class DbBenchmarksSqlite : DbBenchmarks
-	{
-		public DbBenchmarksSqlite ()
-		{
-			this.dbScenario = "sqlite";
-		}
-	}
-
-	[Ignore]
-	[TestFixture]
-	public class DbBenchmarksPostgres : DbBenchmarks
-	{
-		public DbBenchmarksPostgres ()
-		{
-			this.dbScenario = "postgres";
-		}
-	}
 }

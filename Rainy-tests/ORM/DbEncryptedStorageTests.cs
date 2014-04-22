@@ -147,22 +147,4 @@ namespace Rainy.Tests.Db
 			}
 		}
 	}
-
-	[TestFixture()]
-	public class DbEncryptedStorageTestsSqlite : DbEncryptedStorageTests
-	{
-		public DbEncryptedStorageTestsSqlite ()
-		{
-			this.dbScenario = "sqlite";
-		}
-	}
-
-	[TestFixture()]
-	public class DbEncryptedStorageTestsPostgres : DbEncryptedStorageTests
-	{
-		public DbEncryptedStorageTestsPostgres ()
-		{
-			this.dbScenario = "postgres";
-		}
-	}
 }

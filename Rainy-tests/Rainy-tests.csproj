@@ -92,6 +92,15 @@
     <Compile Include="Admin\TestUserSignup.cs" />
     <Compile Include="NoteConversionTests.cs" />
     <Compile Include="ORM\DbEncryptedStorageTests.cs" />
+    <Compile Include="ORM\Sqlite\DbBasicTestsSqlite.cs" />
+    <Compile Include="ORM\Sqlite\DbBenchmarksSqlite.cs" />
+    <Compile Include="ORM\Sqlite\DbEncryptedStorageTestsSqlite.cs" />
+    <Compile Include="ORM\DbOAuthTests.cs" />
+    <Compile Include="ORM\Sqlite\DbStorageTestsSqlite.cs" />
+    <Compile Include="ORM\Postgres\DbBasicTestsPostgres.cs" />
+    <Compile Include="ORM\Postgres\DbBenchmarksPostgres.cs" />
+    <Compile Include="ORM\Postgres\DbEncryptedStorageTestsPostgres.cs" />
+    <Compile Include="ORM\Postgres\DbStorageTestsPostgres.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <ItemGroup>
@@ -119,6 +128,8 @@
   <ItemGroup>
     <Folder Include="ORM\" />
     <Folder Include="Admin\" />
+    <Folder Include="ORM\Postgres\" />
+    <Folder Include="ORM\Sqlite\" />
   </ItemGroup>
   <ItemGroup>
     <None Include="UbuntuOneWebSyncServerTests.cs" />

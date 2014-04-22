@@ -10,7 +10,7 @@ using Tomboy.Db;
 
 namespace Rainy.Tests.Db
 {
-	public class DbTestsBase : TestBase
+	public abstract class DbTestsBase : TestBase
 	{
 		protected DBUser testUser;
 		protected IDbConnectionFactory connFactory;
@@ -40,7 +40,7 @@ namespace Rainy.Tests.Db
 		}
 
 		[TearDown]
-		public void TearDown ()
+		public new void TearDown ()
 		{
 		}
 		
