@@ -276,7 +276,7 @@ namespace Rainy.Tests.Db
 			using (var conn = connFactory.OpenDbConnection ()) {
 				var dbtoken = conn.Select<DBAccessToken> ().First ();
 				Assert.AreEqual (token.Token, dbtoken.Token);
-				Assert.AreEqual (token.TokenSecret, dbtoken.TokenSecret);
+				Assert.AreEqual (token.TokenSecret, dbtoken.Secret);
 			}
 		}
 

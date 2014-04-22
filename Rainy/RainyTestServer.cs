@@ -15,6 +15,7 @@ using Rainy.OAuth;
 using Rainy.Crypto;
 using DevDefined.OAuth.Storage.Basic;
 using DevDefined.OAuth.Storage;
+using Tomboy.OAuth;
 
 namespace Rainy
 {
@@ -61,7 +62,6 @@ namespace Rainy
 		}
 
 		private RainyStandaloneServer rainyServer;
-		private string tmpPath;
 		private ComposeObjectGraphDelegate ObjectGraphComposer;
 
 		public RainyTestServer (ComposeObjectGraphDelegate composer = null)
@@ -233,41 +233,12 @@ namespace Rainy
 			return rest_client.Get<UserResponse> (user_service_url);
 		}
 
-		// this performs our main OAuth authentication, performing
-		// the request token retrieval, authorization, and exchange
-		// for an access token
-		public IToken GetAccessToken ()
+		public IOAuthToken GetAccessToken ()
 		{
-			var consumerContext = new OAuthConsumerContext () {
-				ConsumerKey = "anyone"
-			};
-
-			var rest_client = new JsonServiceClient (BaseUri);
-			var url = new Rainy.WebService.ApiRequest ().ToUrl("GET");
-			var api_ref = rest_client.Get<ApiResponse> (url);
-
-			var session = new OAuthSession (consumerContext, api_ref.OAuthRequestTokenUrl,
-			                                api_ref.OAuthAuthorizeUrl, api_ref.OAuthAccessTokenUrl);
-			
-			IToken request_token = session.GetRequestToken ();
-		
-			// we dont need a callback url
-			string link = session.GetUserAuthorizationUrlForToken (request_token, "http://example.com/");
-			
-			// visit the link to perform the authorization (no interaction needed)
-			HttpWebRequest req = (HttpWebRequest)HttpWebRequest.Create (link);
-			// disallow auto redirection, since we are interested in the location header only
-			req.AllowAutoRedirect = false;
-			
-			// the oauth_verifier we need, is part of the querystring in the (redirection)
-			// 'Location:' header
-			string location = ((HttpWebResponse)req.GetResponse ()).Headers ["Location"];
-			var query = string.Join ("", location.Split ('?').Skip (1));
-			var oauth_data = System.Web.HttpUtility.ParseQueryString (query);
-
-			IToken access_token = session.ExchangeRequestTokenForAccessToken (request_token, oauth_data ["oauth_verifier"]);
-
-			return access_token;
+			var token = WebSyncServer.PerformFastTokenExchange (this.ListenUrl,
+			                                               RainyTestServer.TEST_USER,
+			                                               RainyTestServer.TEST_PASS);
+			return token;	
 		}
 	}
 }

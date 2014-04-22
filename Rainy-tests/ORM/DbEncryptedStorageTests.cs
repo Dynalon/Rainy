@@ -85,7 +85,7 @@ namespace Rainy.Tests.Db
 				}
 			}
 
-			storage = new DbStorage (this.connFactory, this.testUser.Username);
+			storage = new DbStorage (this.connFactory, testUser.Username, testUser.Manifest);
 			sample_notes = DbStorageTests.GetSampleNotes ();
 			foreach(var note in sample_notes) {
 				storage.SaveNote (note);

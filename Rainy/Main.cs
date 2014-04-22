@@ -20,6 +20,7 @@ using DevDefined.OAuth.Storage;
 using Rainy.Crypto;
 using Rainy.WebService;
 using Tomboy;
+using System.Linq;
 
 namespace Rainy
 {
@@ -261,7 +262,7 @@ namespace Rainy
 					using (var storage = f.GetDbStorage (r)) {
 						var sample_notes = new DiskStorage ();
 						sample_notes.SetPath ("../../../sample_notes/");
-						sample_notes.CopyTo (storage);
+						sample_notes.GetNotes ().Values.ToList ().ForEach (n => storage.SaveNote (n));
 					}
 
 				}

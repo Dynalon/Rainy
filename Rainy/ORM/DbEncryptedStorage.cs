@@ -26,7 +26,7 @@ namespace Rainy.Db
 		}
 		public virtual DbStorage GetDbStorage (IUser user) {
 			var db_user = new DBUser () { Username = user.Username };
-			return new DbStorage (connFactory, db_user.Username, useHistory);
+			return new DbStorage (connFactory, db_user.Username, db_user.Manifest, useHistory);
 		}
 	}
 	public class DbEncryptedStorageFactory : DbStorageFactory
@@ -62,7 +62,7 @@ namespace Rainy.Db
 		}
 
 		public DbEncryptedStorage (IDbConnectionFactory factory, DBUser user, string encryption_master_key,
-		                           bool use_history = true) : base (factory, user.Username, use_history)
+		                           bool use_history = true) : base (factory, user.Username, user.Manifest, use_history)
 		{
 			this.User = user;
 

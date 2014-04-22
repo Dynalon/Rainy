@@ -125,9 +125,7 @@ namespace Rainy
 				manifestPath = Path.Combine (storagePath, "manifest.xml");
 				if (File.Exists (manifestPath)) {	
 					string manifest_xml = File.ReadAllText (manifestPath);
-					var textreader = new StringReader (manifest_xml);
-					var xmlreader = new XmlTextReader (textreader);
-					Manifest = SyncManifest.Read (xmlreader);
+					Manifest = SyncManifest.Read(manifest_xml);
 				} else {
 					Manifest = new SyncManifest ();
 					Manifest.ServerId = Guid.NewGuid ().ToString ();
@@ -137,8 +135,8 @@ namespace Rainy
 			public void Dispose ()
 			{
 				// write back the manifest
-				using (var xmlwriter = new XmlTextWriter (this.manifestPath, Encoding.UTF8)) {
-					SyncManifest.Write (xmlwriter, this.Manifest);
+				using (var output_stream = new FileStream (this.manifestPath, FileMode.OpenOrCreate)) {
+					SyncManifest.Write (this.Manifest, output_stream);
 				}
 				userLocks [Username].Release ();
 			}

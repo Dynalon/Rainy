@@ -9,6 +9,8 @@ using System.Collections.Generic;
 using System.Linq;
 using Rainy.OAuth;
 using Rainy.WebService.OAuth;
+using Tomboy.OAuth;
+using Tomboy.Sync.Web;
 
 namespace Rainy.Tests.OAuth
 {
@@ -16,7 +18,7 @@ namespace Rainy.Tests.OAuth
 	public class OAuthTests : TestBase
 	{
 		[SetUp]
-		public void SetUp ()
+		public new void SetUp ()
 		{
 			testServer.Start ();
 		}
@@ -45,10 +47,10 @@ namespace Rainy.Tests.OAuth
 		{
 			// the actual unit under test is GetAccessToken, but we
 			// need it so often so it is its own method
-			IToken access_token = testServer.GetAccessToken ();
+			IOAuthToken access_token = testServer.GetAccessToken ();
 
 			Assert.That (access_token.Token.Length > 14);
-			Assert.That (access_token.TokenSecret.Length > 14);
+			Assert.That (access_token.Secret.Length > 14);
 		}
 		
 		// TODO implement way more security tests
@@ -68,7 +70,7 @@ namespace Rainy.Tests.OAuth
 			} catch (Exception e) {
 				caught_exception = e;
 			} finally {
-				Assert.AreEqual ("Unauthorized", caught_exception.Message);
+				Assert.That (caught_exception.Message.Contains ("Unauthorized"));
 			}
 		}
 

@@ -126,6 +126,9 @@ namespace Rainy
 		#region IDataBackend implementation
 		public INoteRepository GetNoteRepository (IUser user)
 		{
+			if (user == null)
+				throw new ArgumentNullException ("user");
+
 			var rep = new DatabaseNoteRepository (connFactory, storageFactory, user);
 			return rep;
 		}

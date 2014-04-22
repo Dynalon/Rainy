@@ -49,9 +49,9 @@ namespace Rainy.Tests.Db
 			return new DTONote () {
 				Title = "My sämple title",
 				Text = "My sample text",
-				CreateDate = DateTime.Now.ToString (Tomboy.Writer.DATE_TIME_FORMAT),
-				MetadataChangeDate = DateTime.Now.ToString (Tomboy.Writer.DATE_TIME_FORMAT),
-				ChangeDate = DateTime.Now.ToString (Tomboy.Writer.DATE_TIME_FORMAT),
+				CreateDate = DateTime.Now.ToString (Tomboy.Xml.XmlSettings.DATE_TIME_FORMAT),
+				MetadataChangeDate = DateTime.Now.ToString (Tomboy.Xml.XmlSettings.DATE_TIME_FORMAT),
+				ChangeDate = DateTime.Now.ToString (Tomboy.Xml.XmlSettings.DATE_TIME_FORMAT),
 				OpenOnStartup = true,
 				Pinned = false,
 				Tags = new string[] { "school", "fun", "shopping" },

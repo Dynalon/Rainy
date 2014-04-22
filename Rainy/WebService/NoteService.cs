@@ -55,7 +55,7 @@ namespace Rainy.WebService
 
 		public GetSingleNoteResponse Get (GetSingleNoteRequest request) 
 		{
-			List<DTONote> ret = new List<DTONote> ();
+			IList<DTONote> ret = new List<DTONote> ();
 			using (var note_repo = GetNotes ()) {
 				var notes = note_repo.Engine.GetNotes ();
 				if (!notes.ContainsKey (request.Guid)) {
@@ -63,9 +63,7 @@ namespace Rainy.WebService
 					throw new InvalidRequestDtoException ();
 				}
 				ret.Add (notes[request.Guid].ToDTONote ());
-				var gnr = new GetSingleNoteResponse ();
-				gnr.Notes = ret;
-				return gnr;
+				return new GetSingleNoteResponse { Note = ret };
 			}
 
 		}

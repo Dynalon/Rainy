@@ -111,13 +111,27 @@ namespace Rainy.OAuth
 		public static DBAccessToken ToDBAccessToken (this IToken token)
 		{
 			var db_token = new DBAccessToken ();
-			db_token.PopulateWith (token);
+			db_token.Token = token.Token;
+			db_token.Secret = token.TokenSecret;
+			db_token.ConsumerKey = token.ConsumerKey;
+			db_token.Realm = token.Realm;
+			if (token is AccessToken) {
+				db_token.UserName = ((AccessToken)token).UserName;
+				db_token.ExpiryDate = ((AccessToken)token).ExpiryDate;
+				db_token.Roles = ((AccessToken)token).Roles;
+			}
 			return db_token;
 		}
 		public static IToken ToAccessToken (this DBAccessToken token)
 		{
 			var access_token = new AccessToken();
-			access_token.PopulateWith (token);
+			access_token.ConsumerKey = token.ConsumerKey;
+			access_token.TokenSecret = token.Secret;
+			access_token.Token = token.Token;
+			access_token.Realm = token.Realm;
+			access_token.Roles = token.Roles;
+			access_token.UserName = token.UserName;
+			access_token.ExpiryDate = token.ExpiryDate;
 			return access_token;
 		}
 		public static DBRequestToken ToDBRequestToken (this IToken token)

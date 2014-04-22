@@ -74,9 +74,9 @@ namespace Rainy.Tests
 			dto_note.Title = "This is a sample note";
 			dto_note.Text = "This is some sample text";
 			
-			dto_note.ChangeDate = DateTime.Now.ToString (Tomboy.Writer.DATE_TIME_FORMAT);
-			dto_note.MetadataChangeDate = DateTime.Now.ToString (Tomboy.Writer.DATE_TIME_FORMAT);
-			dto_note.CreateDate = DateTime.Now.ToString (Tomboy.Writer.DATE_TIME_FORMAT);
+			dto_note.ChangeDate = DateTime.Now.ToString (Tomboy.Xml.XmlSettings.DATE_TIME_FORMAT);
+			dto_note.MetadataChangeDate = DateTime.Now.ToString (Tomboy.Xml.XmlSettings.DATE_TIME_FORMAT);
+			dto_note.CreateDate = DateTime.Now.ToString (Tomboy.Xml.XmlSettings.DATE_TIME_FORMAT);
 			
 			var tomboy_note = dto_note.ToTomboyNote ();
 			
