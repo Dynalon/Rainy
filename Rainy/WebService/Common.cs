@@ -1,20 +1,54 @@
-using ServiceStack.ServiceInterface;
-using log4net;
 using System;
-using ServiceStack.ServiceHost;
-using Rainy.WebService.OAuth;
+using System.IO;
 using System.Linq;
+using System.Net;
+using DevDefined.OAuth.Storage.Basic;
+using JsonConfig;
+using Rainy.Db;
+using ServiceStack.Common.Web;
+using ServiceStack.OrmLite;
+using ServiceStack.ServiceHost;
+using ServiceStack.ServiceInterface;
 using ServiceStack.Text;
+using ServiceStack.WebHost.Endpoints;
+using ServiceStack.WebHost.Endpoints.Extensions;
+using log4net;
+using Rainy.Crypto;
 using Rainy.Interfaces;
 using Rainy.OAuth;
-using ServiceStack.OrmLite;
-using DevDefined.OAuth.Storage.Basic;
-using Rainy.Crypto;
-using Rainy.Db;
-using JsonConfig;
+using Rainy.WebService.OAuth;
+using ServiceStack;
 
 namespace Rainy.WebService
 {
+	public class PreventChunkedTransferEncodingResponseFilter : Attribute, IHasResponseFilter {
+		#region IHasResponseFilter implementation
+		public void ResponseFilter (IHttpRequest req, IHttpResponse res, object responseDto)
+		{
+			using (var ms = new MemoryStream())
+			{
+				EndpointHost.ContentTypeFilter.SerializeToStream(
+					new SerializationContext(req.ResponseContentType), responseDto, ms);
+
+				var bytes = ms.ToArray();
+
+				var listenerResponse = (HttpListenerResponse)res.OriginalResponse;
+				listenerResponse.SendChunked = false;
+				listenerResponse.ContentLength64 = bytes.Length;
+				listenerResponse.OutputStream.Write(bytes, 0, bytes.Length);
+				res.EndRequest ();
+			}
+		}
+		public IHasResponseFilter Copy ()
+		{
+			return this;
+		}
+		// this filter prevents any filters afterwards from running so make it min priority to
+		// assert it runs last
+		public int Priority { get { return 100; } }
+		#endregion
+	}
+
 	public class RequestLogFilterAttribute : Attribute, IHasRequestFilter
 	{
 		protected ILog Logger;
@@ -92,6 +126,7 @@ namespace Rainy.WebService
 
 	[RequestLogFilter]
 	[ResponseLogFilter]
+	[PreventChunkedTransferEncodingResponseFilter]
 	public abstract class ServiceBase : Service
 	{
 		protected IDbConnectionFactory connFactory;
@@ -152,7 +187,6 @@ namespace Rainy.WebService
 
 	public static class ResponseShortcuts
 	{
-
 		public static void HttpCreated (this IHttpResponse response, IHttpRequest request, string location = null)
 		{
 			response.StatusCode = 204;
