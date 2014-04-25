@@ -167,18 +167,7 @@ namespace Rainy
 				return (IAdminAuthenticator)admin_auth;
 			});
 
-			container.Register<IDbStorageFactory> (c => {
-				var conn_factory = c.Resolve<IDbConnectionFactory> ();
-
-				IDbStorageFactory storage_factory;
-				bool use_encryption = true;
-				if (use_encryption)
-					storage_factory = new DbEncryptedStorageFactory (conn_factory, use_history: true);
-				else
-					storage_factory = new DbStorageFactory (conn_factory, use_history: true);
-
-				return (IDbStorageFactory) storage_factory;
-			});
+			RegisterStorageFactory (container, false);
 
 			container.Register<IDataBackend> (c => {
 				var conn_factory = c.Resolve<IDbConnectionFactory> ();
@@ -205,6 +194,19 @@ namespace Rainy
 
 			// HACK so the user is inserted when a fixture SetUp is run
 			container.Resolve<IAuthenticator> ();
+		}
+
+		static void RegisterStorageFactory (Funq.Container container, bool use_encryption)
+		{
+			container.Register<IDbStorageFactory> (c =>  {
+				var conn_factory = c.Resolve<IDbConnectionFactory> ();
+				IDbStorageFactory storage_factory;
+				if (use_encryption)
+					storage_factory = new DbEncryptedStorageFactory (conn_factory, use_history: true);
+				else
+					storage_factory = new DbStorageFactory (conn_factory, use_history: true);
+				return (IDbStorageFactory)storage_factory;
+			});
 		}
 
 		public JsonServiceClient GetJsonClient ()

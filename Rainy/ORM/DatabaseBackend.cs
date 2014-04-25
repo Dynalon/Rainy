@@ -168,12 +168,10 @@ namespace Rainy
 		{
 			storage.Dispose ();
 
-			// TODO why is this needed? find a better way...
-			// write back the user
+			// write back the user's Manifest which has likely changed
 			using (var db = connFactory.OpenDbConnection ()) {
 				using (var trans = db.OpenTransaction ()) {
-					db.Delete (dbUser);
-					db.Insert (dbUser);
+					db.UpdateOnly (dbUser, u => u.Manifest, u => u.Username == dbUser.Username);
 					trans.Commit ();
 				}
 			}

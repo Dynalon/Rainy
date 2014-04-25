@@ -164,7 +164,7 @@ namespace Rainy.WebService
 				var full_auth_token = (string) base_req.Items["AccessToken"];
 
 				// for now, encryption is always enabled
-				if (true ||JsonConfig.Config.Global.UseNoteEncryption) {
+				if (JsonConfig.Config.Global.UseNoteEncryption) {
 
 					DBUser db_user;
 					using (var db = connFactory.OpenDbConnection ()) {

@@ -25,7 +25,12 @@ namespace Rainy.Db
 			this.connFactory = conn_factory;
 		}
 		public virtual DbStorage GetDbStorage (IUser user) {
-			var db_user = new DBUser () { Username = user.Username };
+			DBUser db_user;
+			using (var db = connFactory.OpenDbConnection ()) {
+				db_user = db.First<DBUser> (u => u.Username == user.Username);
+				if (db_user == null)
+					throw new ArgumentException (user.Username);
+			}
 			return new DbStorage (connFactory, db_user.Username, db_user.Manifest, useHistory);
 		}
 	}
