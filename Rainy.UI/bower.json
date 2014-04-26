@@ -14,5 +14,8 @@
     "noty": "~2.1.0",
     "wysihtml5": "~0.3.0",
     "bootstrap-wysihtml5": "*"
+  },
+  "resolutions": {
+    "bootstrap": ">=2.0.4 <3.0"
   }
 }
