@@ -21,6 +21,11 @@ using ServiceStack;
 
 namespace Rainy.WebService
 {
+	/// <summary>
+	/// This is an ugly hack to prevent chunked transfer encoding which tomboy on linux has sometimes problem with.
+	/// We prevent the usual ServiceStack pipeline from running; instead the last response filter closes the connection.
+	/// This is bad, as we for example have to override the ContentType which would else be configured through SS.
+	/// </summary>
 	public class PreventChunkedTransferEncodingResponseFilter : Attribute, IHasResponseFilter {
 		#region IHasResponseFilter implementation
 		public void ResponseFilter (IHttpRequest req, IHttpResponse res, object responseDto)
@@ -33,9 +38,11 @@ namespace Rainy.WebService
 				var bytes = ms.ToArray();
 
 				var listenerResponse = (HttpListenerResponse)res.OriginalResponse;
+				listenerResponse.ContentType = "application/json";
 				listenerResponse.SendChunked = false;
 				listenerResponse.ContentLength64 = bytes.Length;
 				listenerResponse.OutputStream.Write(bytes, 0, bytes.Length);
+
 				res.EndRequest ();
 			}
 		}
