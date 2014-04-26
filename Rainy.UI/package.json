@@ -9,6 +9,5 @@
     "grunt-contrib-watch": ">=0.2.0rc7",
     "grunt-reload": "git://github.com/webxl/grunt-reload.git",
     "grunt-contrib-jshint": "~0.6.2",
-    "bower": "~1.2.6"
   }
 }
