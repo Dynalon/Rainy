@@ -93,6 +93,6 @@ module.exports = function (grunt) {
     grunt.loadNpmTasks('grunt-reload');
 
     // Default task.
-    grunt.registerTask('default', ['concat', 'copy', 'reload', 'jshint', 'watch']);
-
+    grunt.registerTask('default', ['concat', 'copy', 'jshint' ]);
+    grunt.registerTask('devel', [ 'reload', 'watch' ]);
 };
