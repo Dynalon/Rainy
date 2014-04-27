@@ -259,9 +259,10 @@ namespace Rainy
 						Username = "dummy",
 						EncryptionMasterKey = key.ToHexString ()
 					};
+					// populate with note test cases taken from Tomdroid
+					// these notes will fail Tomboy...
 					using (var storage = f.GetDbStorage (r)) {
-						var sample_notes = new DiskStorage ();
-						sample_notes.SetPath ("../../../sample_notes/");
+						var sample_notes = new DiskStorage ("../../../sample_notes/");
 						sample_notes.GetNotes ().Values.ToList ().ForEach (n => storage.SaveNote (n));
 					}
 
