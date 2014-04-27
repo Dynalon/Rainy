@@ -1,23 +1,20 @@
 using System;
 using System.IO;
-using System.Linq;
 using System.Net;
 using DevDefined.OAuth.Storage.Basic;
-using JsonConfig;
 using Rainy.Db;
+using ServiceStack;
 using ServiceStack.Common.Web;
 using ServiceStack.OrmLite;
 using ServiceStack.ServiceHost;
 using ServiceStack.ServiceInterface;
 using ServiceStack.Text;
 using ServiceStack.WebHost.Endpoints;
-using ServiceStack.WebHost.Endpoints.Extensions;
 using log4net;
 using Rainy.Crypto;
 using Rainy.Interfaces;
 using Rainy.OAuth;
 using Rainy.WebService.OAuth;
-using ServiceStack;
 
 namespace Rainy.WebService
 {
@@ -26,7 +23,7 @@ namespace Rainy.WebService
 	/// We prevent the usual ServiceStack pipeline from running; instead the last response filter closes the connection.
 	/// This is bad, as we for example have to override the ContentType which would else be configured through SS.
 	/// </summary>
-	public class PreventChunkedTransferEncodingResponseFilter : Attribute, IHasResponseFilter {
+	public class PreventChunkedTransferEncodingResponseFilterAttribute : Attribute, IHasResponseFilter {
 		#region IHasResponseFilter implementation
 		public void ResponseFilter (IHttpRequest req, IHttpResponse res, object responseDto)
 		{
@@ -133,7 +130,7 @@ namespace Rainy.WebService
 
 	[RequestLogFilter]
 	[ResponseLogFilter]
-	[PreventChunkedTransferEncodingResponseFilter]
+	[PreventChunkedTransferEncodingResponseFilterAttribute]
 	public abstract class ServiceBase : Service
 	{
 		protected IDbConnectionFactory connFactory;
