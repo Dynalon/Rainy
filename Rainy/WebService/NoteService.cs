@@ -151,10 +151,10 @@ namespace Rainy.WebService
 					// TODO sanitize LatestSyncRevision sent by client - we don't need it to update notes
 					// but a wrong LatestSyncRevision may be an indicator for a bug in the client
 
-					//if (new_sync_rev != note_repo.Manifest.LatestSyncRevision + 1)
-					//	throw new Exception ("Sync revisions differ by more than one, sth went wrong");
+					bool notes_were_deleted_or_uploaded = false;
 
 					foreach (var dto_note in request.Notes) {
+						notes_were_deleted_or_uploaded = true;
 						// map from the DTO 
 						if (notes_as_html) {
 							dto_note.Text = dto_note.Text.ToTomboyXml ();
@@ -170,13 +170,13 @@ namespace Rainy.WebService
 							note_repo.Engine.SaveNote (note, false);
 						}
 					}
-
-					// only update the sync revision if changes were sent
-					if (request.Notes.Count > 0)
-						note_repo.Manifest.LastSyncRevision = new_sync_rev;
-
 					var notes_to_return = NotesService.GetStoredNotes (note_repo);
-					notes_to_return.LatestSyncRevision = new_sync_rev;
+
+					if (notes_were_deleted_or_uploaded) {
+						note_repo.Manifest.LastSyncRevision = new_sync_rev;
+						note_repo.Manifest.LastSyncDate = DateTime.UtcNow;
+						notes_to_return.LatestSyncRevision = new_sync_rev;
+					}
 					return notes_to_return;
 				}
 			} catch (Exception e) {
