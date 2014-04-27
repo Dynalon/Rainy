@@ -6,7 +6,7 @@ SHELL=/bin/bash
 MONO=$(shell which mono)
 XBUILD=$(shell which xbuild)
 
-#XBUILD_ARGS='/p:TargetFrameworkProfile=""'
+XBUILD_ARGS='/p:Configuration=Release'
 MKBUNDLE=$(shell which mkbundle)
 
 UNPACKED_EXE=$(BINDIR)/Rainy.exe
