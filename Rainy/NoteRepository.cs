@@ -117,8 +117,7 @@ namespace Rainy
 					Directory.CreateDirectory (storagePath);
 				}
 
-				var disk_storage = new DiskStorage ();
-				disk_storage.SetPath (storagePath);
+				var disk_storage = new DiskStorage (storagePath);
 				Engine = new Engine (storage);
 
 				// read in data from "manifest" file
