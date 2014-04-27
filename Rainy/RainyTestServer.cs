@@ -171,7 +171,7 @@ namespace Rainy
 
 			container.Register<IDataBackend> (c => {
 				var conn_factory = c.Resolve<IDbConnectionFactory> ();
-				var storage_factory = c.Resolve<IDbStorageFactory> ();
+				var storage_factory = c.Resolve<DbStorageFactory> ();
 				var auth = c.Resolve<IAuthenticator> ();
 				var handler = c.Resolve<OAuthHandler> ();
 				return new DatabaseBackend (conn_factory, storage_factory, auth, handler);
@@ -198,14 +198,14 @@ namespace Rainy
 
 		static void RegisterStorageFactory (Funq.Container container, bool use_encryption)
 		{
-			container.Register<IDbStorageFactory> (c =>  {
+			container.Register<DbStorageFactory> (c =>  {
 				var conn_factory = c.Resolve<IDbConnectionFactory> ();
-				IDbStorageFactory storage_factory;
+				DbStorageFactory storage_factory;
 				if (use_encryption)
-					storage_factory = new DbEncryptedStorageFactory (conn_factory, use_history: true);
+					storage_factory = new DbStorageFactory (conn_factory, use_encryption: true, use_history: true);
 				else
-					storage_factory = new DbStorageFactory (conn_factory, use_history: true);
-				return (IDbStorageFactory)storage_factory;
+					storage_factory = new DbStorageFactory (conn_factory, use_encryption: false, use_history: true);
+				return storage_factory;
 			});
 		}
 

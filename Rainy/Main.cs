@@ -200,18 +200,17 @@ namespace Rainy
 					return handler;
 				});
 
-				container.Register<IDbStorageFactory> (c => {
+				container.Register<DbStorageFactory> (c => {
 					var conn_factory = c.Resolve<IDbConnectionFactory> ();
+					bool use_encryption = (bool) Config.Global.UseNoteEncryption;
 
-					IDbStorageFactory storage_factory;
-					storage_factory = new DbEncryptedStorageFactory (conn_factory, use_history: true);
-
-					return (IDbStorageFactory) storage_factory;
+					var storage_factory = new DbStorageFactory (conn_factory, use_encryption, use_history: true);
+					return storage_factory;
 				});
 
 				container.Register<IDataBackend> (c => {
 					var conn_factory = c.Resolve<IDbConnectionFactory> ();
-					var storage_factory = c.Resolve<IDbStorageFactory> ();
+					var storage_factory = c.Resolve<DbStorageFactory> ();
 					var handler = c.Resolve<OAuthHandler> ();
 					var auth = c.Resolve<IAuthenticator> ();
 					return new DatabaseBackend (conn_factory, storage_factory, auth, handler);
@@ -253,7 +252,7 @@ namespace Rainy
 					user.EmailAddress = "dummy@doe.com";
 					db.Insert<DBUser> (user);
 					// insert some sample notes
-					var f = container.Resolve<IDbStorageFactory> ();
+					var f = container.Resolve<DbStorageFactory> ();
 					var key = user.GetPlaintextMasterKey ("foobar123");
 					var r = new RequestingUser {
 						Username = "dummy",

@@ -69,9 +69,9 @@ namespace Rainy
 	public class DatabaseBackend : DbAccessObject, IDataBackend
 	{
 		OAuthHandler oauthHandler;
-		IDbStorageFactory storageFactory;
+		DbStorageFactory storageFactory;
 
-		public DatabaseBackend (IDbConnectionFactory conn_factory, IDbStorageFactory storage_factory, IAuthenticator auth,
+		public DatabaseBackend (IDbConnectionFactory conn_factory, DbStorageFactory storage_factory, IAuthenticator auth,
 		                        OAuthHandler handler) : base (conn_factory)
 		{
 			oauthHandler = handler;
@@ -148,7 +148,7 @@ namespace Rainy
 		private Engine engine;
 		private DBUser dbUser;
 
-		public DatabaseNoteRepository (IDbConnectionFactory factory, IDbStorageFactory storageFactory, IUser user) : base (factory)
+		public DatabaseNoteRepository (IDbConnectionFactory factory, DbStorageFactory storageFactory, IUser user) : base (factory)
 		{
 			this.storage = storageFactory.GetDbStorage (user);
 			engine = new Engine (storage);
