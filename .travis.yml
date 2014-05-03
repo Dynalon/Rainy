@@ -3,18 +3,14 @@ language: c
 env:
   - BUILD_TYPE=Release MONO_PREFIX="/opt/mono-3" MONO_GAC_PREFIX="/opt/mono-3" LD_LIBRARY_PATH="/opt/mono-3/lib" C_INCLUDE_PATH="/opt/mono-3/include" ACLOCAL_PATH="/opt/mono-3/share/aclocal" PKG_CONFIG_PATH="/opt/mono-3/lib/pkg-config:$PKG_CONFIG_PATH" PATH="/opt/mono-3/bin:$PATH"
 
-
 before_install:
   - sudo add-apt-repository ppa:keks9n/monodevelop-latest -y
   - sudo apt-get update -qq -y
-#  - sudo apt-get install build-essentials automake autoconf m4
   - sudo apt-get install mono-3-opt monodevelop-latest git automake autoconf m4
-
-#before_script:
-  # Configure with CMake
 
 script:
   # Build
   - mono --version
   - mozroots --import --sync
-  - make
+  - make nightly
+  - tools/upload-nightly.sh

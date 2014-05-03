@@ -5,6 +5,9 @@ RELEASEDIR=$(shell pwd)/release
 SHELL=/bin/bash
 MONO=$(shell which mono)
 XBUILD=$(shell which xbuild)
+LATEST_MASTER_COMMIT=$(shell git log -n 1 |head -n 1 | cut -f 2 -d ' ' |head -c 6)
+NIGHTLY_DIR=rainy-nightly-$(LATEST_MASTER_COMMIT)
+NIGHTLY_ZIP=rainy-nightly.zip
 
 XBUILD_ARGS='/p:Configuration=Release'
 MKBUNDLE=$(shell which mkbundle)
@@ -64,7 +67,11 @@ build: checkout deps
 release: clean pack
 	cp -R $(RELEASEDIR) $(ZIPDIR)
 	zip -r $(ZIPDIR).zip $(ZIPDIR)
-	
+
+nightly: clean pack
+	cp -R $(RELEASEDIR) $(NIGHTLY_DIR)
+	zip -r $(NIGHTLY_ZIP) $(NIGHTLY_DIR)
+
 # statically linked binary
 # does not require mono but will be > 13MB of size
 linux_bundle: pack
@@ -81,6 +88,8 @@ clean:
 	rm -rf $(ZIPDIR)
 	rm -rf $(ZIPDIR).zip
 	rm -rf $(BINDIR)/*
+	rm -rf $(NIGHTLY_DIR)
+	rm -rf $(NIGHTLY_ZIP)
 	rm -rf $(RELEASEDIR)/*.exe
 	rm -rf $(RELEASEDIR)/*.mdb
 	rm -rf $(RELEASEDIR)/data/
