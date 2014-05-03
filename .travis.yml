@@ -1,8 +1,7 @@
 language: c
 
 env:
-#   - BUILD_TYPE=Release MONO_PREFIX="/opt/mono" MONO_GAC_PREFIX="/opt/mono" LD_LIBRARY_PATH="/opt/mono/lib" C_INCLUDE_PATH="/opt/mono/include" ACLOCAL_PATH="/opt/mono/share/aclocal" PKG_CONFIG_PATH="/opt/mono/lib/pkg-config:$PKG_CONFIG_PATH" PATH="/opt/mono/bin:$PATH"
-   - BUILD_TYPE=Release
+  - BUILD_TYPE=Release
 
 before_install:
   - sudo add-apt-repository ppa:keks9n/monodevelop-latest -y
