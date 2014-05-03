@@ -7,15 +7,15 @@ before_install:
   - sudo add-apt-repository ppa:keks9n/monodevelop-latest -y
   - sudo apt-get update -qq -y
 #  - sudo apt-get install build-essentials automake autoconf m4
-  - sudo apt-get install monodevelop-latest git automake autoconf m4
+  - sudo apt-get install mono-3-opt monodevelop-latest git automake autoconf m4
 
 #before_script:
   # Configure with CMake
 
 script:
   # Build
+  - ls /opt
   - ls -ailF /opt
   - ls -ailF /opt/mono/
-  - source /opt/mono/env.sh
   - mozroots --import --sync
   - make
