@@ -1,6 +1,6 @@
 RELEASEVER=0.5.0
 ZIPDIR=rainy-$(RELEASEVER)
-BINDIR=$(shell pwd)/Rainy/bin/Debug
+BINDIR=$(shell pwd)/Rainy/bin/Release
 RELEASEDIR=$(shell pwd)/release
 SHELL=/bin/bash
 MONO=$(shell which mono)
