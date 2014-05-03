@@ -15,7 +15,7 @@ before_install:
 script:
   # Build
   - ls /opt
-  - ls -ailF /opt
-  - ls -ailF /opt/mono/
+  - ls /opt/mono-3
+  - source /opt/mono-3/env.sh
   - mozroots --import --sync
   - make
