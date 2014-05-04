@@ -15,6 +15,7 @@ For install and setup instructions, look at the [getting started guide](GETTING_
 Nightly builds
 ---------------
 
+[![Travis build status](https://api.travis-ci.org/Dynalon/Rainy.png?branch=master)]()
 Nightly builds are auto-created by the awesome [Travis Continous Integration Service](http://www.travis-ci.org) from the latest git `master` branch. Nightly builds are unstable and untested, **use at your own risk**!
 
 ### [Download latest nightly build](http://dynalon.github.io/Rainy/nightly/rainy-nightly.zip)
