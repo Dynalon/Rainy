@@ -1,8 +1,8 @@
 language: c
 
 env:
+  - BUILD_TYPE=Release MONO_PREFIX="/opt/mono-3" MONO_GAC_PREFIX="/opt/mono-3" LD_LIBRARY_PATH="/opt/mono-3/lib" C_INCLUDE_PATH="/opt/mono-3/include" ACLOCAL_PATH="/opt/mono-3/share/aclocal" PKG_CONFIG_PATH="/opt/mono-3/lib/pkg-config:$PKG_CONFIG_PATH" PATH="/opt/mono-3/bin:$PATH"
   global:
-    - BUILD_TYPE=Release MONO_PREFIX="/opt/mono-3" MONO_GAC_PREFIX="/opt/mono-3" LD_LIBRARY_PATH="/opt/mono-3/lib" C_INCLUDE_PATH="/opt/mono-3/include" ACLOCAL_PATH="/opt/mono-3/share/aclocal" PKG_CONFIG_PATH="/opt/mono-3/lib/pkg-config:$PKG_CONFIG_PATH" PATH="/opt/mono-3/bin:$PATH"
     secure: "Behp6hypJOXg+pnyQjpmA7DM8nL9gds4eYDjcJiZXSARMNqRYKzNMs38w6XVCH31H78W48RI4eM2gI0Yj4JWMbr/ThDstUzYJsgCiIyKbH/l6SJGOpEeBI48KZzP6XF58FiqRIPhv+6NUhW/z0TeYHbZ4t4094F7ZIOyc3BzQI0=" 
 
 before_install:
