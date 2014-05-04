@@ -1,18 +1,18 @@
 language: c
-
 env:
-  - BUILD_TYPE=Release MONO_PREFIX="/opt/mono-3" MONO_GAC_PREFIX="/opt/mono-3" LD_LIBRARY_PATH="/opt/mono-3/lib" C_INCLUDE_PATH="/opt/mono-3/include" ACLOCAL_PATH="/opt/mono-3/share/aclocal" PKG_CONFIG_PATH="/opt/mono-3/lib/pkg-config:$PKG_CONFIG_PATH" PATH="/opt/mono-3/bin:$PATH"
+  matrix:
+  - BUILD_TYPE=Release MONO_PREFIX="/opt/mono-3" MONO_GAC_PREFIX="/opt/mono-3" LD_LIBRARY_PATH="/opt/mono-3/lib"
+    C_INCLUDE_PATH="/opt/mono-3/include" ACLOCAL_PATH="/opt/mono-3/share/aclocal"
+    PKG_CONFIG_PATH="/opt/mono-3/lib/pkg-config:$PKG_CONFIG_PATH" PATH="/opt/mono-3/bin:$PATH"
   global:
-    secure: "Behp6hypJOXg+pnyQjpmA7DM8nL9gds4eYDjcJiZXSARMNqRYKzNMs38w6XVCH31H78W48RI4eM2gI0Yj4JWMbr/ThDstUzYJsgCiIyKbH/l6SJGOpEeBI48KZzP6XF58FiqRIPhv+6NUhW/z0TeYHbZ4t4094F7ZIOyc3BzQI0=" 
+    secure: pbIk21KizgGZThZ0GyDSd5NoADjvD9Kgs5+jqIRFd3yHjxQuGuyZR8zhpWoEQZrd2BXRBWBk5A8c7QTcxmf3zNvQOfxR8akwVy3UiiqEIeKmmFB7v5jNJjcfi5Gma/h6Dv+HqE4EWAlcDdauSRP5ePsX/Le0YH50Oy2lcN3xMTM=
 
 before_install:
-  - sudo add-apt-repository ppa:keks9n/monodevelop-latest -y
-  - sudo apt-get update -qq -y
-  - sudo apt-get install mono-3-opt monodevelop-latest git automake autoconf m4
-
+- sudo add-apt-repository ppa:keks9n/monodevelop-latest -y
+- sudo apt-get update -qq -y
+- sudo apt-get install mono-3-opt monodevelop-latest git automake autoconf m4
 script:
-  # Build
-  - mono --version
-  - mozroots --import --sync
-  - make nightly
-  - tools/upload-nightly.sh
+- mono --version
+- mozroots --import --sync
+- make nightly
+- tools/upload-nightly.sh
