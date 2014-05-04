@@ -10,7 +10,7 @@ git config --global user.name "TravisCI"
 
 echo -e "Updating Rainy website with latest nightly build"
 
-git clone --quiet --branch=gh-pages https://${GH_TOKEN}@github.com/Dynalon/rainy.git $HOME/rainy-wiki > /dev/null
+git clone --quiet --branch=gh-pages https://${GH_TOKEN}@github.com/Dynalon/Rainy.git $HOME/rainy-wiki > /dev/null
 cp rainy-nightly.zip $HOME/rainy-wiki/nightly/
 cd $HOME/rainy-wiki
 git add nightly/rainy-nightly.zip
