@@ -1,5 +1,8 @@
 #!/bin/bash
 
+# fail on first error
+
+set -e
 # don't do anything on pull requests
 if [ "$TRAVIS_PULL_REQUEST" != "false" ]; then
     exit 0
