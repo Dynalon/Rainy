@@ -73,6 +73,7 @@ namespace Rainy.ErrorHandling
 			ILog logger = LogManager.GetLogger (typeof(ExceptionHandler));
 
 			// create appropriate response
+			// don't even think about turning this into a switch statement - won't work!
 			if (e is UnauthorizedException) {
 				var ex = (UnauthorizedException) e;
 				//logger.Debug (ex.ErrorMessage);
@@ -103,7 +104,7 @@ namespace Rainy.ErrorHandling
 				logger.Debug (e.Message);
 				LogExceptionDetails (logger, e);
 				response.StatusCode = 500;
-				response.StatusDescription = "Internal server error.";
+				response.StatusDescription = "Internal server error: " + e.Message;
 			}
 			// display nice message if viewed in browser
 			if (request.AcceptTypes.Contains ("text/html")) {
