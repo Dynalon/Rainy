@@ -20,12 +20,14 @@
     <Optimize>true</Optimize>
     <OutputPath>bin\Release</OutputPath>
     <WarningLevel>4</WarningLevel>
+    <Commandlineparameters>-c ../../settings.conf -vvvv</Commandlineparameters>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <Optimize>false</Optimize>
     <OutputPath>bin\Debug</OutputPath>
     <WarningLevel>4</WarningLevel>
     <DefineConstants>DEBUG</DefineConstants>
+    <Commandlineparameters>-c ../../settings.conf -vvvv</Commandlineparameters>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="System" />
