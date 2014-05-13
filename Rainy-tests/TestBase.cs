@@ -32,6 +32,8 @@ namespace Rainy.Tests
 	public abstract class TestBase
 	{
 		protected RainyTestServer testServer;
+		protected string adminPass;
+		protected string listenUrl;
 
 		public TestBase ()
 		{
@@ -41,6 +43,8 @@ namespace Rainy.Tests
 		public virtual void SetUp ()
 		{
 			testServer = new RainyTestServer ();
+			adminPass = RainyTestServer.ADMIN_TEST_PASS;
+			listenUrl = testServer.ListenUrl;
 		}
 		[TearDown]
 		public virtual void TearDown ()
@@ -52,7 +56,7 @@ namespace Rainy.Tests
 		{
 			var client = new JsonServiceClient (testServer.ListenUrl);
 			client.LocalHttpWebRequestFilter += (request) => {
-				request.Headers.Add ("Authority", RainyTestServer.ADMIN_TEST_PASS);
+					request.Headers.Add ("Authority", adminPass);
 			};
 
 			return client;

@@ -105,6 +105,9 @@ namespace Rainy.WebService.Management.Admin
 
 			if (string.IsNullOrEmpty (user.Password))
 				throw new InvalidRequestDtoException { ErrorMessage = "Password was empty" };
+
+			if (string.IsNullOrEmpty (user.EmailAddress))
+				throw new InvalidRequestDtoException { ErrorMessage = "Emailaddress was empty" };
 			
 			// TODO move into RequestFilter
 			if (! (user.Username.IsOnlySafeChars ()

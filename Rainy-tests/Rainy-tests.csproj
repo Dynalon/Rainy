@@ -33,6 +33,8 @@
     <Optimize>false</Optimize>
     <OutputPath>bin\Testing</OutputPath>
     <WarningLevel>4</WarningLevel>
+    <DebugSymbols>true</DebugSymbols>
+    <DefineConstants>DEBUG</DefineConstants>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="System" />
@@ -101,6 +103,7 @@
     <Compile Include="ORM\Postgres\DbEncryptedStorageTestsPostgres.cs" />
     <Compile Include="ORM\Postgres\DbStorageTestsPostgres.cs" />
     <Compile Include="ORM\Sqlite\PublicNoteShareTestsSqlite.cs" />
+    <Compile Include="Admin\DemoServerAccess.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <ItemGroup>
