@@ -93,6 +93,8 @@ namespace Rainy.Tests
 		
 				var user = new DTOUser { Username = username, Password = password };
 				user.EmailAddress = username + "@example.com";
+				user.IsActivated = true;
+				user.IsVerified = true;
 
 				var user_url = new UserRequest ().ToUrl ("POST");
 				adminClient.Post<UserRequest> (user_url, user);

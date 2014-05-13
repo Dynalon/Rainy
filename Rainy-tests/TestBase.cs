@@ -54,7 +54,7 @@ namespace Rainy.Tests
 
 		protected JsonServiceClient GetAdminServiceClient ()
 		{
-			var client = new JsonServiceClient (testServer.ListenUrl);
+			var client = new JsonServiceClient (listenUrl);
 			client.LocalHttpWebRequestFilter += (request) => {
 					request.Headers.Add ("Authority", adminPass);
 			};
