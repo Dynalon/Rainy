@@ -1,4 +1,4 @@
-Rainy public hosted cloud server
+Rainy public hosted demo server
 ================================
 
 ## About
@@ -9,13 +9,11 @@ Since this is for testing purposes only, there are no private account registrati
 
   [restapi]: https://live.gnome.org/Tomboy/Synchronization/REST
 
-Attention: The public testserver is running on my RaspberryPi at home, so bandwidth as well as CPU power is limited.
-
 ## HTML5 WebGUI
 
 To use the HTML5/Javascript based in-browser client, use any of belows username/password pairs and follow this link:
 
-[Open Testserver with Web GUI](https://rpi.orion.latecrew.de/)
+[Open Demoserver with Web GUI](https://rainy-demoserver.latecrew.de/)
 
 Note: You will have to add a security exception for the SSL certification, as the test server does not use an expensive CA signed certificate but a self-signed one.
 
@@ -23,7 +21,7 @@ Note: You will have to add a security exception for the SSL certification, as th
 
 Pick a username/password combination below, and then use this URL in Tomboy/Tomdroid as a sync url:
 
-	https://rpi.orion.latecrew.de/
+	https://rainy-demoserver.latecrew.de/
 
 You will have to enter the username/password pair later, after you added this server in Tomboy/Tomdroid.
 
@@ -31,7 +29,7 @@ Note: Double-check you enter _HTTPS_ (with a trailing 's'), as using _HTTP_ will
 
 You can also use unattended authentication by appending `/<username>/<password>/` to the Url:
 
-	https://rpi.orion.latecrew.de/<username>/<password>/
+	https://rainy-demoserver.latecrew.de/<username>/<password>/
 
 - - -
 ## Public account list
