@@ -29,7 +29,8 @@
     <OutputPath>bin\Debug</OutputPath>
     <WarningLevel>4</WarningLevel>
     <DefineConstants>DEBUG</DefineConstants>
-    <Commandlineparameters>-c ../../settings.conf -vvvv</Commandlineparameters>
+    <Commandlineparameters>-c ../../settings.conf -vvvv --nobrowser</Commandlineparameters>
+    <DebugSymbols>true</DebugSymbols>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="System" />
