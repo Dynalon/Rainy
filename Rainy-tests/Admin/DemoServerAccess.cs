@@ -1,10 +1,15 @@
-using NUnit.Framework;
 using System;
-using Rainy.Tests;
-using ServiceStack.ServiceClient.Web;
 using System.Collections.Generic;
-using Rainy.WebService.Management;
+using NUnit.Framework;
 using Rainy.UserManagement;
+using Rainy.WebService.Management;
+using ServiceStack.ServiceClient.Web;
+using Tomboy;
+using Tomboy.Sync;
+using Tomboy.Sync.Filesystem;
+using Tomboy.Sync.Web;
+using Rainy.Tests;
+using Rainy.Tests.Benchmarks;
 
 namespace Rainy.Tests
 {
@@ -16,7 +21,7 @@ namespace Rainy.Tests
 		{
 			base.SetUp ();
 			// uncomment to populate demoserver (do not commit password into master!)
-//			this.listenUrl = "http://rainy-demoserver.latecrew.de";
+//			this.listenUrl = "https://rainy-demoserver.latecrew.de";
 //			this.adminPass = "";
 
 			testServer.Start ();
@@ -104,6 +109,25 @@ namespace Rainy.Tests
 				var resp = adminClient.Get<DTOUser[]> (user_get_url);
 				Assert.AreEqual (username, resp[0].Username);
 			}
+		}
+
+		[Test]
+		[Ignore]
+		public void BenchmarkNoteStorage ()
+		{
+
+			var local_storage = new DiskStorage ("../../tmpstorage");
+			var sample_notes = TestBase.GetSampleNotes ();
+			var manifest = new SyncManifest ();
+			var engine = new Engine (local_storage);
+			sample_notes.ForEach(n => engine.SaveNote (n));
+
+			var sync_client = new FilesystemSyncClient (engine, manifest);
+			var access_token = WebSyncServer.PerformFastTokenExchange (listenUrl, "testuser", "testpass");
+			var sync_server = new WebSyncServer (listenUrl, access_token);
+
+			Action benchmark = () => new SyncManager (sync_client, sync_server).DoSync ();
+			DbBenchmarks.RunBenchmark ("initial sync with 100 times no change at all", benchmark, 100);
 		}
 	}
 }

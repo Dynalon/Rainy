@@ -24,6 +24,10 @@ namespace Rainy.Tests.Benchmarks
 
 		protected void Run (string name, Action bench)
 		{
+			RunBenchmark (name, bench, this.num_runs);
+		}
+		public static void RunBenchmark (string name, Action bench, int num_runs)
+		{
 			// helper to measure the benchmarks runs
 			long total = 0;
 			var sw = new Stopwatch ();
