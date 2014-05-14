@@ -43,7 +43,7 @@ namespace Rainy.ErrorHandling
 				RequestDto = request_dto;
 			}
 		}
-		public static object CustomServiceExceptionHandler (object request_dto, Exception e)
+		public static object CustomServiceExceptionHandler (IHttpRequest req, object request_dto, Exception e)
 		{
 			// since we can access the Request/Response here, we wrap the exception
 			// and rethrow it so that the CustomExceptionHandler can handle it
