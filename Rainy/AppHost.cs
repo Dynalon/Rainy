@@ -1,19 +1,15 @@
 using System;
 using System.IO;
 using ServiceStack.Api.Swagger;
+using ServiceStack.Common;
 using ServiceStack.Common.Web;
+using ServiceStack.ServiceHost;
 using ServiceStack.Text;
 using ServiceStack.WebHost.Endpoints;
+
+
 using Rainy.CustomHandler;
 using Rainy.WebService;
-using System.Web;
-using ServiceStack.WebHost.Endpoints.Support;
-using System.Linq;
-using ServiceStack.ServiceHost;
-
-
-using ServiceStack.ServiceHost;
-using ServiceStack.Common;
 
 namespace Rainy
 {

@@ -1,18 +1,14 @@
 using System;
-using System.Threading;
 using System.Collections.Generic;
 using System.IO;
-
-using System.Xml;
-using System.Text;
-using Rainy.OAuth;
-using Rainy.Db;
-using Rainy.Interfaces;
-using ServiceStack.OrmLite;
+using System.Threading;
 using JsonConfig;
-using Rainy.WebService;
-using Tomboy.Sync;
+using ServiceStack.OrmLite;
 using Tomboy;
+using Tomboy.Sync;
+using Rainy.Interfaces;
+using Rainy.OAuth;
+using Rainy.WebService;
 
 
 namespace Rainy

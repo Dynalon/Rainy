@@ -1,21 +1,17 @@
 using System;
 using System.IO;
-using System.Linq;
-using System.Net;
-using DevDefined.OAuth.Consumer;
-using DevDefined.OAuth.Framework;
+using DevDefined.OAuth.Storage;
+using DevDefined.OAuth.Storage.Basic;
+using Rainy.Db;
 using ServiceStack.OrmLite;
 using ServiceStack.ServiceClient.Web;
+using Tomboy.OAuth;
 using Tomboy.Sync.Web;
 using Tomboy.Sync.Web.DTO;
-using Rainy.Db;
-using Rainy.Interfaces;
-using Rainy.Db.Config;
-using Rainy.OAuth;
 using Rainy.Crypto;
-using DevDefined.OAuth.Storage.Basic;
-using DevDefined.OAuth.Storage;
-using Tomboy.OAuth;
+using Rainy.Db.Config;
+using Rainy.Interfaces;
+using Rainy.OAuth;
 
 namespace Rainy
 {
