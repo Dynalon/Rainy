@@ -1,71 +1,14 @@
 using System;
 using System.Data;
-
-using Rainy.OAuth;
 using Rainy.Db;
 using ServiceStack.OrmLite;
-using Tomboy;
-using Tomboy.Sync;
-using Rainy.Interfaces;
-using Rainy.Crypto;
-using Rainy.WebService;
-using DevDefined.OAuth.Storage.Basic;
 using Tomboy.Db;
+using Rainy.Interfaces;
+using Rainy.OAuth;
+using Rainy.WebService;
 
 namespace Rainy
 {
-	public class DbAccessObject
-	{
-		protected IDbConnectionFactory connFactory;
-		public DbAccessObject (IDbConnectionFactory factory)
-		{
-			connFactory = factory;
-		}
-	}
-
-	/// <summary>
-	/// Authenticates a user against a database. User objects in the database always employ hashed passwords.
-	/// </summary>
-	public class DbAuthenticator : IAuthenticator
-	{
-		private IDbConnectionFactory connFactory;
-
-		public DbAuthenticator (IDbConnectionFactory factory)
-		{
-			if (factory == null)
-				throw new ArgumentNullException ("factory");
-
-			connFactory = factory;
-		}
-
-		public bool VerifyCredentials (string username, string password)
-		{
-			DBUser user = null;
-			using (var conn = connFactory.OpenDbConnection ()) {
-				user = conn.FirstOrDefault<DBUser> (u => u.Username == username);
-			}
-			if (user == null)
-				return false;
-
-			if (user.IsActivated == false) {
-				throw new Rainy.ErrorHandling.UnauthorizedException () {
-					UserStatus = "Moderation required",
-				};
-			}
-
-			//if (user.IsVerified == false)
-			//	return false;
-
-			var supplied_hash = user.ComputePasswordHash (password);
-			if (supplied_hash == user.PasswordHash)
-				return true;
-
-			return false;
-
-		}
-
-	}
-
 	public class DatabaseBackend : DbAccessObject, IDataBackend
 	{
 		OAuthHandler oauthHandler;
@@ -138,57 +81,24 @@ namespace Rainy
 			}
 		}
 
-		#endregion
-	}
-
-	// maybe move into DatabaseBackend as nested class
-	public class DatabaseNoteRepository : DbAccessObject, INoteRepository
-	{
-		private DbStorage storage;
-		private Engine engine;
-		private DBUser dbUser;
-
-		public DatabaseNoteRepository (IDbConnectionFactory factory, DbStorageFactory storageFactory, IUser user) : base (factory)
+		public void ClearNotes (IUser user)
 		{
-			this.storage = storageFactory.GetDbStorage (user);
-			engine = new Engine (storage);
-
 			using (var db = connFactory.OpenDbConnection ()) {
-				this.dbUser = db.Select<DBUser> (u => u.Username == user.Username)[0];
-			}
+				using (var trans = db.BeginTransaction ()) {
+					var db_user = db.First<DBUser> (u => u.Username == user.Username);
 
-			if (dbUser.Manifest == null || string.IsNullOrEmpty (dbUser.Manifest.ServerId)) {
-				// the user may not yet have synced
-				dbUser.Manifest.ServerId = Guid.NewGuid ().ToString ();
-			}
-		}
+					// delete the users notes
+					db.Delete<DBNote> (n => n.Username == user.Username);
 
-		#region IDisposable implementation
-		public void Dispose ()
-		{
-			storage.Dispose ();
+					// reset the sync manifest
+					db_user.Manifest = new Tomboy.Sync.SyncManifest ();
+					db.UpdateOnly (db_user, u => u.Manifest, u => u.Username == user.Username);
 
-			// write back the user's Manifest which has likely changed
-			using (var db = connFactory.OpenDbConnection ()) {
-				using (var trans = db.OpenTransaction ()) {
-					db.UpdateOnly (dbUser, u => u.Manifest, u => u.Username == dbUser.Username);
 					trans.Commit ();
 				}
 			}
 		}
-		#endregion
-		#region INoteRepository implementation
-		public Engine Engine {
-			get {
-				return engine;
-			}
-		}
-		public SyncManifest Manifest {
-			get {
-				return dbUser.Manifest;
-			}
-		}
+
 		#endregion
 	}
-
 }

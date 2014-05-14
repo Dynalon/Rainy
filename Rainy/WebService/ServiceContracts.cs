@@ -157,4 +157,15 @@ namespace Rainy.WebService
 		[DataMember (Name="Guid")]
 		public string Guid { get; set; }
 	}
+
+	// un-standardised additional features for development
+
+	[Route("/api/1.0/{Username}/notes/clear",
+	       Summary = "Clears all notes on the server and resets all syncing information")]
+	[DataContract]
+	public class ClearUserNotesRequest : IReturnVoid
+	{
+		[DataMember (Name="Username")]
+		public string Username { get; set; }
+	}
 }

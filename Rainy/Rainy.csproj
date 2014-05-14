@@ -142,6 +142,10 @@
     <Compile Include="WebService\ConfigService.cs" />
     <Compile Include="WebService\OAuth\DbTokenMapper.cs" />
     <Compile Include="ORM\DbStorageFactory.cs" />
+    <Compile Include="WebService\DevelopmentService.cs" />
+    <Compile Include="ORM\DbAuthenticator.cs" />
+    <Compile Include="ORM\DbAccessObject.cs" />
+    <Compile Include="ORM\DatabaseNoteRepository.cs" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="WebService\" />

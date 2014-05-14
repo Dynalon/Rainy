@@ -69,6 +69,10 @@ namespace Rainy
 		public OAuthHandler OAuth {
 			get { return oauthHandler; }
 		}
+		public void ClearNotes (IUser user)
+		{
+			throw new NotImplementedException ();
+		}
 
 
 		/// <summary>

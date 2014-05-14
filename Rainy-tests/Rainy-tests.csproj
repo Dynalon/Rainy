@@ -101,6 +101,7 @@
     <Compile Include="ORM\Postgres\DbStorageTestsPostgres.cs" />
     <Compile Include="ORM\Sqlite\PublicNoteShareTestsSqlite.cs" />
     <Compile Include="Admin\DemoServerAccess.cs" />
+    <Compile Include="DeveloperServiceTests.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <ItemGroup>

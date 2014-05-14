@@ -24,5 +24,6 @@ namespace Rainy.Interfaces
 	{
 		INoteRepository GetNoteRepository (IUser user);
 		OAuthHandler OAuth { get; }
+		void ClearNotes (IUser user);
 	}
 }
