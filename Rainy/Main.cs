@@ -336,12 +336,8 @@ namespace Rainy
 			}
 
 			if (Config.Global.Backend != "filesystem" && string.IsNullOrEmpty (Config.Global.AdminPassword)) {
-				if (Config.Global.Development == true)
-					Config.Global.AdminPassword = "foobar";
-				else {
-					logger.Fatal ("An administrator password must be set");
-					Environment.Exit (-1);
-				}
+				logger.Fatal ("An administrator password must be set");
+				Environment.Exit (-1);
 			}
 
 			open_browser = open_browser && !string.IsNullOrEmpty (Environment.GetEnvironmentVariable ("DISPLAY"));
