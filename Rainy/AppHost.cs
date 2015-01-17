@@ -72,8 +72,8 @@ namespace Rainy
 				DefaultContentType = ContentType.Json,
 
 				RawHttpHandlers = { 
-					swagger_handler.CheckAndProcess,
-					uihandler.CheckAndProcess
+					uihandler.CheckAndProcess,
+					swagger_handler.CheckAndProcess
 				},
 
 				// enable cors
