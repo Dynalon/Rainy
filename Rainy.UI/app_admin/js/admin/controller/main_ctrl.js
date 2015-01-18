@@ -17,3 +17,5 @@ function MainCtrl($scope, $routeParams, $route, $location) {
         $scope.checkLocation();
     });
 }
+
+MainCtrl.$inject = [ '$scope', '$routeParams', '$route', '$location' ];
