@@ -3,9 +3,7 @@ var app = angular.module('myApp', [
     'myApp.filters',
     'myApp.services',
     'myApp.directives',
-
-    // anguar-strap.js
-    '$strap.directives'
+    'ngRoute'
 ])
 .config(['$routeProvider',
     function($routeProvider) {
