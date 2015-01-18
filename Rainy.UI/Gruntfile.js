@@ -43,10 +43,17 @@ module.exports = function (grunt) {
             },
             css_client: {
                 src: [
+                    'bower_components/bootstrap/dist/css/bootstrap.min.css',
                     'bower_components/bootstrap-wysihtml5/dist/bootstrap-wysihtml5-0.0.2.css',
                     'bower_components/bootstrap-switch/static/stylesheets/bootstrap-switch.css'
                 ],
                 dest: 'dist/client.css'
+            },
+            admin_client : {
+                src: [
+                    'bower_components/bootstrap/dist/css/bootstrap.min.css',
+                ],
+                dest: 'dist/admin/admin.css'
             },
             admin_ui: {
                 src: ['app_admin/admin.html', 'app_admin/html/views_admin/*.html'],
