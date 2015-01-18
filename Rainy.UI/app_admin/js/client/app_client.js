@@ -54,25 +54,20 @@ var app = angular.module('clientApp', [
 
 // register the interceptor as a service
 app.factory('loginInterceptor', function($q, $location) {
-    return function(promise) {
-        return promise.then(function(response) {
-            // do something on success
-            return response;
-        }, function(response) {
+    return {
+        responseError: function(response) {
             // do something on error
-            if (response.status === 401) {
-                if (window.localStorage)
-                    window.localStorage.removeItem('accessToken');
-                $location.path('/login');
-            }
+            debugger;
+            if (window.localStorage)
+                window.localStorage.removeItem('accessToken');
+            $location.path('/login');
             return $q.reject(response);
-        });
+        }
     };
 });
 app.config(['$httpProvider', function($httpProvider) {
-        $httpProvider.responseInterceptors.push('loginInterceptor');
-    }
-]);
+    $httpProvider.interceptors.push('loginInterceptor');
+}]);
 
 
 // FILTERS

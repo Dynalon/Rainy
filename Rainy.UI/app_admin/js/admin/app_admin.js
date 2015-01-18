@@ -71,7 +71,7 @@ var app = angular.module('myApp', [
     return notyService;
 })
 
-.run(['$rootScope', '$modal', '$route', '$q', function($rootScope, $modal, $route, $q)  {
+.run(['$rootScope', '$route', '$q', function($rootScope, $route, $q)  {
     var backend = {
         ajax: function(rel_url, options) {
             var backend_url = '/';
