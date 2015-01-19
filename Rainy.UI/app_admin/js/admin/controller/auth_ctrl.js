@@ -1,6 +1,6 @@
 /*global admin_pw:true*/
 var admin_pw='';
-function AuthCtrl($scope, $route, $location) {
+function AuthCtrl($scope, $route, $location, adminPassword) {
 
     var url_pw = ($location.search()).password;
     if (url_pw !== undefined && url_pw.length > 0) {
@@ -21,6 +21,7 @@ function AuthCtrl($scope, $route, $location) {
         .success (function() {
             $('#loginModal').modal('hide');
             admin_pw = $scope.adminPassword;
+            adminPassword = $scope.adminPassword;
         }).fail(function () {
             $scope.adminPassword='';
             $('#loginModal').find(':password').focus();

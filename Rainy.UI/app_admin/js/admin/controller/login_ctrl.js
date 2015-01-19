@@ -1,5 +1,5 @@
 
-function LoginCtrl($scope, $rootScope, $http, notyService) {
+function LoginCtrl($scope, $http, notyService) {
 
     $scope.getUrlVars = function() {
         var vars = [], hash;

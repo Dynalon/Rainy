@@ -15,14 +15,14 @@ module.exports = function (grunt) {
             scripts_common: {
                 src: [
                     'bower_components/jquery/jquery.min.js',
+/*                    'bower_components/bootstrap/dist/js/bootstrap.min.js',  */
                     'bower_components/bootstrap.zip/js/bootstrap.min.js',
-                    'bower_components/angular/angular.min.js',
-                    'bower_components/angular-strap/dist/angular-strap.min.js',
+                    'bower_components/angular/angular.js',
+                    'bower_components/angular-route/angular-route.js',
                     'bower_components/underscore/underscore-min.js',
                     'bower_components/noty/js/noty/jquery.noty.js',
                     'bower_components/noty/js/noty/themes/default.js',
-                    'bower_components/noty/js/noty/layouts/topCenter.js',
-                    'bower_components/bootstrap-switch/static/js/bootstrap-switch.js',
+                    'bower_components/noty/js/noty/layouts/topCenter.js'
                 ],
                 dest: 'dist/common.js'
             },
@@ -43,7 +43,8 @@ module.exports = function (grunt) {
             },
             css_client: {
                 src: [
-                    'bower_components/bootstrap/dist/css/bootstrap.min.css',
+                    'bower_components/bootstrap.zip/css/bootstrap.min.css',
+/*                    'bower_components/bootstrap/dist/css/bootstrap.min.css', */
                     'bower_components/bootstrap-wysihtml5/dist/bootstrap-wysihtml5-0.0.2.css',
                     'bower_components/bootstrap-switch/static/stylesheets/bootstrap-switch.css'
                 ],
@@ -51,7 +52,7 @@ module.exports = function (grunt) {
             },
             admin_client : {
                 src: [
-                    'bower_components/bootstrap/dist/css/bootstrap.min.css',
+                    'bower_components/bootstrap.zip/css/bootstrap.min.css',
                 ],
                 dest: 'dist/admin/admin.css'
             },

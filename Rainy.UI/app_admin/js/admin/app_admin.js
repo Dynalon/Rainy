@@ -44,6 +44,8 @@ var app = angular.module('myApp', [
         $locationProvider.html5Mode(false);
     }
 ])
+.value('adminPassword', undefined)
+
 .factory('notyService', function($rootScope) {
     var notyService = {};
 

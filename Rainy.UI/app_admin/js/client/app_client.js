@@ -13,7 +13,7 @@ var app = angular.module('clientApp', [
             controller: 'LoginCtrl'
         });
 
-        $routeProvider.when('/notes/:guid', {
+        $routeProvider.when('/notes/:guid?', {
             templateUrl: 'notes.html',
             controller: 'NoteCtrl'
         });
@@ -33,6 +33,7 @@ var app = angular.module('clientApp', [
         $routeProvider.otherwise({
             redirectTo: '/login'
         });
+
     }
 ])
 .config(['$controllerProvider', function($controllerProvider) {
@@ -57,7 +58,6 @@ app.factory('loginInterceptor', function($q, $location) {
     return {
         responseError: function(response) {
             // do something on error
-            debugger;
             if (window.localStorage)
                 window.localStorage.removeItem('accessToken');
             $location.path('/login');

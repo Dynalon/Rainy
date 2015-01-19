@@ -182,6 +182,7 @@
     <None Include="sqlite\x86\sqlite3.dll" />
     <None Include="sqlite\x86\sqlite3.exe" />
     <None Include="packages.config" />
+    <None Include="settings.development.conf" />
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="..\Rainy.UI\dist\client.css">
