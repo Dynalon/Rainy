@@ -1,4 +1,4 @@
-function MainCtrl($scope, $routeParams, $route, $location, adminPassword) {
+function MainCtrl($scope, $location, adminPassword) {
 
     $scope.checkLocation = function() {
         if (!$location.path().startsWith('/login')) {
@@ -13,4 +13,4 @@ function MainCtrl($scope, $routeParams, $route, $location, adminPassword) {
     $scope.checkLocation();
 }
 
-MainCtrl.$inject = [ '$scope', '$routeParams', '$route', '$location' ];
+MainCtrl.$inject = [ '$scope', '$location', 'adminPassword' ];

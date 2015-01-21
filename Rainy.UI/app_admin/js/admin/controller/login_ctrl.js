@@ -31,4 +31,4 @@ function LoginCtrl($scope, $http, notyService) {
             });
     };
 }
-//LoginCtrl.$inject = [ '$scope','$http' ];
+LoginCtrl.$inject = [ '$scope', '$http', 'notyService' ];

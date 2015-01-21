@@ -1,5 +1,4 @@
-function LoginCtrl($scope, $location, $rootScope,
-                   loginService, notyService, configService) {
+function LoginCtrl($scope, $location, loginService, notyService, configService) {
 
     $scope.username = '';
     $scope.password = '';
@@ -50,4 +49,4 @@ function LoginCtrl($scope, $location, $rootScope,
         });
     };
 }
-//LoginCtrl.$inject = [ '$scope','$http' ];
+LoginCtrl.$inject = [ '$scope', '$location', 'loginService', 'notyService',  'configService' ];

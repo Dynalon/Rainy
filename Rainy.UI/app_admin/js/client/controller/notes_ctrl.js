@@ -1,4 +1,4 @@
-function NoteCtrl($scope,$location, $routeParams, $timeout, $q, $rootScope,
+function NoteCtrl($scope,$location, $routeParams, $timeout, $rootScope,
                   noteService, loginService, notyService, configService) {
 
     $scope.notebooks = {};
@@ -131,3 +131,5 @@ function NoteCtrl($scope,$location, $routeParams, $timeout, $q, $rootScope,
         $scope.selectNote(note);
     };
 }
+NoteCtrl.$inject = [ '$scope', '$location', '$routeParams', '$timeout', '$rootScope', 'noteService',
+    'lgoinService', 'notyService', 'configService' ];

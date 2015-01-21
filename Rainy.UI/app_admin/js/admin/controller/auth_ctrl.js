@@ -30,4 +30,4 @@ function AuthCtrl($scope, $route, $location, adminPassword) {
         $route.reload();
     };
 }
-AuthCtrl.$inject = [ '$scope','$route', '$location' ];
+AuthCtrl.$inject = [ '$scope','$route', '$location', 'adminPassword' ];

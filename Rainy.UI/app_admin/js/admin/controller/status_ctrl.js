@@ -1,4 +1,4 @@
-function StatusCtrl($scope, $http, $route) {
+function StatusCtrl($scope) {
     $scope.serverStatus = {};
 
     $scope.getStatus = function () {
@@ -19,4 +19,4 @@ function StatusCtrl($scope, $http, $route) {
     }();
 
 }
-StatusCtrl.$inject = [ '$scope', '$http', '$route' ];
+StatusCtrl.$inject = [ '$scope' ];

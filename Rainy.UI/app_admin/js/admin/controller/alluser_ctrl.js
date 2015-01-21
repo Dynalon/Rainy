@@ -1,5 +1,5 @@
 
-function AllUserCtrl($scope, $route) {
+function AllUserCtrl($scope) {
     $scope.currently_edited_user = null;
     $scope.new_user = {};
 
@@ -77,3 +77,5 @@ function AllUserCtrl($scope, $route) {
         });
     };
 }
+
+AllUserCtrl.$inject = ['$scope'];

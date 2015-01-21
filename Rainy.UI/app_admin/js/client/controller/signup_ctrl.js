@@ -46,3 +46,4 @@ function SignupCtrl($scope, $location, $http, $timeout, notyService) {
         });
     };
 }
+SignupCtrl.$inject = [ '$scope', '$location' , '$http', '$timeout', 'notyService' ];

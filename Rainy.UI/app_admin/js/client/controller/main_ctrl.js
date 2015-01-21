@@ -5,3 +5,4 @@ function MainCtrl ($scope, loginService) {
         $scope.isLoggedIn = isLoggedIn;
     });
 }
+MainCtrl.$inject = [ '$scope', 'loginService' ];
