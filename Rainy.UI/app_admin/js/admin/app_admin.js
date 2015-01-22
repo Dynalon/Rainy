@@ -44,7 +44,6 @@ var app = angular.module('myApp', [
         $locationProvider.html5Mode(false);
     }
 ])
-.value('adminPassword', undefined)
 
 .factory('notyService', function($rootScope) {
     var notyService = {};
@@ -73,28 +72,29 @@ var app = angular.module('myApp', [
     return notyService;
 })
 
-.run(['$rootScope', '$route', '$q', function($rootScope, $route, $q)  {
-    var backend = {
-        ajax: function(rel_url, options) {
-            var backend_url = '/';
+.service('backendService', function($rootScope) {
+    var self = this;
+    self.adminPassword = '';
 
-            if (options === undefined)
-                options = {};
+    self.ajax = function(rel_url, options) {
+        var backend_url = '/';
 
-            var abs_url = backend_url + rel_url;
-            options.beforeSend = function(request) {
-                request.setRequestHeader('Authority', admin_pw);
-            };
-            var ret = $.ajax(abs_url, options);
+        if (options === undefined)
+            options = {};
 
-            ret.fail(function(jqxhr, textStatus) {
-                if (jqxhr.status === 401) {
-                    $('#loginModal').modal();
-                    $('#loginModal').find(':password').focus();
-                }
-            });
-            return ret;
-        }
+        var abs_url = backend_url + rel_url;
+        options.beforeSend = function(request) {
+            request.setRequestHeader('Authority', self.adminPassword);
+        };
+        var ret = $.ajax(abs_url, options);
+
+        ret.fail(function(jqxhr, textStatus) {
+            if (jqxhr.status === 401) {
+                $('#loginModal').modal();
+                $('#loginModal').find(':password').focus();
+                $rootScope.$digest();
+            }
+        });
+        return ret;
     };
-    $rootScope.backend = backend;
-}]);
+});

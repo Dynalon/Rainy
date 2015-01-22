@@ -1,8 +1,8 @@
-function StatusCtrl($scope) {
+function StatusCtrl($scope, backendService) {
     $scope.serverStatus = {};
 
     $scope.getStatus = function () {
-        $scope.backend.ajax('api/admin/status/')
+        backendService.ajax('api/admin/status/')
         .success(function(data) {
             $scope.serverStatus = data;
 
@@ -19,4 +19,4 @@ function StatusCtrl($scope) {
     }();
 
 }
-StatusCtrl.$inject = [ '$scope' ];
+StatusCtrl.$inject = [ '$scope', 'backendService' ];

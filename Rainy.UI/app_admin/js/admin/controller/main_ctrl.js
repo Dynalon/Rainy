@@ -1,4 +1,4 @@
-function MainCtrl($scope, $location, adminPassword) {
+function MainCtrl($scope, $location) {
 
     $scope.checkLocation = function() {
         if (!$location.path().startsWith('/login')) {
@@ -9,8 +9,7 @@ function MainCtrl($scope, $location, adminPassword) {
             $scope.dontAskForPassword = true;
         }
     };
-    $scope.adminPassword = adminPassword;
     $scope.checkLocation();
 }
 
-MainCtrl.$inject = [ '$scope', '$location', 'adminPassword' ];
+MainCtrl.$inject = [ '$scope', '$location' ];

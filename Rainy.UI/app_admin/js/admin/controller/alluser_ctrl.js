@@ -1,5 +1,4 @@
-
-function AllUserCtrl($scope) {
+function AllUserCtrl($scope, backendService) {
     $scope.currently_edited_user = null;
     $scope.new_user = {};
 
@@ -15,7 +14,7 @@ function AllUserCtrl($scope) {
     });*/
 
     $scope.reload_user_list = function() {
-        $scope.backend.ajax('api/admin/alluser/').success(function(data) {
+        backendService.ajax('api/admin/alluser/').success(function(data) {
             $scope.alluser = data;
             $scope.$apply();
         });
@@ -35,7 +34,7 @@ function AllUserCtrl($scope) {
         $scope.new_user.IsActivated = true;
         $scope.new_user.IsVerified = true;
         if(is_new === true) {
-            ajax_req = $scope.backend.ajax('api/admin/user/', {
+            ajax_req = backendService.ajax('api/admin/user/', {
                 data: JSON.stringify($scope.new_user),
                 type:'POST',
                 contentType:'application/json; charset=utf-8',
@@ -43,7 +42,7 @@ function AllUserCtrl($scope) {
             });
         } else {
             // update user is done via PUT request
-            ajax_req = $scope.backend.ajax('api/admin/user/', {
+            ajax_req = backendService.ajax('api/admin/user/', {
                 data: JSON.stringify($scope.currently_edited_user),
                 type:'PUT',
                 contentType:'application/json; charset=utf-8',
@@ -67,7 +66,7 @@ function AllUserCtrl($scope) {
         if(!confirm('Really delete user \'' + user.Username + '\' ?')) {
             return;
         }
-        $scope.backend.ajax('api/admin/user/' + user.Username, {
+        backendService.ajax('api/admin/user/' + user.Username, {
             type:'DELETE',
             data: JSON.stringify(user),
             contentType:'application/json; charset=utf-8',
@@ -78,4 +77,4 @@ function AllUserCtrl($scope) {
     };
 }
 
-AllUserCtrl.$inject = ['$scope'];
+AllUserCtrl.$inject = ['$scope', 'backendService'];
