@@ -1,8 +1,8 @@
 // Declare app level module which depends on filters, and services
-var app = angular.module('myApp', [
-    'myApp.filters',
-    'myApp.services',
-    'myApp.directives',
+var app = angular.module('adminApp', [
+    'adminApp.filters',
+    'adminApp.services',
+    'adminApp.directives',
     'ngRoute'
 ])
 .config(['$routeProvider',
@@ -29,12 +29,6 @@ var app = angular.module('myApp', [
         });
     }
 ]) 
-.config(['$controllerProvider', function($controllerProvider) {
-    // this will allow controller function to sit on the window object (or window scope)
-    // This was disabled in Angular 1.1.x and we shouldn't use this, but for migration 
-    // we keep it until everything is moved to app.module().controler() syntax.
-    $controllerProvider.allowGlobals();
-}])
 .config(['$httpProvider', function($httpProvider) {
         delete $httpProvider.defaults.headers.common['X-Requested-With'];
     }
@@ -97,4 +91,6 @@ var app = angular.module('myApp', [
         });
         return ret;
     };
-});
+})
+
+;

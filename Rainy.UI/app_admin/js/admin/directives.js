@@ -1,6 +1,6 @@
 /*global $:false */
 /*global angular:false */
-angular.module('myApp.directives', [])
+angular.module('adminApp.directives', [])
     .directive('appVersion', ['version',
         function(version) {
             return function(scope, elm, attrs) {
