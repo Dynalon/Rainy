@@ -1,8 +1,14 @@
-function MainCtrl ($scope, loginService) {
-    $scope.isLoggedIn = loginService.userIsLoggedIn();
+angular.module('clientApp').controller('MainCtrl', [
+    '$scope',
+    'loginService',
+    function (
+        $scope,
+        loginService
+    ) {
+        $scope.isLoggedIn = loginService.userIsLoggedIn();
 
-    $scope.$on('loginStatus', function(ev, isLoggedIn) {
-        $scope.isLoggedIn = isLoggedIn;
-    });
-}
-MainCtrl.$inject = [ '$scope', 'loginService' ];
+        $scope.$on('loginStatus', function(ev, isLoggedIn) {
+            $scope.isLoggedIn = isLoggedIn;
+        });
+    }
+]);

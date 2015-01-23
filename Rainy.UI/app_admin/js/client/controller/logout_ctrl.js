@@ -1,6 +1,11 @@
-function LogoutCtrl($location, loginService) {
-    
-    loginService.logout();
-    $location.path('/login/');
-}
-LogoutCtrl.$inject = [ '$location', 'loginService' ];
+angular.module('clientApp').controller('LogoutCtrl', [
+    '$location',
+    'loginService',
+    function (
+        $location,
+        loginService
+    ) {
+        loginService.logout();
+        $location.path('/login/');
+    }
+]);

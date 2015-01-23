@@ -36,12 +36,6 @@ var app = angular.module('clientApp', [
 
     }
 ])
-.config(['$controllerProvider', function($controllerProvider) {
-    // this will allow controller function to sit on the window object (or window scope)
-    // This was disabled in Angular 1.1.x and we shouldn't use this, but for migration 
-    // we keep it until everything is moved to app.module().controler() syntax.
-    $controllerProvider.allowGlobals();
-}])
 // disable the X-Requested-With header
 .config(['$httpProvider', function($httpProvider) {
         delete $httpProvider.defaults.headers.common['X-Requested-With'];
