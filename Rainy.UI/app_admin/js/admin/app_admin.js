@@ -29,10 +29,6 @@ var app = angular.module('adminApp', [
         });
     }
 ]) 
-.config(['$httpProvider', function($httpProvider) {
-        delete $httpProvider.defaults.headers.common['X-Requested-With'];
-    }
-])
 .config(['$locationProvider',
     function($locationProvider) {
         $locationProvider.html5Mode(false);

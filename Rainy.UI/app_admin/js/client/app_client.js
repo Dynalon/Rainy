@@ -36,11 +36,6 @@ var app = angular.module('clientApp', [
 
     }
 ])
-// disable the X-Requested-With header
-.config(['$httpProvider', function($httpProvider) {
-        delete $httpProvider.defaults.headers.common['X-Requested-With'];
-    }
-])
 .config(['$locationProvider',
     function($locationProvider) {
         $locationProvider.html5Mode(false);
