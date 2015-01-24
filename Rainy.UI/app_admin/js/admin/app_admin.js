@@ -65,6 +65,7 @@ var app = angular.module('adminApp', [
 .service('backendService', function($rootScope) {
     var self = this;
     self.adminPassword = '';
+    self.isAuthenticated = false;
 
     self.ajax = function(rel_url, options) {
         var backend_url = '/';
@@ -78,16 +79,31 @@ var app = angular.module('adminApp', [
         };
         var ret = $.ajax(abs_url, options);
 
+        ret.success(function() {
+            self.isAuthenticated = true;
+            $rootScope.$digest();
+        });
+
         ret.fail(function(jqxhr, textStatus) {
-            if (jqxhr.status === 401) {
-                $rootScope.showAdminLogin = true;
-//                $('#loginModal').modal();
-//                $('#loginModal').find(':password').focus();
+            if (jqxhr.status === 401 || jqxhr.status === 403) {
+                self.isAuthenticated = false;
                 $rootScope.$digest();
             }
         });
+
         return ret;
     };
 })
+
+.run(['$rootScope', 'backendService', function($rootScope, backendService) {
+    $rootScope.showLogin = true;
+    $rootScope.$watch(
+        function() {
+            return backendService.isAuthenticated;
+        }, function(newVal, oldVal) {
+            $rootScope.showLogin = !newVal;
+        }
+    );
+}])
 
 ;

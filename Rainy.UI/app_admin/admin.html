@@ -39,28 +39,10 @@
 
         <div class="container">
 
-            <row ng-show="showAdminLogin">
-                <div ng-controller="AuthCtrl" class="" id="nonloginModal">
-                    <form class="form" ng-submit="doLogin()">
-                        <div class="non-modal-header">
-                            <h3>
-                                Authentication
-                            </h3>
-                        </div>
-                        <div class="non-modal-body">
-                            <p>
-                                <label>Password: </label>
-                                <input ng-model="adminPassword" type="password" required />
-                            </p>
-                        </div>
-                        <div class="">
-                            <button type="submit" class="btn btn-primary">Login</a>
-                        </div>
-                    </form>
-                </div>
+            <row ng-show="showLogin" ng-include=" 'auth.html' ">
             </row>
 
-            <row ng-View ng-show="!showAdminLogin">
+            <row ng-View ng-show="!showLogin">
             </row>
 
             <script src="../common.js" type="text/javascript">

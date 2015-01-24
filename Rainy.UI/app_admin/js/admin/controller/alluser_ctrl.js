@@ -1,9 +1,11 @@
 angular.module('adminApp').controller('AllUserCtrl', [
     '$scope',
+    '$rootScope',
     'backendService',
 
     function(
         $scope,
+        $rootScope,
         backendService
     ) {
         $scope.currently_edited_user = null;
@@ -20,13 +22,21 @@ angular.module('adminApp').controller('AllUserCtrl', [
             }
         });*/
 
+        $scope.$watch(
+            function() { return backendService.isAuthenticated; },
+            function(newVal, oldVal) {
+                if (newVal === true) {
+                    $scope.reload_user_list(); 
+                }
+            }
+        );
+        
         $scope.reload_user_list = function() {
             backendService.ajax('api/admin/alluser/').success(function(data) {
                 $scope.alluser = data;
-                $scope.$apply();
+                $rootScope.$digest();
             });
         };
-        $scope.reload_user_list();
 
         $scope.start_edit = function(user) {
             $scope.currently_edited_user = jQuery.extend(true, {}, user);

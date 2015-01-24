@@ -3,24 +3,22 @@
 -->
 
 <script type="text/ng-template" id="auth.html">
-
-<div ng-controller="AuthCtrl" class="non-modal fade" id="loginnon-modal">
-<form class="form" ng-submit="doLogin()">
-    <div class="non-modal-header">
-        <h3>
-            Authentication
-        </h3>
-    </div>
-    <div class="non-modal-body">
-        <p>
-            <label>Password: </label>
-            <input ng-model="adminPassword" type="password" required />
-        </p>
-    </div>
-    <div class="non-modal-footer">
-        <button type="submit" class="btn btn-primary">Login</a>
-    </div>
-</form>
+<div class="" id="nonloginModal" ng-controller="AuthCtrl">
+    <form class="form" ng-submit="doLogin()">
+        <div class="non-modal-header">
+            <h3>
+                Authentication
+            </h3>
+        </div>
+        <div class="non-modal-body">
+            <p>
+                <label>Password: </label>
+                <input ng-model="adminPassword" type="password" required />
+            </p>
+        </div>
+        <div class="">
+            <button type="submit" class="btn btn-primary">Login</a>
+        </div>
+    </form>
 </div>
-
 </script>
