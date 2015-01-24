@@ -1,11 +1,13 @@
 angular.module('adminApp').controller('AuthCtrl', [
     '$scope',
+    '$rootScope',
     '$route',
     '$location',
     'backendService',
 
     function(
         $scope,
+        $rootScope,
         $route,
         $location,
         backendService
@@ -19,8 +21,9 @@ angular.module('adminApp').controller('AuthCtrl', [
             // new admin pw, update teh cookie
             backendService.adminPassword = url_pw;
         } else if (!$location.path().startsWith('/login')) {
-            $('#loginModal').modal();
-            $('#loginModal').find(':password').focus();
+            $rootScope.showAdminLogin = true;
+//            $('#loginModal').modal();
+//            $('#loginModal').find(':password').focus();
         }
 
 
@@ -28,11 +31,16 @@ angular.module('adminApp').controller('AuthCtrl', [
             backendService.adminPassword = $scope.adminPassword;
             backendService.ajax('api/admin/status/')
             .success (function() {
-                $('#loginModal').modal('hide');
+ //               $('#loginModal').modal('hide');
+                $rootScope.showAdminLogin = false;
+                $rootScope.$digest();
+                $scope.$apply();
             }).fail(function () {
                 backendService.adminPassword = $scope.adminPassword = '';
-                $('#loginModal').find(':password').focus();
+ //               $('#loginModal').find(':password').focus();
+                $rootScope.showAdminLogin = true;
                 $scope.$apply();
+                $rootScope.$digest();
             });
             $route.reload();
         };

@@ -80,8 +80,9 @@ var app = angular.module('adminApp', [
 
         ret.fail(function(jqxhr, textStatus) {
             if (jqxhr.status === 401) {
-                $('#loginModal').modal();
-                $('#loginModal').find(':password').focus();
+                $rootScope.showAdminLogin = true;
+//                $('#loginModal').modal();
+//                $('#loginModal').find(':password').focus();
                 $rootScope.$digest();
             }
         });

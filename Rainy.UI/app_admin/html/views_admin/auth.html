@@ -1,22 +1,26 @@
-<!-- authentication modal - intentionally not put into a <script> element so it
+<!-- authentication non-modal - intentionally not put into a <script> element so it
     gets executed on every page load
 -->
-<div ng-controller="AuthCtrl" class="modal fade" id="loginModal">
+
+<script type="text/ng-template" id="auth.html">
+
+<div ng-controller="AuthCtrl" class="non-modal fade" id="loginnon-modal">
 <form class="form" ng-submit="doLogin()">
-    <div class="modal-header">
+    <div class="non-modal-header">
         <h3>
             Authentication
         </h3>
     </div>
-    <div class="modal-body">
+    <div class="non-modal-body">
         <p>
             <label>Password: </label>
             <input ng-model="adminPassword" type="password" required />
         </p>
     </div>
-    <div class="modal-footer">
+    <div class="non-modal-footer">
         <button type="submit" class="btn btn-primary">Login</a>
     </div>
 </form>
 </div>
 
+</script>
