@@ -1,8 +1,10 @@
 angular.module('adminApp').controller('StatusCtrl', [
     '$scope',
+    '$rootScope',
     'backendService',
     function(
         $scope,
+        $rootScope,
         backendService
     ) {
         $scope.serverStatus = {};
@@ -21,6 +23,15 @@ angular.module('adminApp').controller('StatusCtrl', [
                 $scope.upSinceMinutes = Math.round(((dt % 86400000) % 3600000) / 60000); // minutes
 
             });
-        }();
+        };
+
+        $rootScope.$watch(
+            function() { return backendService.isAuthenticated; },
+            function(newValue, oldValue) {
+                if (newValue === true) {
+                    $scope.getStatus();
+                }
+            }
+        );
     }
 ]);

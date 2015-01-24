@@ -67,8 +67,6 @@ var app = angular.module('adminApp', [
     self.adminPassword = '';
     self.isAuthenticated = false;
 
-
-
     self.ajax = function(rel_url, options) {
         var backend_url = '/';
 
@@ -93,6 +91,17 @@ var app = angular.module('adminApp', [
 
         return prm;
     };
+}])
+
+.run(['$rootScope', function($rootScope) {
+    $rootScope.section = 'overview';
+    $rootScope.$on('$routeChangeSuccess', function(ev, next, current) {
+        if (!next || !next.originalPath) return;
+        if (next.originalPath.indexOf('overview') >= 0)
+            $rootScope.section = 'overview';
+        if (next.originalPath.indexOf('user') >= 0)
+            $rootScope.section = 'user';
+    });
 }])
 
 .run(['$rootScope', 'backendService', function($rootScope, backendService) {

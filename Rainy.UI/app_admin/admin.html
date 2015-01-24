@@ -14,14 +14,17 @@
             <div class="container">
                 <div class="navbar-header">
                     <a class="navbar-brand" href="#/">Rainy <span class="label label-danger">ADMIN</span></a>
+                    <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#adminNavbar">
+                        <span class="sr-only">Toggle navigation</span>
+                    </button>
                 </div><!-- /navbar-header -->
 
-                <div class="collapse navbar-collapse">
+                <div class="collapse navbar-collapse" id="adminNavbar">
                     <ul class="nav navbar-nav">
-                        <li class="active">
+                        <li ng-class="{ active: section === 'overview' }">
                             <a href="#/overview"><i class="icon-signal icon-white"></i> Overview</a>
                         </li>
-                        <li>
+                        <li ng-class="{ active: section === 'user' }">
                             <a href="#/user"><i class="icon-user icon-white"></i> User</a>
                         </li>
                     </ul>
