@@ -43,9 +43,12 @@ namespace Rainy
 			var swagger_handler = new FilesystemHandler ("/swagger-ui/", swagger_path);
 
 			IHttpHandlerDecider uihandler;
+			IHttpHandlerDecider fontshandler = null;
 			if (JsonConfig.Config.Global.Development) {
 				var webui_path = Path.Combine(Path.GetDirectoryName(this.GetType ().Assembly.Location), "../../../Rainy.UI/dist/");
 				uihandler = (IHttpHandlerDecider) new FilesystemHandler ("/", webui_path);
+				var fonts_path = Path.Combine(Path.GetDirectoryName(this.GetType ().Assembly.Location), "../../../Rainy.UI/dist/fonts/");
+				fontshandler = (IHttpHandlerDecider) new FilesystemHandler ("/fonts/", fonts_path);
 			} else {
 				uihandler = (IHttpHandlerDecider) new EmbeddedResourceHandler ("/", this.GetType ().Assembly, "Rainy.WebService.Admin.UI");
 			}
@@ -73,6 +76,7 @@ namespace Rainy
 
 				RawHttpHandlers = { 
 					uihandler.CheckAndProcess,
+					fontshandler.CheckAndProcess,
 					swagger_handler.CheckAndProcess
 				},
 

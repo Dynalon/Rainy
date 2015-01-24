@@ -30,7 +30,7 @@
         <input type="checkbox" ng-model="sendMail" ng-disabled="sendMailDisabled" />
         -->
         <button type="submit" class="btn" ng-disabled="!formNewUser.$valid">
-            <i class="icon-plus"></i>Add new user
+            <i class="glyphicon glyphicon-plus"></i>Add new user
         </button>
     </form>
     <hr>
@@ -39,7 +39,7 @@
 
     <!-- SEARCH INPUT -->
     <div class="input-prepend pull-right" ng-show="alluser.length > 0">
-        <span class="add-on"><i class="icon-search"></i></span>
+        <span class="add-on"><i class="glyphicon glyphicon-search"></i></span>
         <input ng-model="search_term" type="text" placeholder="Search term..." />
     </div>
 
@@ -73,15 +73,15 @@
                     {{ user.AdditionalData }}
                 </td>
                 <td>
-                    <i class="icon-ok" ng-show="user.IsActivated"></i>
-                    <i class="icon-remove" ng-show="!user.IsActivated"></i>
+                    <i class="glyphicon glyphicon-ok" ng-show="user.IsActivated"></i>
+                    <i class="glyphicon glyphicon-remove" ng-show="!user.IsActivated"></i>
                 </td>
                 <!-- <td>
-                    <i class="icon-ok" ng-show="user.IsVerified"></i>
-                    <i class="icon-remove" ng-show="!user.IsVerified"></i>
+                    <i class="glyphicon glyphicon-ok" ng-show="user.IsVerified"></i>
+                    <i class="glyphicon glyphicon-remove" ng-show="!user.IsVerified"></i>
                 </td> -->
                 <td>
-                    <a class="btn pull-right" ng-click="delete_user(user,$event)"><i class="icon-trash"></i></a>
+                    <a class="btn pull-right" ng-click="delete_user(user,$event)"><i class="glyphicon glyphicon-trash"></i></a>
                 </td>
             </tr>
 
@@ -107,8 +107,8 @@
                 </td> -->
                 <td>
                     <span class="pull-right">
-                        <a class="btn btn-primary" ng-click="save_user(false)"><i class="icon-ok"></i>Save</a>
-                        <a class="btn" ng-click="stop_edit()"><i class="icon-remove"></i> Cancel</a>
+                        <a class="btn btn-primary" ng-click="save_user(false)"><i class="glyphicon glyphicon-ok"></i>Save</a>
+                        <a class="btn" ng-click="stop_edit()"><i class="glyphicon glyphicon-remove"></i> Cancel</a>
                     </span>
                 </td>
             </tr>

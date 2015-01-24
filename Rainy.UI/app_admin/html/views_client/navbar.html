@@ -1,0 +1,33 @@
+<script type="text/ng-template" id="navbar.html">
+
+<nav class="navbar navbar-default" ng-show="!hideAdminNav">
+    <div class="container">
+        <div class="navbar-header">
+            <a class="navbar-brand" href="#/">Rainy <span class="label label-danger">2GO</span></a>
+            <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#adminNavbar">
+                <span class="sr-only">Toggle navigation</span>
+            </button>
+        </div><!-- /navbar-header -->
+
+        <div class="collapse navbar-collapse" id="clientNavbar">
+            <ul class="nav navbar-nav">
+                <li ng-show="isLoggedIn">
+                    <a href="#/logout"><span class="glyphicon-circle-arrow-right glyphicon"></span> Logout</a>
+                </li>
+                <li>
+                    <a href="#/notes/"><span class="glyphicon-th-list glyphicon"></span> Notes</a>
+                </li>
+            </ul>
+            <ul class="nav navbar-nav navbar-right">
+                <li>
+                    <a href="/admin/">
+                        Go to admin panel
+                        <span class="glyphicon-lock glyphicon"></span>
+                    </a>
+                </li>
+            </ul>
+        </div><!-- /navbar-collapse-->
+    </div> <!-- /container-fluid -->
+</nav>
+
+</script>

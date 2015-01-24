@@ -10,49 +10,16 @@
     </head>
 
     <body>
-        <nav class="navbar navbar-default" ng-show="!hideAdminNav">
-            <div class="container">
-                <div class="navbar-header">
-                    <a class="navbar-brand" href="#/">Rainy <span class="label label-danger">ADMIN</span></a>
-                    <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#adminNavbar">
-                        <span class="sr-only">Toggle navigation</span>
-                    </button>
-                </div><!-- /navbar-header -->
-
-                <div class="collapse navbar-collapse" id="adminNavbar">
-                    <ul class="nav navbar-nav">
-                        <li ng-class="{ active: section === 'overview' }">
-                            <a href="#/overview"><i class="icon-signal icon-white"></i> Overview</a>
-                        </li>
-                        <li ng-class="{ active: section === 'user' }">
-                            <a href="#/user"><i class="icon-user icon-white"></i> User</a>
-                        </li>
-                    </ul>
-                    <ul class="nav navbar-nav navbar-right">
-                        <li>
-                            <a href="/">
-                                Go to notes panel
-                                <i class="icon-circle-arrow-right icon-white"></i>
-                            </a>
-                        </li>
-                    </ul>
-                </div><!-- /navbar-collapse-->
-            </div> <!-- /container-fluid -->
-        </nav>
+        <div ng-include=" 'navbar.html' "></div>
 
         <div class="container">
 
-            <row ng-show="showLogin" ng-include=" 'auth.html' ">
-            </row>
-
-            <row ng-View ng-show="!showLogin">
-            </row>
-
-            <script src="../common.js" type="text/javascript">
-            </script>
-            <script src="admin.js" type="text/javascript">
-            </script>
+            <row ng-show="showLogin" ng-include=" 'auth.html' "></row>
+            <row ng-view ng-show="!showLogin"></row>
         </div>
+
+        <script src="../common.js" type="text/javascript"></script>
+        <script src="admin.js" type="text/javascript"></script>
     </body>
 
 </html>
