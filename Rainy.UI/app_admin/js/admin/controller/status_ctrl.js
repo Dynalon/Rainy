@@ -20,7 +20,6 @@ angular.module('adminApp').controller('StatusCtrl', [
                 $scope.upSinceHours = Math.round((dt % 86400000) / 3600000); // hours
                 $scope.upSinceMinutes = Math.round(((dt % 86400000) % 3600000) / 60000); // minutes
 
-                $scope.$apply();
             });
         }();
     }

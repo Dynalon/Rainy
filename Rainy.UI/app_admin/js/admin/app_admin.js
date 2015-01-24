@@ -62,38 +62,38 @@ var app = angular.module('adminApp', [
     return notyService;
 })
 
-.service('backendService', function($rootScope) {
+.service('backendService', ['$rootScope', '$http', function($rootScope, $http) {
     var self = this;
     self.adminPassword = '';
     self.isAuthenticated = false;
 
+
+
     self.ajax = function(rel_url, options) {
         var backend_url = '/';
 
-        if (options === undefined)
-            options = {};
+        options = options || {};
+        options.url = backend_url + rel_url;
+        options.headers = options.headers || {};
 
-        var abs_url = backend_url + rel_url;
-        options.beforeSend = function(request) {
-            request.setRequestHeader('Authority', self.adminPassword);
-        };
-        var ret = $.ajax(abs_url, options);
+        var authHeader = { Authority: self.adminPassword };
+        $.extend(options.headers, authHeader);
 
-        ret.success(function() {
+        var prm =  $http(options);
+
+        prm.success(function(response) {
             self.isAuthenticated = true;
-            $rootScope.$digest();
         });
 
-        ret.fail(function(jqxhr, textStatus) {
+        prm.error(function(jqxhr, textStatus) {
             if (jqxhr.status === 401 || jqxhr.status === 403) {
                 self.isAuthenticated = false;
-                $rootScope.$digest();
             }
         });
 
-        return ret;
+        return prm;
     };
-})
+}])
 
 .run(['$rootScope', 'backendService', function($rootScope, backendService) {
     $rootScope.showLogin = true;

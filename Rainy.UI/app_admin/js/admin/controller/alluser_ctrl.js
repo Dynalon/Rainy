@@ -34,7 +34,6 @@ angular.module('adminApp').controller('AllUserCtrl', [
         $scope.reload_user_list = function() {
             backendService.ajax('api/admin/alluser/').success(function(data) {
                 $scope.alluser = data;
-                $rootScope.$digest();
             });
         };
 
@@ -53,22 +52,24 @@ angular.module('adminApp').controller('AllUserCtrl', [
             if(is_new === true) {
                 ajax_req = backendService.ajax('api/admin/user/', {
                     data: JSON.stringify($scope.new_user),
-                    type:'POST',
-                    contentType:'application/json; charset=utf-8',
-                    dataType:'json'
+                    method:'POST',
+                    headers: {
+                        'Content-Type': 'application/json; charset=utf-8'
+                    }
                 });
             } else {
                 // update user is done via PUT request
                 ajax_req = backendService.ajax('api/admin/user/', {
                     data: JSON.stringify($scope.currently_edited_user),
-                    type:'PUT',
-                    contentType:'application/json; charset=utf-8',
-                    dataType:'json'
+                    method:'PUT',
+                    headers: {
+                        'Content-Type': 'application/json; charset=utf-8'
+                    }
                 });
             }
-            ajax_req.done(function() {
+            ajax_req.finally(function() {
                 if (is_new === true) {
-                    $scope.new_user = null;
+                    $scope.new_user = {};
                 } else {
                     $scope.stop_edit();
                 }
@@ -84,11 +85,12 @@ angular.module('adminApp').controller('AllUserCtrl', [
                 return;
             }
             backendService.ajax('api/admin/user/' + user.Username, {
-                type:'DELETE',
+                method :'DELETE',
                 data: JSON.stringify(user),
-                contentType:'application/json; charset=utf-8',
-                dataType:'json'
-            }).done(function() {
+                headers: {
+                    'Content-Type': 'application/json; charset=utf-8',
+                }
+            }).success(function() {
                 $scope.reload_user_list();
             });
         };
