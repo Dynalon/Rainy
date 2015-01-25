@@ -60,46 +60,48 @@ app.directive('wysiwyg', ['$q', function($q){
                 }
             }
         });
-        // HACK we modify/remove the bootstrap-wysihtml5 elements from the bar
-        $('[data-wysihtml5-command=insertOrderedList]').remove();
-        $('[data-wysihtml5-command=Outdent]').remove();
-        $('[data-wysihtml5-command=Indent]').remove();
 
         $('[data-wysihtml5-command=underline]').remove();
-
         // remove the text formatting dropdown
         $('.wysihtml5-toolbar li.dropdown').remove();
+
+
 
         var font_btns = $('<div class="btn-group"></div>');
         font_btns.insertBefore($('div.btn-group').eq(0));
 
-        var small_btn = $('<a class="btn" data-wysihtml5-command="formatInline" data-wysihtml5-command-value="small">Small</a>');
+        var small_btn = $('<a class="btn btn-default" data-wysihtml5-command="formatInline" unselectable="on" data-wysihtml5-command-value="small">Small</a>');
         small_btn.appendTo(font_btns);
 
-        var huge_btn= $('<a class="btn" data-wysihtml5-command="formatBlock" data-wysihtml5-command-value="h1">Huge</a>');
+        var huge_btn= $('<a class="btn btn-default" data-wysihtml5-command="formatBlock" unselectable="on" data-wysihtml5-command-value="h1">Huge</a>');
         huge_btn.appendTo(font_btns);
 
-        var large_btn= $('<a class="btn" data-wysihtml5-command="formatBlock" data-wysihtml5-command-value="h2">Large</a>');
+        var large_btn= $('<a class="btn btn-default" data-wysihtml5-command="formatBlock" unselectable="on" data-wysihtml5-command-value="h2">Large</a>');
         large_btn.appendTo(font_btns);
 
-        var strike_btn = $('<a class="btn" data-wysihtml5-command="formatInline" data-wysihtml5-command-value="strike"><del>Strike</del></a>');
+        var strike_btn = $('<a class="btn btn-default" data-wysihtml5-command="formatInline" data-wysihtml5-command-value="strike"><del>Strike</del></a>');
         strike_btn.insertAfter($('[data-wysihtml5-command=italic]'));
 
-        var highlight_btn = $('<a class="btn highlight" data-wysihtml5-command="highlight">Highlight</a>');
+        var highlight_btn = $('<a class="btn btn-default highlight" data-wysihtml5-command="highlight"><span style="background-color: yellow;">Highlight</span></a>');
         highlight_btn.insertAfter(strike_btn);
+
+        var fixed_btn = $('<a style="font-family: monospace;" class="btn btn-default" data-wysihtml5-command="fixedwidth">Fixed</a>');
+        fixed_btn.insertAfter(strike_btn);
 
         // speech recognition is not good on chrome
         /* var speech_btn= $('<a class="btn" data-wysihtml5-command="insertSpeech">Speech</a>');
         speech_btn.insertAfter(strike_btn); */
 
-        $('span.current-font').text('Text formatting');
-        $('span.current-font').parent('a').attr('href', '');
 
-        var fixed_btn = $('<a style="font-family: monospace;" class="btn" data-wysihtml5-command="fixedwidth">Fixed</a>');
-        fixed_btn.insertAfter(strike_btn);
+        // remove unwanted buttons
+        $('[data-wysihtml5-command=small]').remove();
+        $('[data-wysihtml5-command-value="blockquote"]').remove();
+        $('[data-wysihtml5-command="insertOrderedList"]').remove();
+        $('[data-wysihtml5-command="Outdent"]').remove();
+        $('[data-wysihtml5-command="Indent"]').remove();
+        $('[data-wysihtml5-command="createLink"]').remove();
+        $('[data-wysihtml5-command="insertImage"]').remove();
 
-        //$('[data-wysihtml5-command-value=h3]').replaceWith('<a data-wysihtml5-command=​"formatBlock" data-wysihtml5-command-value=​"h3" href=​"javascript:​;​" unselectable=​"on">Small</a>​');
-        //$('[data-wysihtml5-command-value=h3]').replaceWith('<a data-wysihtml5-command=​"formatBlock" data-wysihtml5-command-value=​"h3" href=​"javascript:​;​" unselectable=​"on">Small</a>​');
         $('.wysihtml5-toolbar').find('a').click(function () {
             scope.updateWysiText();
         });

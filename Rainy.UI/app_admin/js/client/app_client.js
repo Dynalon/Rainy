@@ -58,6 +58,14 @@ app.config(['$httpProvider', function($httpProvider) {
     $httpProvider.interceptors.push('loginInterceptor');
 }]);
 
+app.run(['$rootScope', 'loginService', function($rootScope, loginService) {
+    $rootScope.$watch(
+        function() { return loginService.userIsLoggedIn(); },
+        function(newValue, oldValue) {
+            $rootScope.userIsLoggedIn = newValue;
+        }
+    );
+}]);
 
 // FILTERS
 angular.module('clientApp.filters', [])
