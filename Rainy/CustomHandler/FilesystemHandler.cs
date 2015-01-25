@@ -91,6 +91,9 @@ namespace Rainy.CustomHandler
 					return this;
 				}
 			}
+			if (abs_path.StartsWith ("/fonts/")) {
+				return this;
+			}
 			if (abs_path.StartsWith ("/resource")) {
 				return null;
 			}
