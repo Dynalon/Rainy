@@ -1,11 +1,9 @@
 // Declare app level module which depends on filters, and services
-var app = angular.module('myApp', [
-    'myApp.filters',
-    'myApp.services',
-    'myApp.directives',
-
-    // anguar-strap.js
-    '$strap.directives'
+var app = angular.module('adminApp', [
+    'adminApp.filters',
+    'adminApp.services',
+    'adminApp.directives',
+    'ngRoute'
 ])
 .config(['$routeProvider',
     function($routeProvider) {
@@ -30,17 +28,13 @@ var app = angular.module('myApp', [
             redirectTo: '/user'
         });
     }
-])
-// disable the X-Requested-With header
-.config(['$httpProvider', function($httpProvider) {
-        delete $httpProvider.defaults.headers.common['X-Requested-With'];
-    }
-])
+]) 
 .config(['$locationProvider',
     function($locationProvider) {
         $locationProvider.html5Mode(false);
     }
 ])
+
 .factory('notyService', function($rootScope) {
     var notyService = {};
 
@@ -68,226 +62,293 @@ var app = angular.module('myApp', [
     return notyService;
 })
 
-.run(['$rootScope', '$modal', '$route', '$q', function($rootScope, $modal, $route, $q)  {
-    var backend = {
-        ajax: function(rel_url, options) {
-            var backend_url = '/';
+.service('backendService', ['$rootScope', '$http', function($rootScope, $http) {
+    var self = this;
+    self.adminPassword = '';
+    self.isAuthenticated = false;
 
-            if (options === undefined)
-                options = {};
+    self.ajax = function(rel_url, options) {
+        var backend_url = '/';
 
-            var abs_url = backend_url + rel_url;
-            options.beforeSend = function(request) {
-                request.setRequestHeader('Authority', admin_pw);
-            };
-            var ret = $.ajax(abs_url, options);
+        options = options || {};
+        options.url = backend_url + rel_url;
+        options.headers = options.headers || {};
 
-            ret.fail(function(jqxhr, textStatus) {
-                if (jqxhr.status === 401) {
-                    $('#loginModal').modal();
-                    $('#loginModal').find(':password').focus();
-                }
-            });
-            return ret;
-        }
-    };
-    $rootScope.backend = backend;
-}]);
+        var authHeader = { Authority: self.adminPassword };
+        $.extend(options.headers, authHeader);
 
+        var prm =  $http(options);
 
-function AllUserCtrl($scope, $route) {
-    $scope.currently_edited_user = null;
-    $scope.new_user = {};
-
-    /*$scope.sendMail = true;
-    $scope.sendMailDisabled = true;
-    $scope.$watch('new_user.Password', function() {
-        if ($scope.new_user.Password === undefined) {
-            $scope.sendMail = true;
-            $scope.sendMailDisabled = true;
-        } else {
-            $scope.sendMailDisabled = false;
-        }
-    });*/
-
-    $scope.reload_user_list = function() {
-        $scope.backend.ajax('api/admin/alluser/').success(function(data) {
-            $scope.alluser = data;
-            $scope.$apply();
+        prm.success(function(response) {
+            self.isAuthenticated = true;
         });
-    };
-    $scope.reload_user_list();
 
-    $scope.start_edit = function(user) {
-        $scope.currently_edited_user = jQuery.extend(true, {}, user);
-        $scope.currently_edited_user.Password = '';
-    };
-    $scope.stop_edit = function() {
-        $scope.currently_edited_user = null;
-    };
-
-    $scope.save_user = function(is_new) {
-        var ajax_req;
-        $scope.new_user.IsActivated = true;
-        $scope.new_user.IsVerified = true;
-        if(is_new === true) {
-            ajax_req = $scope.backend.ajax('api/admin/user/', {
-                data: JSON.stringify($scope.new_user),
-                type:'POST',
-                contentType:'application/json; charset=utf-8',
-                dataType:'json'
-            });
-        } else {
-            // update user is done via PUT request
-            ajax_req = $scope.backend.ajax('api/admin/user/', {
-                data: JSON.stringify($scope.currently_edited_user),
-                type:'PUT',
-                contentType:'application/json; charset=utf-8',
-                dataType:'json'
-            });
-        }
-        ajax_req.done(function() {
-            if (is_new === true) {
-                $scope.new_user = null;
-            } else {
-                $scope.stop_edit();
+        prm.error(function(jqxhr, textStatus) {
+            if (jqxhr.status === 401 || jqxhr.status === 403) {
+                self.isAuthenticated = false;
             }
-            $scope.reload_user_list();
-            $('#inputUsername').focus();
         });
+
+        return prm;
     };
+}])
 
-    $scope.delete_user = function(user, $event) {
-        $event.stopPropagation();
-        /* global confirm: true */
-        if(!confirm('Really delete user \'' + user.Username + '\' ?')) {
-            return;
-        }
-        $scope.backend.ajax('api/admin/user/' + user.Username, {
-            type:'DELETE',
-            data: JSON.stringify(user),
-            contentType:'application/json; charset=utf-8',
-            dataType:'json'
-        }).done(function() {
-            $scope.reload_user_list();
-        });
-    };
-}
-
-/*global admin_pw:true*/
-var admin_pw='';
-function AuthCtrl($scope, $route, $location) {
-
-    var url_pw = ($location.search()).password;
-    if (url_pw !== undefined && url_pw.length > 0) {
-        // new admin pw, update teh cookie
-        admin_pw = url_pw;
-    } else if (!$location.path().startsWith('/login')) {
-        $('#loginModal').modal();
-        $('#loginModal').find(':password').focus();
-    }
-
-    $scope.doLogin = function() {
-        // test request to the server
-        // check if pw was correct by
-        // doing dummy request
-        admin_pw = $scope.adminPassword;
-
-        $scope.backend.ajax('api/admin/status/')
-        .success (function() {
-            $('#loginModal').modal('hide');
-            admin_pw = $scope.adminPassword;
-        }).fail(function () {
-            $scope.adminPassword='';
-            $('#loginModal').find(':password').focus();
-            $scope.$apply();
-        });
-        $route.reload();
-    };
-}
-AuthCtrl.$inject = [ '$scope','$route', '$location' ];
-
-
-function LoginCtrl($scope, $rootScope, $http, notyService) {
-
-    $scope.getUrlVars = function() {
-        var vars = [], hash;
-        var hashes = window.location.href.slice(window.location.href.indexOf('?') + 1).split('&');
-        for(var i = 0; i < hashes.length; i++)
-        {
-            hash = hashes[i].split('=');
-            vars.push(hash[0]);
-            vars[hash[0]] = hash[1];
-        }
-        return vars;
-    };
-
-    var url_vars = $scope.getUrlVars();
-
-    $scope.authData = { Username: '', Password: '', RequestToken: '' };
-    $scope.authData.RequestToken = url_vars['oauth_token'];
-
-    $scope.doLogin = function () {
-        $http.post('/oauth/authenticate', $scope.authData)
-            .success(function (data, status, headers, config) {
-                window.document.location = data.RedirectUrl;
-            })
-            .error(function (data, status, headers, config) {
-                if (status === 412)
-                    notyService.error('Login failed. User ' + $scope.authData.Username + ' requires activation by an admin (Moderation is enabled)');
-                else
-                    notyService.error('Login failed. Check username and password');
-            });
-    };
-}
-//LoginCtrl.$inject = [ '$scope','$http' ];
-
-function MainCtrl($scope, $routeParams, $route, $location) {
-
-    $scope.checkLocation = function() {
-        if (!$location.path().startsWith('/login')) {
-            $scope.hideAdminNav = false;
-            $scope.dontAskForPassword = false;
-        } else {
-            $scope.hideAdminNav = true;
-            $scope.dontAskForPassword = true;
-        }
-    };
-    $scope.checkLocation();
-
-    // bug in angular prevents this from firing when the back button is used
-    // (fixed in 1.1.5) - see https://github.com/angular/angular.js/pull/2206
-    $scope.$on('$locationChangeStart', function(ev, oldloc, newloc) {
-        $scope.checkLocation();
+.run(['$rootScope', function($rootScope) {
+    $rootScope.section = 'overview';
+    $rootScope.$on('$routeChangeSuccess', function(ev, next, current) {
+        if (!next || !next.originalPath) return;
+        if (next.originalPath.indexOf('overview') >= 0)
+            $rootScope.section = 'overview';
+        if (next.originalPath.indexOf('user') >= 0)
+            $rootScope.section = 'user';
     });
-}
+}])
 
-function StatusCtrl($scope, $http, $route) {
-    $scope.serverStatus = {};
+.run(['$rootScope', 'backendService', function($rootScope, backendService) {
+    $rootScope.showLogin = true;
+    $rootScope.$watch(
+        function() {
+            return backendService.isAuthenticated;
+        }, function(newVal, oldVal) {
+            $rootScope.showLogin = !newVal;
+        }
+    );
+}])
 
-    $scope.getStatus = function () {
-        $scope.backend.ajax('api/admin/status/')
-        .success(function(data) {
-            $scope.serverStatus = data;
+;
 
-            var today = new Date();
-            var then = new Date(data.Uptime);
-            var dt = today - then;
+angular.module('adminApp').controller('AllUserCtrl', [
+    '$scope',
+    '$rootScope',
+    'backendService',
 
-            $scope.upSinceDays = Math.round(dt / 86400000); // days
-            $scope.upSinceHours = Math.round((dt % 86400000) / 3600000); // hours
-            $scope.upSinceMinutes = Math.round(((dt % 86400000) % 3600000) / 60000); // minutes
+    function(
+        $scope,
+        $rootScope,
+        backendService
+    ) {
+        $scope.currently_edited_user = null;
+        $scope.new_user = {};
 
-            $scope.$apply();
-        });
-    }();
+        /*$scope.sendMail = true;
+        $scope.sendMailDisabled = true;
+        $scope.$watch('new_user.Password', function() {
+            if ($scope.new_user.Password === undefined) {
+                $scope.sendMail = true;
+                $scope.sendMailDisabled = true;
+            } else {
+                $scope.sendMailDisabled = false;
+            }
+        });*/
 
-}
-StatusCtrl.$inject = [ '$scope', '$http', '$route' ];
+        $scope.$watch(
+            function() { return backendService.isAuthenticated; },
+            function(newVal, oldVal) {
+                if (newVal === true) {
+                    $scope.reload_user_list(); 
+                }
+            }
+        );
+        
+        $scope.reload_user_list = function() {
+            backendService.ajax('api/admin/alluser/').success(function(data) {
+                $scope.alluser = data;
+            });
+        };
 
+        $scope.start_edit = function(user) {
+            $scope.currently_edited_user = jQuery.extend(true, {}, user);
+            $scope.currently_edited_user.Password = '';
+        };
+        $scope.stop_edit = function() {
+            $scope.currently_edited_user = null;
+        };
+
+        $scope.save_user = function(is_new) {
+            var ajax_req;
+            $scope.new_user.IsActivated = true;
+            $scope.new_user.IsVerified = true;
+            if(is_new === true) {
+                ajax_req = backendService.ajax('api/admin/user/', {
+                    data: JSON.stringify($scope.new_user),
+                    method:'POST',
+                    headers: {
+                        'Content-Type': 'application/json; charset=utf-8'
+                    }
+                });
+            } else {
+                // update user is done via PUT request
+                ajax_req = backendService.ajax('api/admin/user/', {
+                    data: JSON.stringify($scope.currently_edited_user),
+                    method:'PUT',
+                    headers: {
+                        'Content-Type': 'application/json; charset=utf-8'
+                    }
+                });
+            }
+            ajax_req.finally(function() {
+                if (is_new === true) {
+                    $scope.new_user = {};
+                } else {
+                    $scope.stop_edit();
+                }
+                $scope.reload_user_list();
+                $('#inputUsername').focus();
+            });
+        };
+
+        $scope.delete_user = function(user, $event) {
+            $event.stopPropagation();
+            /* global confirm: true */
+            if(!confirm('Really delete user \'' + user.Username + '\' ?')) {
+                return;
+            }
+            backendService.ajax('api/admin/user/' + user.Username, {
+                method :'DELETE',
+                data: JSON.stringify(user),
+                headers: {
+                    'Content-Type': 'application/json; charset=utf-8',
+                }
+            }).success(function() {
+                $scope.reload_user_list();
+            });
+        };
+    }
+]);
+
+angular.module('adminApp').controller('AuthCtrl', [
+    '$scope',
+    '$rootScope',
+    '$route',
+    '$location',
+    'backendService',
+
+    function(
+        $scope,
+        $rootScope,
+        $route,
+        $location,
+        backendService
+    ) {
+
+        $scope.adminPassword = '';
+
+        // TODO move this into a custom route
+        var url_pw = ($location.search()).password;
+        if (url_pw !== undefined && url_pw.length > 0) {
+            // new admin pw, update teh cookie
+            backendService.adminPassword = url_pw;
+        } else if (!$location.path().startsWith('/login')) {
+        }
+
+        $scope.doLogin = function() {
+            backendService.adminPassword = $scope.adminPassword;
+            backendService.ajax('api/admin/status/');
+        };
+    }
+]);
+angular.module('adminApp').controller('LoginCtrl', [
+    '$scope',
+    '$http',
+    'notyService',
+    function (
+        $scope,
+        $http,
+        notyService
+    ) {
+
+        $scope.getUrlVars = function() {
+            var vars = [], hash;
+            var hashes = window.location.href.slice(window.location.href.indexOf('?') + 1).split('&');
+            for(var i = 0; i < hashes.length; i++)
+            {
+                hash = hashes[i].split('=');
+                vars.push(hash[0]);
+                vars[hash[0]] = hash[1];
+            }
+            return vars;
+        };
+
+        var url_vars = $scope.getUrlVars();
+
+        $scope.authData = { Username: '', Password: '', RequestToken: '' };
+        $scope.authData.RequestToken = url_vars['oauth_token'];
+
+        $scope.doLogin = function () {
+            $http.post('/oauth/authenticate', $scope.authData)
+                .success(function (data, status, headers, config) {
+                    window.document.location = data.RedirectUrl;
+                })
+                .error(function (data, status, headers, config) {
+                    if (status === 412)
+                        notyService.error('Login failed. User ' + $scope.authData.Username + ' requires activation by an admin (Moderation is enabled)');
+                    else
+                        notyService.error('Login failed. Check username and password');
+                });
+        };
+    }
+]);
+
+angular.module('adminApp').controller('MainCtrl', [
+    '$scope',
+    '$location',
+    function (
+        $scope,
+        $location
+    ) {
+        $scope.checkLocation = function() {
+            if (!$location.path().startsWith('/login')) {
+                $scope.hideAdminNav = false;
+                $scope.dontAskForPassword = false;
+            } else {
+                $scope.hideAdminNav = true;
+                $scope.dontAskForPassword = true;
+            }
+        };
+        $scope.checkLocation();
+    }
+]);
+
+angular.module('adminApp').controller('StatusCtrl', [
+    '$scope',
+    '$rootScope',
+    'backendService',
+    function(
+        $scope,
+        $rootScope,
+        backendService
+    ) {
+        $scope.serverStatus = {};
+
+        $scope.getStatus = function () {
+            backendService.ajax('api/admin/status/')
+            .success(function(data) {
+                $scope.serverStatus = data;
+
+                var today = new Date();
+                var then = new Date(data.Uptime);
+                var dt = today - then;
+
+                $scope.upSinceDays = Math.round(dt / 86400000); // days
+                $scope.upSinceHours = Math.round((dt % 86400000) / 3600000); // hours
+                $scope.upSinceMinutes = Math.round(((dt % 86400000) % 3600000) / 60000); // minutes
+
+            });
+        };
+
+        $rootScope.$watch(
+            function() { return backendService.isAuthenticated; },
+            function(newValue, oldValue) {
+                if (newValue === true) {
+                    $scope.getStatus();
+                }
+            }
+        );
+    }
+]);
 /*global $:false */
 /*global angular:false */
-angular.module('myApp.directives', [])
+angular.module('adminApp.directives', [])
     .directive('appVersion', ['version',
         function(version) {
             return function(scope, elm, attrs) {
@@ -306,7 +367,7 @@ if (typeof String.prototype.startsWith !== 'function') {
 /*global $:false */
 /*global angular:false */
 
-angular.module('myApp.filters', []).
+angular.module('adminApp.filters', []).
     filter('interpolate', ['version', function(version) {
     return function(text) {
         return String(text).replace(/\%VERSION\%/mg, version);
@@ -322,6 +383,6 @@ angular.module('myApp.filters', []).
 
 // Demonstrate how to register services
 // In this case it is a simple value service.
-angular.module('myApp.services', [])
+angular.module('adminApp.services', [])
     .value('version', '0.1');
 

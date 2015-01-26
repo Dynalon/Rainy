@@ -6,175 +6,218 @@
     <title>
         Rainy - 2 GO
     </title>
-    <link href="//netdna.bootstrapcdn.com/twitter-bootstrap/2.3.2/css/bootstrap-combined.min.css"
-    rel="stylesheet"/>
     <link href="client.css" rel="stylesheet"/>
-    <style>
-        .mainContent {
-            margin-left: 10px;
-        }
-    </style>
 </head>
 
 <body>
-	<div ng-controller="MainCtrl">
-	    <div class="navbar navbar-inverse" bs-navbar>
-	        <div class="navbar-inner">
-	            <a class="brand" href="#/notes/">Rainy <span class="label label-important">2 GO</span></a>
-	            <ul class="nav">
-	                <!-- <li data-match-route="/account">
-	                    <a href="#/account"><i class="icon-user icon-white"></i> Account</a>
-	                </li> -->
-                    <li class="divider"></li>
-	                <li data-match-route="/logout" ng-show="isLoggedIn">
-	                    <a href="#/logout"><i class="icon-circle-arrow-right icon-white"></i> Logout</a>
-	                </li>
-                    <li data-match-route="/notes/">
-                        <a href="#/notes/"><i class="icon-th-list icon-white"></i> Notes</a>
-                    </li>
-<!--                     <li data-match-route="/settings">
-                        <a href="#/settings"><i class="icon-preferences"></i> Settings</a>
-                    </li> -->
-	            </ul>
-                <ul class="pull-right nav">
-                    <li class="pull-right">
-                        <a href="/admin/">
-                            Admin panel
-                            <i class="icon-lock icon-white"></i>
-                        </a>
-                    </li>
-                </ul>
-	        </div>
-	    </div>
-	</div>
+    <div ng-include=" 'navbar.html' "></div>
 
-    <div class="mainContent" ng-view>
-    <!-- MAIN VIEW CONTENT-->
-    </div>
+    <div ng-view> </div>
 
-        <script src="common.js" type="text/javascript">
-        </script>
-        <script src="client.js" type="text/javascript">
-        </script>
+    <script src="common.js" type="text/javascript"></script>
+    <script src="client.js" type="text/javascript"></script>
 </body>
 
 </html>
 
 <script type="text/ng-template" id="login.html">
 
-<div class="row">
-    <div class="span3"></div>
-    <div class="span6">
-        <!-- login form -->
-        <h2>Login</h2><hr />
-        <form name="formLogin" ng-submit="doLogin()">
-            <div class="row">
-                <div class="alert span5" ng-show="isTestServer">For testing, you can use:<br>
-                    Username: <b>testuser</b>, Password: <b>testpass</b>
-                </div>
-                <div class="span3">
-                    <div class="control-group">
-                        <label class="control-label" for="inputEmail">Username</label>
-                        <div class="controls">
-                            <input type="text" ng-model="username" id="inputUsername" placeholder="Username" required>
-                        </div>
-                    </div>
-                </div>
-                <div class="span3">
-                    <div class="control-group">
-                        <label class="control-label" for="inputPassword">Password</label>
-                        <div class="controls">
-                          <input type="password" ng-model="password" id="inputPassword" placeholder="Password" required ng-minLength="6">
-                        </div>
-                    </div>
-                </div>
-            </div> <!-- /row -->
-            <div class="row">
-                <div class="span6"
-                    <div class="control-group">
-                        <div class="controls">
-                            <label class="checkbox">
-                                <input type="checkbox" ng-model="rememberMe"> Remember me
-                            </label>
-                            <div class="alert alert-info" ng-show="rememberMe">
-                            Note: Chosing to remember the login will store a token on this computer that can be used to access your notes. For security reasons, that token lasts only 14 days or until you logout.
-                            </div>
+<div class="container">
+    <div class="row">
+        <div class="col-md-12">
+            <h2>Login</h2><hr />
+        </div>
+    </div>
 
-                            <button type="submit" ng-disabled="!formLogin.$valid" class="btn">Sign in</button>
-                        </div>
+    <form name="formLogin" ng-submit="doLogin()">
+        <div class="row">
+            <div class="col-md-12 alert" ng-show="isTestServer">For testing, you can use:<br>
+                Username: <b>testuser</b>, Password: <b>testpass</b>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-md-6">
+                <div class="form-group">
+                    <label class="control-label " for="inputEmail">Username</label>
+                    <div class="">
+                        <input type="text" class="form-control" ng-model="username" id="inputUsername" placeholder="Username" required>
                     </div>
                 </div>
             </div>
-        </form>
-        <div class="span3"></div>
-    </div>
-</div><!-- /row -->
+            <div class="col-md-6">
+                <div class="form-group">
+                    <label class="control-label " for="inputPassword">Password</label>
+                    <div class="">
+                        <input type="password" class="form-control" ng-model="password" id="inputPassword" placeholder="Password" required ng-minLength="6">
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-12">
+                <div class="form-group">
+                    <label class="checkbox-inline">
+                        <input type="checkbox" ng-model="rememberMe"> Remember me
+                    </label>
+                </div>
+            </div>
+        </div>
+        <!-- /row -->
+        <div class="row">
+            <div class="col-md-12">
+                <div class="alert alert-info" ng-show="rememberMe">
+                    Note: Chosing to remember the login will store a token on this computer that can be used to access your notes. For security reasons, that token lasts only 14 days or until you logout.
+                </div>
+            </div>
+        </div> <!-- /row -->
+        <div class="row">
+            <div class="col-md-2">
+                <button type="submit" ng-disabled="!formLogin.$valid" class="btn">Sign in</button>
+            </div>
+        </div>
+    </form>
 
-<div class="row" ng-show="serverConfig.AllowSignup">
-    <div class="span3"></div>
-    <div class="span6">
-        <div class="alert">Don&#39;t have an account yet? Click <a href="#/signup">here to sign up!</a>
-    </div>
+    <div class="row" ng-show="serverConfig.AllowSignup">
+        <div class="col-md-3"></div>
+        <div class="col-md-6">
+            <div class="alert">Don&#39;t have an account yet? Click <a href="#/signup">here to sign up!</a>
+        </div>
 
-    <div class="span3"></div>
+        <div class="col-md-3"></div>
+    </div>
 </div>
 
 </script>
 
-<script type="text/ng-template" id="notes.html">
+<script type="text/ng-template" id="navbar.html">
 
-<div class="container-fluid">
-    <div class="row-fluid">
-        <h3>{{ username }}'s notes</h3>
-    </div>
-    <div class="row-fluid">
-        <div class="span3">
-            <!-- SEARCH INPUT -->
-            <div class="input-prepend pull-left">
-                <span class="add-on"><i class="icon-search"></i></span>
-                <input class="input-large" ng-model="search_term" type="text" placeholder="Search notes..." />
+<nav class="navbar navbar-default" ng-show="!hideAdminNav">
+    <div class="container">
+        <div class="navbar-header">
+            <a class="navbar-brand" href="#/">Rainy <span class="label label-danger">2GO</span></a>
+            <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#adminNavbar">
+                <span class="sr-only">Toggle navigation</span>
+            </button>
+        </div><!-- /navbar-header -->
+
+        <div class="collapse navbar-collapse" id="clientNavbar">
+            <ul class="nav navbar-nav">
+                <li ng-show="userIsLoggedIn">
+                    <a href="#/logout"><span class="glyphicon-circle-arrow-right glyphicon"></span> Logout</a>
+                </li>
+                <li>
+                    <a href="#/notes/"><span class="glyphicon-th-list glyphicon"></span> Notes</a>
+                </li>
+            </ul>
+            <ul class="nav navbar-nav navbar-right">
+                <li>
+                    <a href="/admin/">
+                        Go to admin panel
+                        <span class="glyphicon-lock glyphicon"></span>
+                    </a>
+                </li>
+            </ul>
+        </div><!-- /navbar-collapse-->
+    </div> <!-- /container-fluid -->
+</nav>
+
+</script>
+<script type="text/ng-template" id="accordion.html">
+
+<div id="accordion" role="tablist">
+    <div class="list-group"
+
+        ng-show="(notes | filter: search_term).length > 0">
+
+        <div ng-repeat="(name,notes) in notebooks" >
+            <a class="list-group-item list-group-item-info" data-toggle="collapse" data-parent="#accordion" data-target="{{ '#foo' + $index }}">
+                {{ name }}
+                <span class="pull-right badge">{{ notes.length }} </span>
+            </a>
+            <div class="collapse" id="{{ 'foo' + $index }}" style="margin-bottom: 8px;">
+                <a class="list-group-item small"
+                    role="tabpanel"
+                    ng-repeat="note in notes | filter: search_term"
+                    href="#/notes/{{ note.guid }}">
+                    {{ note.title }}
+                </a>
             </div>
         </div>
-        <div class="span6">
+    </div>
+</div>
+
+</script>
+<script type="text/ng-template" id="listgroup.html">
+
+<div class="list-group"
+    ng-repeat="(name,notes) in notebooks"
+    ng-show="(notes | filter: search_term).length > 0">
+
+    <a class="list-group-item disabled">
+        {{ name }}
+    </a>
+
+    <a class="list-group-item"
+        ng-repeat="note in notes | filter: search_term"
+        href="#/notes/{{ note.guid }}">
+        {{ note.title }}
+    </a>
+</div>
+
+</script>
+<script type="text/ng-template" id="notes.html">
+
+<div class="container">
+    <div class="row">
+        <h3>{{ username }}&#39;s notes</h3>
+    </div>
+    <div class="row">
+        <div class="col-md-3">
+            <!-- SEARCH INPUT -->
+            <form class="">
+                <div class="form-group">
+                    <div class="input-group">
+                        <div class="input-group-addon">
+                            <span class="glyphicon glyphicon-search"></span>
+                        </div>
+                        <input type="text" ng-model="search_term" class="form-control" placeholder="Search notes...">
+                    </div>
+                </div>
+            </form>
+        </div>
+        <div class="col-md-9">
         <!-- CONTROLLS -->
             <button class="btn btn-primary" ng-click="newNote()">
-                <i class="icon-plus"></i>
+                <i class="glyphicon glyphicon-plus"></i>
                 New note
             </button>
             <button class="btn btn-danger" ng-click="deleteNote()" ng-disabled="selectedNote == null">
-                <i class="icon-trash"></i>
+                <i class="glyphicon glyphicon-trash"></i>
                 Delete note
             </button>
             <a ng-disabled="!enableSyncButton" rel="tooltip" id="sync_btn" class="btn btn-primary" ng-click="sync()">
-                <i class="icon-refresh"></i>
+                <i class="glyphicon glyphicon-refresh"></i>
                 Sync
             </a>
-
         </div>
     </div><!-- /row -->
-    <div class="row-fluid">
-        <div class="span3">
-            <div class="well sidebar-nav">
-                <ul class="nav nav-list">
-                    <div class="" ng-repeat="(name,notes) in notebooks">
-                    <li class="nav-header" ng-show="(notes | filter: search_term).length > 0">{{ name }}</li>
-                        <li ng-repeat="note in notes | filter: search_term">
-                            <a href="#/notes/{{ note.guid }}">{{ note.title }} </a>
-                        </li>
-                    </div>
-                </ul>
-            </div><!--/.well -->
+
+    <!-- NOTEBOOKS -->
+    <div class="row" style="margin-top: 1em;">
+        <div class="col-md-3">
+            <div ng-include=" 'accordion.html' "></div>
         </div><!--/span-->
 
-        <div class="span6" ng-show="selectedNote">
+        <div class="col-md-9" ng-show="selectedNote">
             <!-- DEBUG TXTAREA SHOWING THE RAW HTML SRC OF A NOTE - ONLY IN DEVELOPMENT MODE -->
-            <textarea ng-show="config.DevelopmentMode" style="width:700px; height: 200px;">{{ selectedNote['note-content'] }}</textarea>
+            <textarea ng-show="config.DevelopmentMode && false" style="width:700px; height: 200px;">{{ selectedNote['note-content'] }}</textarea>
 
             <wysiwyg />
 
-        </div><!--/span-->
+        </div>
     </div><!--/row-->
-</div><!--/.fluid-container-->
+</div><!--/container-->
 </script>
 
 <script type="text/ng-template" id="settings.html">
