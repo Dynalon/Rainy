@@ -59,11 +59,11 @@ module.exports = function (grunt) {
                 dest: 'dist/admin/admin.css'
             },
             admin_ui: {
-                src: ['app_admin/admin.html', 'app_admin/html/views_admin/*.html'],
+                src: ['app_admin/admin.html', 'app_admin/html/views_admin/**/*.html'],
                 dest: 'dist/admin/index.html'
             },
             client_ui: {
-                src: ['app_admin/client.html', 'app_admin/html/views_client/*.html'],
+                src: ['app_admin/client.html', 'app_admin/html/views_client/**/*.html'],
                 dest: 'dist/index.html'
             },
         },

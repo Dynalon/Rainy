@@ -1,0 +1,25 @@
+<script type="text/ng-template" id="accordion.html">
+
+<div id="accordion" role="tablist">
+    <div class="list-group"
+
+        ng-show="(notes | filter: search_term).length > 0">
+
+        <div ng-repeat="(name,notes) in notebooks" >
+            <a class="list-group-item list-group-item-info" data-toggle="collapse" data-parent="#accordion" data-target="{{ '#foo' + $index }}">
+                {{ name }}
+                <span class="pull-right badge">{{ notes.length }} </span>
+            </a>
+            <div class="collapse" id="{{ 'foo' + $index }}" style="margin-bottom: 8px;">
+                <a class="list-group-item small"
+                    role="tabpanel"
+                    ng-repeat="note in notes | filter: search_term"
+                    href="#/notes/{{ note.guid }}">
+                    {{ note.title }}
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+
+</script>

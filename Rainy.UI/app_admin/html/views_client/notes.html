@@ -38,16 +38,7 @@
     <!-- NOTEBOOKS -->
     <div class="row" style="margin-top: 1em;">
         <div class="col-md-3">
-            <div class="panel panel-default" ng-repeat="(name,notes) in notebooks" ng-show="(notes | filter: search_term).length > 0">
-                <div class="panel-heading" >{{ name }}</div>
-                <div class="panel-body">
-                    <ul class="list-group">
-                        <li class="list-group-item" ng-repeat="note in notes | filter: search_term">
-                            <a href="#/notes/{{ note.guid }}">{{ note.title }} </a>
-                        </li>
-                    </ul>
-                </div>
-            </div>
+            <div ng-include=" 'accordion.html' "></div>
         </div><!--/span-->
 
         <div class="col-md-9" ng-show="selectedNote">

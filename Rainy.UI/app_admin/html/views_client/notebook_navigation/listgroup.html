@@ -1,0 +1,18 @@
+<script type="text/ng-template" id="listgroup.html">
+
+<div class="list-group"
+    ng-repeat="(name,notes) in notebooks"
+    ng-show="(notes | filter: search_term).length > 0">
+
+    <a class="list-group-item disabled">
+        {{ name }}
+    </a>
+
+    <a class="list-group-item"
+        ng-repeat="note in notes | filter: search_term"
+        href="#/notes/{{ note.guid }}">
+        {{ note.title }}
+    </a>
+</div>
+
+</script>
