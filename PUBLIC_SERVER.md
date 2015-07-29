@@ -1,3 +1,6 @@
+Note: The Public Rainy Demo Server was temporarily shut-off/disabled. Please host your own local version for your development purposes.
+
+
 Rainy public hosted demo server
 ================================
 
