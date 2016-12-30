@@ -3,6 +3,7 @@ using Rainy.Db;
 using ServiceStack.OrmLite;
 using System;
 using ServiceStack.Common.Web;
+using Tomboy.Db;
 
 namespace Rainy.WebService.Admin
 {
@@ -27,8 +28,8 @@ namespace Rainy.WebService.Admin
 
 			// determine number of users
 			using (var conn = connFactory.OpenDbConnection ()) {
-				s.NumberOfUser = conn.Scalar<int>("SELECT COUNT(*) FROM DBUser");
-				s.TotalNumberOfNotes = conn.Scalar<int>("SELECT COUNT(*) FROM DBNote");
+				s.NumberOfUser = (int)conn.Count<DBUser> ();
+				s.TotalNumberOfNotes = (int)conn.Count<DBNote> ();
 
 				if (s.NumberOfUser > 0)
 					s.AverageNotesPerUser = (float)s.TotalNumberOfNotes / (float)s.NumberOfUser; 
