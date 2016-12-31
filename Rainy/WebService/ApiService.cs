@@ -40,8 +40,7 @@ namespace Rainy.WebService
 
 			Logger.Debug ("ApiRequest received");
 			var response = new DTO.ApiResponse ();
-			var baseUri = ((HttpListenerRequest)this.Request.OriginalRequest).Url;
-			string baseUrl = baseUri.Scheme + "://" + baseUri.Authority + "/";
+			string baseUrl = ((HttpListenerRequest)this.Request.OriginalRequest).GetBaseUrl ();
 
 			// should only be set if authenticated
 			response.UserRef = new DTO.ContentRef () {

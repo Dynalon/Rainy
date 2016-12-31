@@ -1,6 +1,7 @@
 using System;
 using System.IO;
 using System.Net;
+using System.Linq;
 using DevDefined.OAuth.Storage.Basic;
 using Rainy.Db;
 using ServiceStack;
@@ -186,6 +187,23 @@ namespace Rainy.WebService
 
 				return user;
 			}
+		}
+	}
+
+
+	public static class BaseUrlMapper
+	{
+		public static string GetBaseUrl (this HttpListenerRequest request)
+		{
+			string scheme =
+				request.Headers.AllKeys.Contains ("X-Forwarded-Proto") ?
+				request.Headers["X-Forwarded-Proto"] :
+				request.Url.Scheme;
+			string authority =
+				request.Headers.AllKeys.Contains ("X-Forwarded-Host") ?
+				request.Headers["X-Forwarded-Host"] :
+				request.Url.Authority;
+			return scheme + "://" + authority + "/";
 		}
 	}
 }
