@@ -21,8 +21,7 @@ namespace Rainy.WebService
 		public object Get (UserRequest request)
 		{
 			var u = new DTO.UserResponse ();
-			var baseUri = ((HttpListenerRequest)this.Request.OriginalRequest).Url;
-			string baseUrl = baseUri.Scheme + "://" + baseUri.Authority + "/";
+			string baseUrl = ((HttpListenerRequest)this.Request.OriginalRequest).GetBaseUrl ();
 
 			u.Username = request.Username;
 			u.Firstname = "Not";

@@ -227,7 +227,8 @@ namespace Rainy
 					return handler;
 				});
 */
-				AddDummyUserIfRequired (container);
+				if (config.Development == true)
+					AddDummyUserIfRequired (container);
 			}
 
 		}
