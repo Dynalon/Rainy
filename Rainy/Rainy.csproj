@@ -70,7 +70,8 @@
       <HintPath>..\packages\ServiceStack.Common.3.9.71\lib\net35\ServiceStack.Interfaces.dll</HintPath>
     </Reference>
     <Reference Include="ServiceStack.OrmLite.PostgreSQL">
-      <HintPath>..\packages\ServiceStack.OrmLite.PostgreSQL.3.9.71\lib\net35\ServiceStack.OrmLite.PostgreSQL.dll</HintPath>
+      <!-- <HintPath>..\packages\ServiceStack.OrmLite.PostgreSQL.3.9.71\lib\net35\ServiceStack.OrmLite.PostgreSQL.dll</HintPath> -->
+      <HintPath>..\lib\ServiceStack.OrmLite.PostgreSQL.dll</HintPath>
     </Reference>
     <Reference Include="Mono.Data.Sqlite">
       <HintPath>..\packages\ServiceStack.OrmLite.Sqlite.Mono.3.9.71\lib\net35\Mono.Data.Sqlite.dll</HintPath>
