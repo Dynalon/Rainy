@@ -1,5 +1,8 @@
-To run rainy, you need to have mono >=2.10.9 installed. You can then
-execute rainy by entering:
+To run rainy, you need to have mono >=2.10.9 installed, as well as
+mono-complete & libsqlite3-0 (read QuickStart guide for futher 
+information: https://dynalon.github.io/Rainy/#!GETTING_STARTED.md)
+
+You can then execute rainy by entering:
 
 	mono Rainy.exe -c settings.conf 
 
